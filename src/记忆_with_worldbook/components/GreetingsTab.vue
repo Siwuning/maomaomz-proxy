@@ -801,7 +801,7 @@ import toastr from 'toastr';
 import { computed, onMounted, ref } from 'vue';
 import { z } from 'zod';
 import { useSettingsStore } from '../settings';
-import { copyToClipboard } from '../utils';
+import { copyToClipboard, getScriptIdSafe } from '../utils';
 import AIGenerateDialog from './AIGenerateDialog.vue';
 import AIModifyDialog from './AIModifyDialog.vue';
 

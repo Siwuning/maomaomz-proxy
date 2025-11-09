@@ -21,7 +21,6 @@ try {
     array: (schema: any) => ({
       default: (def: any[]) => ({ parse: (data: any) => (Array.isArray(data) ? data : def) }),
     }),
-    prefault: (def: any) => ({ parse: (data: any) => data || def }),
   };
 }
 
@@ -52,7 +51,7 @@ const Settings = z
       )
       .default([]),
   })
-  .prefault({});
+  .default({});
 
 /**
  * 将 API 端点规范化为完整的 URL

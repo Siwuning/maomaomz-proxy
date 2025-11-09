@@ -73,25 +73,14 @@ export async function copyToClipboard(text: string, successMessage?: string): Pr
 
 /**
  * 安全获取脚本 ID
- * 优先使用缓存的全局ID，确保网络加载时ID稳定
+ * 插件环境使用固定ID
  */
 export function getScriptIdSafe(): string {
-  // 优先使用缓存的全局ID（确保网络加载时ID不变）
-  if (globalScriptId) {
-    return globalScriptId;
+  // 插件环境直接返回固定ID
+  if (!globalScriptId) {
+    globalScriptId = 'maomaomz_extension_v1';
   }
-
-  try {
-    const id = getScriptId();
-    // 缓存ID以供后续使用
-    if (id && !globalScriptId) {
-      globalScriptId = id;
-    }
-    return id || 'maomao_writing_tool_v1'; // 使用固定的fallback ID
-  } catch (error) {
-    console.error('获取脚本 ID 失败:', error);
-    return 'maomao_writing_tool_v1'; // 使用固定的fallback ID
-  }
+  return globalScriptId;
 }
 
 /**

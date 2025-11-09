@@ -9,25 +9,15 @@ import { globalPinia } from './globalPinia';
 import TaskManager from './components/TaskManager.vue';
 
 $(() => {
-  // 延迟初始化，确保酒馆助手完全加载
+  // 延迟初始化，确保酒馆完全加载
   setTimeout(() => {
-    let script_id: string | null = null;
-    try {
-      script_id = getScriptId?.();
-    } catch (e) {
-      console.error('无法获取 script_id:', e);
-    }
-
-    if (!script_id) {
-      console.error('无法获取 script_id，mzrodyu猫猫的小破烂脚本无法正常工作');
-      window.toastr.error('mzrodyu猫猫的小破烂脚本初始化失败');
-      return;
-    }
-
+    // 插件环境：使用固定的ID
+    const script_id = 'maomaomz_extension_v1';
+    
     // 设置全局 script_id
     setGlobalScriptId(script_id);
 
-    console.log('mzrodyu猫猫的小破烂脚本开始初始化，script_id:', script_id);
+    console.log('🐱 猫猫的记忆管理工具开始初始化，插件ID:', script_id);
 
     // 等待一段时间确保完全准备好
     setTimeout(() => {

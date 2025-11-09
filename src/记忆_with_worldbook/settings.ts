@@ -85,9 +85,10 @@ export function normalizeApiEndpoint(endpoint: string, path: string = '/chat/com
 const SETTINGS_GLOBAL_KEY = 'maomao_tool_settings';
 
 export const useSettingsStore = defineStore('settings', () => {
-  // 检测是否在本地调试环境（没有酒馆助手）
+  // 检测是否在插件环境（插件始终使用 localStorage，不使用酒馆助手API）
   const isLocalDebug = () => {
-    return typeof getVariables !== 'function';
+    // 插件环境没有 getVariables 函数，使用 localStorage
+    return true; // 插件环境强制使用 localStorage
   };
 
   // 初始化设置

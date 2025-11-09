@@ -199,7 +199,7 @@ export const useSummaryHistoryStore = defineStore('summaryHistory', () => {
       const scriptId = getScriptIdSafe();
       const storageKey = `${scriptId}_summary_history_${chat_id}`;
       let chatHistory: Array<{ start_id: number; end_id: number; content: string }> = [];
-      
+
       try {
         const savedData = localStorage.getItem(storageKey);
         if (savedData) {
@@ -245,7 +245,7 @@ export const useSummaryHistoryStore = defineStore('summaryHistory', () => {
       const scriptId = getScriptIdSafe();
       const storageKey = `${scriptId}_summary_history_${chat_id}`;
       const savedData = localStorage.getItem(storageKey);
-      
+
       if (savedData) {
         const history = JSON.parse(savedData);
         return Array.isArray(history) ? history : [];

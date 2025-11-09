@@ -228,15 +228,15 @@ const refreshTableHistory = () => {
     const scriptId = getScriptIdSafe();
     const storageKey = `${scriptId}_table_history_${chat_id}`;
     const savedData = localStorage.getItem(storageKey);
-    
+
     console.log('从 localStorage 读取表格历史，key:', storageKey);
-    
+
     if (savedData) {
       table_history.value = JSON.parse(savedData);
     } else {
       table_history.value = [];
     }
-    
+
     console.log('已刷新表格历史，当前聊天表格数:', table_history.value.length);
   } catch (e) {
     console.error('刷新表格历史失败:', e);

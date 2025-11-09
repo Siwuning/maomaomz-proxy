@@ -2811,9 +2811,7 @@ function saveToChatVar() {
 
     // 插件环境：保存到 localStorage
     const scriptId = getScriptIdSafe();
-    const storageKey = chatId
-      ? `${scriptId}_frontend_projects_${chatId}`
-      : `${scriptId}_frontend_projects_global`;
+    const storageKey = chatId ? `${scriptId}_frontend_projects_${chatId}` : `${scriptId}_frontend_projects_global`;
 
     localStorage.setItem(storageKey, JSON.stringify(dataToSave));
     console.log('保存成功到 localStorage！', dataToSave.frontend_projects_files.length, '个项目');
@@ -2830,9 +2828,7 @@ function loadFromChatVar() {
 
     // 插件环境：从 localStorage 加载
     const scriptId = getScriptIdSafe();
-    const storageKey = chatId
-      ? `${scriptId}_frontend_projects_${chatId}`
-      : `${scriptId}_frontend_projects_global`;
+    const storageKey = chatId ? `${scriptId}_frontend_projects_${chatId}` : `${scriptId}_frontend_projects_global`;
 
     const savedData = localStorage.getItem(storageKey);
     let data = null;

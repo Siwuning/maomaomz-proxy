@@ -94,7 +94,7 @@ $(() => {
                 console.warn('script_id 为空，无法检查现有总结');
                 return;
               }
-              
+
               // 插件环境：从 localStorage 读取历史总结
               const historyKey = `${scriptId}_summary_history_${current_chat_id}`;
               const savedHistory = localStorage.getItem(historyKey);
@@ -376,7 +376,7 @@ $(() => {
           const messages = SillyTavern.chat || [];
           const lastMessageId = messages.length > 0 ? messages.length - 1 : 0;
           const chat_id = SillyTavern.chatId;
-          
+
           const scriptId = getScriptIdSafe();
           const storageKey = `${scriptId}_auto_summary_start_id_${chat_id}`;
           const auto_summary_start_id = localStorage.getItem(storageKey) || '0';
@@ -411,7 +411,7 @@ $(() => {
           const scriptId = getScriptIdSafe();
           const storageKey = `${scriptId}_auto_summary_start_id_${chat_id}`;
           const auto_summary_start_id = localStorage.getItem(storageKey);
-          
+
           console.log('插件环境 localStorage 数据:', {
             聊天ID: chat_id,
             起始楼层: auto_summary_start_id,
@@ -440,7 +440,7 @@ $(() => {
 
           const lastMessageId = messages.length - 1;
           const current_floor = lastMessageId;
-          
+
           const scriptId = getScriptIdSafe();
           const chat_id = SillyTavern.chatId;
           const storageKey = `${scriptId}_auto_summary_start_id_${chat_id}`;
@@ -467,12 +467,12 @@ $(() => {
 
           const store = useSettingsStore();
           const settings = store.settings;
-          
+
           // 插件环境：从 SillyTavern.chat 获取
           const messages = SillyTavern.chat || [];
           const lastMessageId = messages.length > 0 ? messages.length - 1 : 0;
           const current_floor = lastMessageId;
-          
+
           const scriptId = getScriptIdSafe();
           const chat_id = SillyTavern.chatId;
           const storageKey = `${scriptId}_auto_summary_start_id_${chat_id}`;
@@ -504,12 +504,12 @@ $(() => {
 
           const store = useSettingsStore();
           const settings = store.settings;
-          
+
           // 插件环境：从 SillyTavern.chat 获取
           const messages = SillyTavern.chat || [];
           const lastMessageId = messages.length > 0 ? messages.length - 1 : 0;
           const chat_id = SillyTavern.chatId;
-          
+
           const scriptId = getScriptIdSafe();
           const storageKey = `${scriptId}_auto_summary_start_id_${chat_id}`;
           const auto_summary_start_id = localStorage.getItem(storageKey) || '0';

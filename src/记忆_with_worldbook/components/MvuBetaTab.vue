@@ -1986,7 +1986,7 @@ function loadSavedData() {
     // 插件环境：从 localStorage 加载
     const storageKey = `${scriptId}_mvu_beta_config`;
     const savedDataStr = localStorage.getItem(storageKey);
-    
+
     if (savedDataStr) {
       const savedData = JSON.parse(savedDataStr);
       if (savedData.varName) varName.value = savedData.varName;

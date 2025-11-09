@@ -169,7 +169,10 @@ $(() => {
       } catch (e) {
         console.log('无法监听事件:', e);
       }
-    } else if (typeof (window as any).TavernHelper !== 'undefined' && typeof (window as any).TavernHelper.eventOn === 'function') {
+    } else if (
+      typeof (window as any).TavernHelper !== 'undefined' &&
+      typeof (window as any).TavernHelper.eventOn === 'function'
+    ) {
       // 降级：使用 TavernHelper (酒馆助手环境)
       try {
         const TavernHelper = (window as any).TavernHelper;

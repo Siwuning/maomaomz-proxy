@@ -917,7 +917,7 @@ function getCurrentCharacter() {
         return char;
       }
     }
-    
+
     // 降级：尝试直接从 SillyTavern API 获取
     if (typeof SillyTavern !== 'undefined') {
       const charData = (SillyTavern as any).getContext?.()?.characters?.[0];
@@ -926,7 +926,7 @@ function getCurrentCharacter() {
         return charData;
       }
     }
-    
+
     console.log('未找到角色卡');
     return null;
   } catch (error) {
@@ -1172,7 +1172,7 @@ ${greetingContent}
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${settings.value.api_key}`,
+        Authorization: `Bearer ${settings.value.api_key}`,
       },
       body: JSON.stringify({
         model: settings.value.model,
@@ -1308,7 +1308,7 @@ ${requirement}
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${settings.value.api_key}`,
+        Authorization: `Bearer ${settings.value.api_key}`,
       },
       body: JSON.stringify({
         model: settings.value.model,
@@ -1585,7 +1585,7 @@ ${switchGreetingCode}
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${settings.value.api_key}`,
+        Authorization: `Bearer ${settings.value.api_key}`,
       },
       body: JSON.stringify({
         model: settings.value.model,

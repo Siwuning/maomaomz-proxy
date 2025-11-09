@@ -2428,7 +2428,10 @@ const isDataLoaded = ref(false);
 const loadAvailableWorldbooks = () => {
   try {
     // 插件环境：优先使用 TavernHelper.getWorldbookNames()
-    if (typeof (window as any).TavernHelper !== 'undefined' && typeof (window as any).TavernHelper.getWorldbookNames === 'function') {
+    if (
+      typeof (window as any).TavernHelper !== 'undefined' &&
+      typeof (window as any).TavernHelper.getWorldbookNames === 'function'
+    ) {
       availableWorldbooks.value = (window as any).TavernHelper.getWorldbookNames();
       console.log('✅ 已加载世界书列表 (TavernHelper):', availableWorldbooks.value);
     } else {

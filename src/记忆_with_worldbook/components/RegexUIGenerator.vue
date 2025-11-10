@@ -507,7 +507,7 @@ ${interfaceDescription.value}
     taskStore.addTaskDetail(taskId, `触发词: ${triggerKeyword.value}`);
 
     const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
-    
+
     const requestParams = {
       model: settings.value.model,
       messages: [
@@ -523,7 +523,7 @@ ${interfaceDescription.value}
       presence_penalty: settings.value.presence_penalty,
       frequency_penalty: settings.value.frequency_penalty,
     };
-    
+
     // 导入参数过滤函数
     const { filterApiParams } = await import('../settings');
     const filteredParams = filterApiParams(requestParams, settings.value.api_endpoint);

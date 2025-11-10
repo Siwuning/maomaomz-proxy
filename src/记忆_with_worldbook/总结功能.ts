@@ -295,7 +295,7 @@ ${messages.map(msg => `[${msg.role}]: ${msg.message}`).join('\n\n')}
 
   // 导入参数过滤函数
   const { filterApiParams } = await import('./settings');
-  
+
   const requestParams = {
     model: settings.model,
     messages: [
@@ -310,10 +310,10 @@ ${messages.map(msg => `[${msg.role}]: ${msg.message}`).join('\n\n')}
     presence_penalty: settings.presence_penalty,
     frequency_penalty: settings.frequency_penalty,
   };
-  
+
   // 根据 API 提供商过滤参数
   const filteredParams = filterApiParams(requestParams, settings.api_endpoint);
-  
+
   // 调用 OpenAI 兼容 API
   let response;
   try {

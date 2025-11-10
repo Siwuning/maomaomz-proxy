@@ -1183,7 +1183,7 @@ ${greetingContent}
 
     // 导入参数过滤函数
     const { filterApiParams } = await import('../settings');
-    
+
     const requestParams = {
       model: settings.value.model,
       messages: [
@@ -1196,7 +1196,7 @@ ${greetingContent}
       presence_penalty: settings.value.presence_penalty,
       frequency_penalty: settings.value.frequency_penalty,
     };
-    
+
     // 根据 API 提供商过滤参数
     const filteredParams = filterApiParams(requestParams, settings.value.api_endpoint);
 
@@ -1340,7 +1340,7 @@ ${requirement}
 
     // 导入参数过滤函数
     const { filterApiParams: filterApiParams2 } = await import('../settings');
-    
+
     const requestParams2 = {
       model: settings.value.model,
       messages: [
@@ -1353,7 +1353,7 @@ ${requirement}
       presence_penalty: settings.value.presence_penalty,
       frequency_penalty: settings.value.frequency_penalty,
     };
-    
+
     // 根据 API 提供商过滤参数
     const filteredParams2 = filterApiParams2(requestParams2, settings.value.api_endpoint);
 
@@ -1648,7 +1648,7 @@ ${switchGreetingCode}
 
     // 导入参数过滤函数
     const { filterApiParams: filterApiParams3 } = await import('../settings');
-    
+
     const requestParams3 = {
       model: settings.value.model,
       messages: [
@@ -1661,7 +1661,7 @@ ${switchGreetingCode}
       presence_penalty: settings.value.presence_penalty,
       frequency_penalty: settings.value.frequency_penalty,
     };
-    
+
     // 根据 API 提供商过滤参数
     const filteredParams3 = filterApiParams3(requestParams3, settings.value.api_endpoint);
 

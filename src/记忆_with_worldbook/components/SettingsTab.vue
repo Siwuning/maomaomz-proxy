@@ -2257,7 +2257,7 @@ ${messagesText}
       presence_penalty: settings.value.presence_penalty,
       frequency_penalty: settings.value.frequency_penalty,
     };
-    
+
     // 根据 API 提供商过滤参数
     const filteredParams = filterApiParams(requestParams, settings.value.api_endpoint);
 

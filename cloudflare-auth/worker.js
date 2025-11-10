@@ -898,7 +898,7 @@ function handleAdmin(env) {
                     // 更新当前授权码
                     document.getElementById('currentCode').textContent = data.currentCode;
                     document.getElementById('updatedTime').textContent =
-                        '更新时间: ' + new Date(data.updatedAt).toLocaleString('zh-CN');
+                        '更新时间: ' + new Date(data.updatedAt).toLocaleString("zh-CN");
 
                     // 更新统计数据
                     document.getElementById('statSuccess').textContent = data.stats.success;
@@ -910,44 +910,49 @@ function handleAdmin(env) {
                     // 🔥 更新授权码使用统计
                     const codeUsageList = document.getElementById('codeUsageList');
                     if (data.codeUsage && data.codeUsage.length > 0) {
-                        codeUsageList.innerHTML = data.codeUsage.map(usage => {
-                            const isHighUsage = usage.usageCount > 100; // 使用次数超过100标记为高频
-                            const isMultiIP = usage.ipCount > 5; // IP数量超过5标记为异常
+                        codeUsageList.innerHTML = data.codeUsage.map(function(usage) {
+                            const isHighUsage = usage.usageCount > 100;
+                            const isMultiIP = usage.ipCount > 5;
                             const endpointList = usage.endpoints ? Object.entries(usage.endpoints) : [];
 
-                            return \`
-                            <div class="history-item" style="border-left-color: \${isHighUsage || isMultiIP ? '#ef4444' : '#10b981'}">
-                                <div style="flex: 1;">
-                                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                                        \${isHighUsage ? '<span style="background: #ef4444; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">⚠️ 高频使用</span>' : ''}
-                                        \${isMultiIP ? '<span style="background: #f59e0b; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">⚠️ 多IP</span>' : ''}
-                                        <span style="font-family: 'Courier New', monospace; font-weight: 700; color: #4a9eff; font-size: 14px;">
-                                            \${usage.code}
-                                        </span>
-                                    </div>
-                                    <div style="color: #888; font-size: 13px; margin-bottom: 6px;">
-                                        使用次数: <span style="color: \${isHighUsage ? '#ef4444' : '#10b981'}; font-weight: 700;">\${usage.usageCount}</span> |
-                                        独立IP: <span style="color: \${isMultiIP ? '#f59e0b' : '#10b981'}; font-weight: 700;">\${usage.ipCount}</span>
-                                    </div>
-                                    <div style="color: #666; font-size: 12px; margin-bottom: 4px;">
-                                        首次: \${new Date(usage.firstUsed).toLocaleString('zh-CN')} |
-                                        最后: \${new Date(usage.lastUsed).toLocaleString('zh-CN')}
-                                    </div>
-                                    \${endpointList.length > 0 ? \`
-                                        <details style="margin-top: 8px;">
-                                            <summary style="cursor: pointer; color: #666; font-size: 12px;">查看API端点分布</summary>
-                                            <div style="margin-top: 8px; padding: 10px; background: #0a0a0a; border-radius: 8px;">
-                                                \${endpointList.map(([endpoint, count]) => \`
-                                                    <div style="color: #666; font-size: 11px; margin-bottom: 4px;">
-                                                        🌐 \${endpoint}: \${count}次
-                                </div>
-                                                \`).join('')}
-                            </div>
-                                        </details>
-                                    \` : ''}
-                                </div>
-                            </div>
-                        \`}).join('');
+                            let endpointDetails = '';
+                            if (endpointList.length > 0) {
+                                const endpointItems = endpointList.map(function(item) {
+                                    return '<div style="color: #666; font-size: 11px; margin-bottom: 4px;">🌐 ' + item[0] + ': ' + item[1] + '次</div>';
+                                }).join('');
+                                endpointDetails = '<details style="margin-top: 8px;">' +
+                                    '<summary style="cursor: pointer; color: #666; font-size: 12px;">查看API端点分布</summary>' +
+                                    '<div style="margin-top: 8px; padding: 10px; background: #0a0a0a; border-radius: 8px;">' +
+                                    endpointItems +
+                                    '</div></details>';
+                            }
+
+                            const borderColor = (isHighUsage || isMultiIP) ? '#ef4444' : '#10b981';
+                            const highUsageBadge = isHighUsage ? '<span style="background: #ef4444; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">⚠️ 高频使用</span>' : '';
+                            const multiIPBadge = isMultiIP ? '<span style="background: #f59e0b; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">⚠️ 多IP</span>' : '';
+                            const usageColor = isHighUsage ? '#ef4444' : '#10b981';
+                            const ipColor = isMultiIP ? '#f59e0b' : '#10b981';
+
+                            return '<div class="history-item" style="border-left-color: ' + borderColor + ';">' +
+                                '<div style="flex: 1;">' +
+                                    '<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">' +
+                                        highUsageBadge + multiIPBadge +
+                                        '<span style="font-family: Courier New, monospace; font-weight: 700; color: #4a9eff; font-size: 14px;">' +
+                                            usage.code +
+                                        '</span>' +
+                                    '</div>' +
+                                    '<div style="color: #888; font-size: 13px; margin-bottom: 6px;">' +
+                                        '使用次数: <span style="color: ' + usageColor + '; font-weight: 700;">' + usage.usageCount + '</span> | ' +
+                                        '独立IP: <span style="color: ' + ipColor + '; font-weight: 700;">' + usage.ipCount + '</span>' +
+                                    '</div>' +
+                                    '<div style="color: #666; font-size: 12px; margin-bottom: 4px;">' +
+                                        '首次: ' + new Date(usage.firstUsed).toLocaleString("zh-CN") + ' | ' +
+                                        '最后: ' + new Date(usage.lastUsed).toLocaleString("zh-CN") +
+                                    '</div>' +
+                                    endpointDetails +
+                                '</div>' +
+                            '</div>';
+                        }).join('');
                     } else {
                         codeUsageList.innerHTML = '<p style="color: #888; text-align: center;">暂无授权码使用数据</p>';
                     }
@@ -955,39 +960,51 @@ function handleAdmin(env) {
                     // 🔥 更新API端点列表
                     const endpointsList = document.getElementById('endpointsList');
                     if (data.apiEndpoints && data.apiEndpoints.length > 0) {
-                        endpointsList.innerHTML = data.apiEndpoints.map(endpoint => {
+                        endpointsList.innerHTML = data.apiEndpoints.map(function(endpoint) {
                             const ipCount = endpoint.ips ? Object.keys(endpoint.ips).length : 0;
-                            const isHighRisk = endpoint.accessCount > 50; // 访问次数超过50次标记为高风险
+                            const isHighRisk = endpoint.accessCount > 50;
 
-                            return \`
-                            <div class="history-item" style="border-left-color: \${isHighRisk ? '#ef4444' : '#4a9eff'}">
-                                <div style="flex: 1;">
-                                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                                        \${isHighRisk ? '<span style="background: #ef4444; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">⚠️ 高风险</span>' : ''}
-                                        <span style="font-family: 'Courier New', monospace; font-weight: 700; color: #4a9eff; font-size: 14px;">
-                                            \${endpoint.endpoint}
-                                        </span>
-                                    </div>
-                                    <div style="color: #888; font-size: 13px; margin-bottom: 4px;">
-                                        访问次数: <span style="color: \${isHighRisk ? '#ef4444' : '#10b981'}; font-weight: 700;">\${endpoint.accessCount}</span> |
-                                        独立IP: \${ipCount} |
-                                        首次: \${new Date(endpoint.firstAccess).toLocaleString('zh-CN')}
-                                    </div>
-                                    <details style="margin-top: 8px;">
-                                        <summary style="cursor: pointer; color: #666; font-size: 12px;">查看IP详情</summary>
-                                        <div style="margin-top: 8px; padding: 10px; background: #0a0a0a; border-radius: 8px;">
-                                            \${endpoint.ips ? Object.entries(endpoint.ips).slice(0, 10).map(([ip, info]) => \`
-                                                <div style="color: #666; font-size: 11px; margin-bottom: 4px;">
-                                                    📍 \${ip} (\${info.country}) - 访问\${info.count}次
-                                                </div>
-                                            \`).join('') : '无IP数据'}
-                                            \${endpoint.ips && Object.keys(endpoint.ips).length > 10 ? '<div style="color: #666; font-size: 11px;">...更多IP</div>' : ''}
-                                        </div>
-                                    </details>
-                                </div>
-                                <span class="history-time">\${new Date(endpoint.lastAccess).toLocaleString('zh-CN')}</span>
-                            </div>
-                        \`}).join('');
+                            let ipDetails = '无IP数据';
+                            let moreIPsText = '';
+                            if (endpoint.ips) {
+                                const ipEntries = Object.entries(endpoint.ips).slice(0, 10);
+                                ipDetails = ipEntries.map(function(item) {
+                                    const ip = item[0];
+                                    const info = item[1];
+                                    return '<div style="color: #666; font-size: 11px; margin-bottom: 4px;">📍 ' + ip + ' (' + info.country + ') - 访问' + info.count + '次</div>';
+                                }).join('');
+                                if (Object.keys(endpoint.ips).length > 10) {
+                                    moreIPsText = '<div style="color: #666; font-size: 11px;">...更多IP</div>';
+                                }
+                            }
+
+                            const borderColor = isHighRisk ? '#ef4444' : '#4a9eff';
+                            const highRiskBadge = isHighRisk ? '<span style="background: #ef4444; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">⚠️ 高风险</span>' : '';
+                            const countColor = isHighRisk ? '#ef4444' : '#10b981';
+
+                            return '<div class="history-item" style="border-left-color: ' + borderColor + ';">' +
+                                '<div style="flex: 1;">' +
+                                    '<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">' +
+                                        highRiskBadge +
+                                        '<span style="font-family: Courier New, monospace; font-weight: 700; color: #4a9eff; font-size: 14px;">' +
+                                            endpoint.endpoint +
+                                        '</span>' +
+                                    '</div>' +
+                                    '<div style="color: #888; font-size: 13px; margin-bottom: 4px;">' +
+                                        '访问次数: <span style="color: ' + countColor + '; font-weight: 700;">' + endpoint.accessCount + '</span> | ' +
+                                        '独立IP: ' + ipCount + ' | ' +
+                                        '首次: ' + new Date(endpoint.firstAccess).toLocaleString("zh-CN") +
+                                    '</div>' +
+                                    '<details style="margin-top: 8px;">' +
+                                        '<summary style="cursor: pointer; color: #666; font-size: 12px;">查看IP详情</summary>' +
+                                        '<div style="margin-top: 8px; padding: 10px; background: #0a0a0a; border-radius: 8px;">' +
+                                            ipDetails + moreIPsText +
+                                        '</div>' +
+                                    '</details>' +
+                                '</div>' +
+                                '<span class="history-time">' + new Date(endpoint.lastAccess).toLocaleString("zh-CN") + '</span>' +
+                            '</div>';
+                        }).join('');
                     } else {
                         endpointsList.innerHTML = '<p style="color: #888; text-align: center;">暂无API端点数据</p>';
                     }
@@ -995,25 +1012,30 @@ function handleAdmin(env) {
                     // 更新验证日志
                     const logsList = document.getElementById('logsList');
                     if (data.logs && data.logs.length > 0) {
-                        logsList.innerHTML = data.logs.map(log => \`
-                            <div class="history-item" style="border-left-color: \${log.isValid ? '#10b981' : '#ef4444'}">
-                                <div>
-                                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                                        <span style="font-size: 14px;">\${log.isValid ? '✅' : '❌'}</span>
-                                        <span style="font-family: 'Courier New', monospace; color: \${log.isValid ? '#10b981' : '#ef4444'};">
-                                            \${log.code}
-                                        </span>
-                                        <span style="color: #888; font-size: 12px;">
-                                            IP: \${log.ip} (\${log.country})
-                                        </span>
-                                    </div>
-                                    <div style="color: #666; font-size: 12px;">
-                                        🌐 API: \${log.apiEndpoint || 'unknown'}
-                                    </div>
-                                </div>
-                                <span class="history-time">\${new Date(log.timestamp).toLocaleString('zh-CN')}</span>
-                            </div>
-                        \`).join('');
+                        logsList.innerHTML = data.logs.map(function(log) {
+                            const borderColor = log.isValid ? '#10b981' : '#ef4444';
+                            const icon = log.isValid ? '✅' : '❌';
+                            const codeColor = log.isValid ? '#10b981' : '#ef4444';
+                            const apiEndpoint = log.apiEndpoint || 'unknown';
+
+                            return '<div class="history-item" style="border-left-color: ' + borderColor + ';">' +
+                                '<div>' +
+                                    '<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">' +
+                                        '<span style="font-size: 14px;">' + icon + '</span>' +
+                                        '<span style="font-family: Courier New, monospace; color: ' + codeColor + ';">' +
+                                            log.code +
+                                        '</span>' +
+                                        '<span style="color: #888; font-size: 12px;">' +
+                                            'IP: ' + log.ip + ' (' + log.country + ')' +
+                                        '</span>' +
+                                    '</div>' +
+                                    '<div style="color: #666; font-size: 12px;">' +
+                                        '🌐 API: ' + apiEndpoint +
+                                    '</div>' +
+                                '</div>' +
+                                '<span class="history-time">' + new Date(log.timestamp).toLocaleString("zh-CN") + '</span>' +
+                            '</div>';
+                        }).join('');
                     } else {
                         logsList.innerHTML = '<p style="color: #888; text-align: center;">暂无验证日志</p>';
                     }
@@ -1021,12 +1043,12 @@ function handleAdmin(env) {
                     // 更新历史授权码
                     const historyList = document.getElementById('historyList');
                     if (data.history && data.history.length > 0) {
-                        historyList.innerHTML = data.history.map(item => \`
-                            <div class="history-item">
-                                <span class="history-code">\${item.code}</span>
-                                <span class="history-time">\${new Date(item.replacedAt).toLocaleString('zh-CN')}</span>
-                            </div>
-                        \`).join('');
+                        historyList.innerHTML = data.history.map(function(item) {
+                            return '<div class="history-item">' +
+                                '<span class="history-code">' + item.code + '</span>' +
+                                '<span class="history-time">' + new Date(item.replacedAt).toLocaleString("zh-CN") + '</span>' +
+                            '</div>';
+                        }).join('');
                     } else {
                         historyList.innerHTML = '<p style="color: #888; text-align: center;">暂无历史记录</p>';
                     }
@@ -1063,13 +1085,11 @@ function handleAdmin(env) {
 
                     // 显示当前信息
                     const displayDiv = document.getElementById('plugin-info-display');
-                    displayDiv.innerHTML = \`
-                        <div style="color: #ccc;">
-                            <div style="margin-bottom: 8px;">📌 版本：<strong style="color: #4a9eff;">\${data.version}</strong></div>
-                            <div style="margin-bottom: 8px;">🕐 最后更新：\${new Date(data.lastUpdated).toLocaleString('zh-CN')}</div>
-                            <div style="font-size: 12px; color: #888;">💡 插件前端可以通过 /plugin-info 接口获取这些信息</div>
-                        </div>
-                    \`;
+                    displayDiv.innerHTML = '<div style="color: #ccc;">' +
+                        '<div style="margin-bottom: 8px;">📌 版本：<strong style="color: #4a9eff;">' + data.version + '</strong></div>' +
+                        '<div style="margin-bottom: 8px;">🕐 最后更新：' + new Date(data.lastUpdated).toLocaleString("zh-CN") + '</div>' +
+                        '<div style="font-size: 12px; color: #888;">💡 插件前端可以通过 /plugin-info 接口获取这些信息</div>' +
+                    '</div>';
                     document.getElementById('plugin-info-status').style.display = 'block';
                 } else {
                     showAlert('⚠️ 暂无插件信息，请填写并保存', 'error');
@@ -1112,6 +1132,8 @@ function handleAdmin(env) {
             }
         }
 
+        console.log('✅ Worker.js 已加载最新版本 2024-11-10-22:00 - 安全版模板管理');
+
         // 全局存储模板数据
         let currentTemplates = [];
 
@@ -1126,59 +1148,72 @@ function handleAdmin(env) {
                     renderTemplates();
                 } else {
                     document.getElementById('templatesList').innerHTML =
-                        '<p style="color: #ef4444; text-align: center;">❌ 加载失败</p>';
+                        '<p style="color: #ef4444; text-align: center;">加载失败</p>';
                 }
             } catch (error) {
                 console.error('加载模板失败:', error);
                 document.getElementById('templatesList').innerHTML =
-                    '<p style="color: #ef4444; text-align: center;">❌ 加载失败：' + error.message + '</p>';
+                    '<p style="color: #ef4444; text-align: center;">加载失败：' + error.message + '</p>';
             }
         }
 
         // 渲染模板列表
         function renderTemplates() {
-            const listHtml = currentTemplates.map((template, index) => {
-                const borderColor = template.enabled ? '#4a9eff' : '#6b7280';
-                const checkedAttr = template.enabled ? 'checked' : '';
-                const codeValue = (template.code || '').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                return '<div style="background: #1a1a1a; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid ' + borderColor + ';">' +
-                    '<div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">' +
-                        '<div style="flex: 1;">' +
-                            '<input type="text" id="template-icon-' + index + '" value="' + template.icon + '" ' +
-                                   'style="width: 60px; padding: 8px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px; color: #e0e0e0; font-size: 20px; text-align: center; margin-right: 10px;" ' +
-                                   'placeholder="🎨" />' +
-                            '<input type="text" id="template-title-' + index + '" value="' + template.title + '" ' +
-                                   'style="width: calc(100% - 80px); padding: 8px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px; color: #e0e0e0; font-size: 14px;" ' +
-                                   'placeholder="模板标题" />' +
+            var listHtml = currentTemplates.map(function(template, index) {
+                var borderColor = template.enabled ? '#4a9eff' : '#6b7280';
+                var checkedAttr = template.enabled ? 'checked' : '';
+                var files = template.files || [];
+
+                // 渲染文件列表
+                var filesHtml = files.map(function(file, fileIndex) {
+                    var fileName = (file.name || '').replace(/"/g, '&quot;');
+                    var fileContent = (file.content || '').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    return '<div style="background: #0a0a0a; padding: 10px; border-radius: 6px; margin-bottom: 8px;">' +
+                        '<div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">' +
+                            '<input type="text" id="template-' + index + '-file-' + fileIndex + '-name" value="' + fileName + '" ' +
+                                   'style="flex: 1; padding: 6px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 4px; color: #4a9eff; font-size: 12px; font-family: monospace;" ' +
+                                   'placeholder="filename.ext" />' +
+                            '<button onclick="removeFile(' + index + ',' + fileIndex + ')" ' +
+                                    'style="padding: 4px 8px; background: #7c2d12; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">Del</button>' +
                         '</div>' +
+                        '<textarea id="template-' + index + '-file-' + fileIndex + '-content" ' +
+                                  'style="width: 100%; min-height: 150px; padding: 8px; background: #1a1a1a; border: 1px solid #3a3a3a; border-radius: 4px; color: #10b981; font-size: 12px; font-family: monospace; line-height: 1.4; resize: vertical;" ' +
+                                  'placeholder="File content...">' + fileContent + '</textarea>' +
+                    '</div>';
+                }).join('');
+
+                return '<div style="background: #1a1a1a; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid ' + borderColor + ';">' +
+                    '<div style="display: flex; gap: 10px; margin-bottom: 10px;">' +
+                        '<input type="text" id="template-icon-' + index + '" value="' + template.icon + '" ' +
+                               'style="width: 60px; padding: 8px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px; color: #e0e0e0; font-size: 20px; text-align: center;" ' +
+                               'placeholder="📁" />' +
+                        '<input type="text" id="template-title-' + index + '" value="' + template.title + '" ' +
+                               'style="flex: 1; padding: 8px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px; color: #e0e0e0; font-size: 14px;" ' +
+                               'placeholder="Template Title" />' +
                     '</div>' +
                     '<div style="margin-bottom: 10px;">' +
                         '<input type="text" id="template-desc-' + index + '" value="' + template.description + '" ' +
                                'style="width: 100%; padding: 8px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px; color: #e0e0e0; font-size: 13px;" ' +
-                               'placeholder="模板描述" />' +
+                               'placeholder="Description" />' +
                     '</div>' +
                     '<div style="margin-bottom: 10px;">' +
-                        '<label style="display: block; color: #888; font-size: 12px; margin-bottom: 6px;">📝 模板代码（Vue 组件）</label>' +
-                        '<textarea id="template-code-' + index + '" ' +
-                                  'style="width: 100%; min-height: 300px; padding: 12px; background: #0a0a0a; border: 1px solid #3a3a3a; border-radius: 6px; color: #10b981; font-size: 13px; font-family: Courier New, monospace; line-height: 1.5; resize: vertical;" ' +
-                                  'placeholder="<template>\n  <div>\n    <!-- 你的 Vue 组件代码 -->\n  </div>\n</template>\n\n<script setup>\n// 你的 JS 代码\n</script>\n\n<style scoped>\n/* 你的样式 */\n</style>">' + codeValue + '</textarea>' +
+                        '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">' +
+                            '<label style="display: block; color: #888; font-size: 12px;">Files:</label>' +
+                            '<button onclick="addFile(' + index + ')" ' +
+                                    'style="padding: 4px 12px; background: #065f46; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">+ Add File</button>' +
+                        '</div>' +
+                        '<div id="template-' + index + '-files">' +
+                            filesHtml +
+                        '</div>' +
                     '</div>' +
-                    '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">' +
+                    '<div style="display: flex; justify-content: space-between; align-items: center;">' +
                         '<label style="display: flex; align-items: center; cursor: pointer;">' +
                             '<input type="checkbox" id="template-enabled-' + index + '" ' + checkedAttr + ' ' +
                                    'style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;" />' +
-                            '<span style="color: #888; font-size: 13px;">启用模板</span>' +
+                            '<span style="color: #888; font-size: 13px;">Enabled</span>' +
                         '</label>' +
                         '<button onclick="removeTemplate(' + index + ')" ' +
-                                'style="padding: 6px 12px; background: #dc2626; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">' +
-                            '🗑️ 删除' +
-                        '</button>' +
-                    '</div>' +
-                    '<div style="padding: 8px; background: #2a2a2a; border-radius: 4px;">' +
-                        '<span style="color: #666; font-size: 11px;">ID: </span>' +
-                        '<input type="text" id="template-id-' + index + '" value="' + template.id + '" ' +
-                               'style="width: calc(100% - 40px); padding: 4px 8px; background: #1a1a1a; border: 1px solid #3a3a3a; border-radius: 4px; color: #888; font-size: 11px; font-family: Courier New, monospace;" ' +
-                               'placeholder="template-id" />' +
+                                'style="padding: 6px 12px; background: #dc2626; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">Delete Template</button>' +
                     '</div>' +
                 '</div>';
             }).join('');
@@ -1186,26 +1221,50 @@ function handleAdmin(env) {
             document.getElementById('templatesList').innerHTML = listHtml +
                 '<button onclick="addTemplate()" ' +
                         'style="width: 100%; padding: 12px; background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; margin-top: 10px;">' +
-                    '➕ 添加新模板' +
+                    '+ Add Template' +
                 '</button>';
         }
 
         // 添加新模板
         function addTemplate() {
             currentTemplates.push({
-                id: 'new-template-' + Date.now(),
-                icon: '📝',
-                title: '新模板',
-                description: '描述',
-                code: '<template>\n  <div class="new-template">\n    <h2>新模板</h2>\n    <p>在这里编写你的代码...</p>\n  </div>\n</template>\n\n<script setup>\n// 你的逻辑代码\n</script>\n\n<style scoped>\n.new-template {\n  padding: 20px;\n}\n</style>',
+                id: 'template-' + Date.now(),
+                icon: '📁',
+                title: 'New Template',
+                description: 'Description',
+                files: [
+                    { name: 'index.html', content: '' },
+                    { name: 'style.css', content: '' },
+                    { name: 'script.js', content: '' }
+                ],
                 enabled: true
             });
             renderTemplates();
         }
 
+        // 添加文件
+        function addFile(templateIndex) {
+            if (!currentTemplates[templateIndex].files) {
+                currentTemplates[templateIndex].files = [];
+            }
+            currentTemplates[templateIndex].files.push({
+                name: 'newfile.js',
+                content: ''
+            });
+            renderTemplates();
+        }
+
+        // 删除文件
+        function removeFile(templateIndex, fileIndex) {
+            if (confirm('Delete this file?')) {
+                currentTemplates[templateIndex].files.splice(fileIndex, 1);
+                renderTemplates();
+            }
+        }
+
         // 删除模板
         function removeTemplate(index) {
-            if (confirm('确定要删除这个模板吗？')) {
+            if (confirm('Delete this template?')) {
                 currentTemplates.splice(index, 1);
                 renderTemplates();
             }
@@ -1214,36 +1273,44 @@ function handleAdmin(env) {
         // 保存模板配置
         async function saveTemplates() {
             try {
-                // 从DOM读取最新数据
-                const templates = currentTemplates.map(function(_, index) {
+                var templates = currentTemplates.map(function(template, index) {
+                    var files = (template.files || []).map(function(file, fileIndex) {
+                        var nameElem = document.getElementById('template-' + index + '-file-' + fileIndex + '-name');
+                        var contentElem = document.getElementById('template-' + index + '-file-' + fileIndex + '-content');
+                        return {
+                            name: nameElem ? nameElem.value : file.name,
+                            content: contentElem ? contentElem.value : file.content
+                        };
+                    });
+
                     return {
-                        id: document.getElementById('template-id-' + index).value.trim(),
+                        id: template.id,
                         icon: document.getElementById('template-icon-' + index).value.trim(),
                         title: document.getElementById('template-title-' + index).value.trim(),
                         description: document.getElementById('template-desc-' + index).value.trim(),
-                        code: document.getElementById('template-code-' + index).value,
+                        files: files,
                         enabled: document.getElementById('template-enabled-' + index).checked
                     };
                 });
 
-                const response = await fetch('/update-templates', {
+                var response = await fetch('/update-templates', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ templates })
+                    body: JSON.stringify({ templates: templates })
                 });
 
-                const result = await response.json();
+                var result = await response.json();
 
                 if (result.success) {
-                    showAlert('✅ ' + result.message, 'success');
+                    showAlert('Saved successfully', 'success');
                     currentTemplates = result.data.templates;
                     renderTemplates();
                 } else {
-                    showAlert('❌ ' + (result.message || '保存失败'), 'error');
+                    showAlert('Save failed', 'error');
                 }
             } catch (error) {
-                console.error('保存模板失败:', error);
-                showAlert('❌ 保存失败：' + error.message, 'error');
+                console.error('Save error:', error);
+                showAlert('Save failed: ' + error.message, 'error');
             }
         }
     </script>
@@ -1493,27 +1560,15 @@ async function handleGetTemplates(request, env, corsHeaders) {
       : {
           templates: [
             {
-              id: 'chat-interface',
-              icon: '💬',
-              title: '同层对话界面',
-              description: '流式对话、消息历史、正则清洗',
-              code: '<template>\n  <div class="chat-interface">\n    <div class="messages">\n      <!-- 消息列表 -->\n    </div>\n    <div class="input-area">\n      <input type="text" placeholder="输入消息..." />\n      <button>发送</button>\n    </div>\n  </div>\n</template>\n\n<script setup>\n// 对话逻辑\n</script>\n\n<style scoped>\n.chat-interface {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n}\n</style>',
-              enabled: true,
-            },
-            {
-              id: 'status-bar',
-              icon: '📊',
-              title: '状态栏面板',
-              description: 'HP/MP/经验槽，进度条动画',
-              code: '<template>\n  <div class="status-bar">\n    <div class="stat-item">\n      <span>HP</span>\n      <div class="bar">\n        <div class="fill hp" :style="{ width: hp + \'%\' }"></div>\n      </div>\n    </div>\n    <div class="stat-item">\n      <span>MP</span>\n      <div class="bar">\n        <div class="fill mp" :style="{ width: mp + \'%\' }"></div>\n      </div>\n    </div>\n  </div>\n</template>\n\n<script setup>\nimport { ref } from \'vue\';\nconst hp = ref(75);\nconst mp = ref(50);\n</script>\n\n<style scoped>\n.status-bar {\n  padding: 10px;\n}\n.bar {\n  height: 20px;\n  background: #333;\n  border-radius: 10px;\n}\n.fill {\n  height: 100%;\n  border-radius: 10px;\n  transition: width 0.3s;\n}\n.hp { background: #ef4444; }\n.mp { background: #3b82f6; }\n</style>',
-              enabled: true,
-            },
-            {
-              id: 'favorability',
-              icon: '💖',
-              title: '好感度面板',
-              description: '多角色卡片，爱心图标',
-              code: '<template>\n  <div class="favorability">\n    <div class="character-card">\n      <h3>角色名称</h3>\n      <div class="hearts">\n        <span v-for="i in 5" :key="i">❤️</span>\n      </div>\n      <p>好感度: 100/100</p>\n    </div>\n  </div>\n</template>\n\n<script setup>\n// 好感度逻辑\n</script>\n\n<style scoped>\n.favorability {\n  padding: 20px;\n}\n.character-card {\n  background: #2a2a2a;\n  padding: 15px;\n  border-radius: 8px;\n}\n.hearts {\n  font-size: 24px;\n}\n</style>',
+              id: 'basic-template',
+              icon: '📄',
+              title: '基础模板',
+              description: 'HTML + CSS + JS 基础项目',
+              files: [
+                { name: 'index.html', content: '' },
+                { name: 'style.css', content: '' },
+                { name: 'script.js', content: '' },
+              ],
               enabled: true,
             },
           ],

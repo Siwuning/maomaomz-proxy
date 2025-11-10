@@ -1538,7 +1538,7 @@ interface BackendTemplate {
   icon: string;
   title: string;
   description: string;
-  code?: string;
+  files?: Array<{ name: string; content: string }>;
   enabled: boolean;
 }
 
@@ -2106,28 +2106,32 @@ function showProjectTemplateDialog() {
 function createProjectFromTemplate(templateKey: string) {
   // 优先使用后端模板
   const backendTemplate = backendTemplates.value.find(t => t.title === templateKey);
+<<<<<<< HEAD
 
   if (backendTemplate && backendTemplate.code) {
     // 使用后端模板代码
+=======
+  
+  if (backendTemplate && backendTemplate.files && backendTemplate.files.length > 0) {
+    // 使用后端模板的多文件结构
+>>>>>>> e6c709d (feat: 支持多文件项目模板管理)
     const name = prompt('项目名称:', backendTemplate.title);
     if (!name || !name.trim()) return;
 
     const newProj: Project = {
       id: Date.now().toString(),
       name: name.trim(),
-      files: [
-        {
-          path: 'index.vue',
-          name: 'index.vue',
-          content: backendTemplate.code,
-        },
-      ],
+      files: backendTemplate.files.map(f => ({
+        path: f.name,
+        name: f.name,
+        content: f.content || '',
+      })),
     };
 
     projects.value.push(newProj);
     currentId.value = newProj.id;
-    currentFile.value = 'index.vue';
-    code.value = backendTemplate.code;
+    currentFile.value = newProj.files[0]?.path || 'index.html';
+    code.value = newProj.files[0]?.content || '';
     saveToChatVar();
 
     showProjectTemplate.value = false;

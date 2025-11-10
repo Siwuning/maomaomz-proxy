@@ -193,168 +193,168 @@
 
         <!-- 旧的硬编码版本记录（作为备份） -->
         <div v-if="false">
-          <div
-            style="
-              padding: 20px;
-              background: rgba(76, 175, 80, 0.05);
-              border-left: 4px solid #4caf50;
-              border-radius: 8px;
-              margin-bottom: 15px;
-            "
-          >
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px">
-              <div
-                style="font-size: 16px; font-weight: 600; color: #4caf50; display: flex; align-items: center; gap: 8px"
-              >
-                v1.34
-              </div>
-              <div style="font-size: 13px; color: #888">2025年11月8日</div>
+        <div
+          style="
+            padding: 20px;
+            background: rgba(76, 175, 80, 0.05);
+            border-left: 4px solid #4caf50;
+            border-radius: 8px;
+            margin-bottom: 15px;
+          "
+        >
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px">
+            <div
+              style="font-size: 16px; font-weight: 600; color: #4caf50; display: flex; align-items: center; gap: 8px"
+            >
+              v1.34
             </div>
+            <div style="font-size: 13px; color: #888">2025年11月8日</div>
+          </div>
+          <ul class="update-list">
+            <li class="update-item">🐛 修复：移除 vue-i18n 国际化系统，改为直接使用中文</li>
+            <li class="update-item">🔧 优化：精简代码，提高加载速度</li>
+            <li class="update-item">✨ 改进：界面显示更加稳定</li>
+          </ul>
+        </div>
+
+        <!-- v1.33 -->
+        <div
+          style="
+            padding: 20px;
+            background: rgba(255, 152, 0, 0.05);
+            border-left: 4px solid #ff9800;
+            border-radius: 8px;
+            margin-bottom: 15px;
+          "
+        >
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px">
+            <div
+              style="font-size: 16px; font-weight: 600; color: #ff9800; display: flex; align-items: center; gap: 8px"
+            >
+              v1.33 - 🎨 开场白管理器
+            </div>
+            <div style="font-size: 13px; color: #888">2025年11月5日</div>
+          </div>
+          <ul class="update-list">
+            <li class="update-item">新增：开场白美化选择器工具</li>
+            <li class="update-item">自动读取角色卡的所有开场白</li>
+            <li class="update-item">为每个开场白配置美化样式（图标、标题、描述）</li>
+            <li class="update-item">AI 生成描述：根据开场白原文内容自动生成吸引人的描述</li>
+            <li class="update-item">AI 编辑描述：根据需求快速修改描述</li>
+            <li class="update-item">⭐ AI 生成界面样式：直接告诉AI你想要什么风格，自动生成完整HTML界面</li>
+            <li class="update-item">实时预览生成的美化界面样式效果</li>
+            <li class="update-item">一键导出为 STScript JSON 格式</li>
+            <li class="update-item">配置自动保存到角色卡变量</li>
+          </ul>
+        </div>
+
+        <!-- v1.32 -->
+        <div
+          style="
+            padding: 20px;
+            background: rgba(99, 102, 241, 0.05);
+            border-left: 4px solid #6366f1;
+            border-radius: 8px;
+            margin-bottom: 15px;
+          "
+        >
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px">
+            <div style="font-size: 16px; font-weight: 600; color: #6366f1">v1.32</div>
+            <div style="font-size: 13px; color: #888">2025年11月2日</div>
+          </div>
+
+          <div style="margin-bottom: 15px">
+            <div style="color: #6366f1; font-weight: 600; margin-bottom: 8px">🔧 优化</div>
             <ul class="update-list">
-              <li class="update-item">🐛 修复：移除 vue-i18n 国际化系统，改为直接使用中文</li>
-              <li class="update-item">🔧 优化：精简代码，提高加载速度</li>
-              <li class="update-item">✨ 改进：界面显示更加稳定</li>
+              <li class="update-item">最小化图标支持拖动，可随意调整位置</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- v1.31 -->
+        <div
+          style="
+            padding: 20px;
+            background: rgba(99, 102, 241, 0.05);
+            border-left: 4px solid #6366f1;
+            border-radius: 8px;
+            margin-bottom: 15px;
+          "
+        >
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px">
+            <div style="font-size: 16px; font-weight: 600; color: #6366f1">v1.31</div>
+            <div style="font-size: 13px; color: #888">2025年10月30日</div>
+          </div>
+
+          <div style="margin-bottom: 15px">
+            <div style="color: #ffc107; font-weight: 600; margin-bottom: 8px">✨ 新功能</div>
+            <ul class="update-list">
+              <li class="update-item">同层对话：AI 回复直接显示在面板内，支持流式传输和正则过滤</li>
+              <li class="update-item">状态栏生成器新增 AI 解析 XML 和自然语言生成字段功能</li>
             </ul>
           </div>
 
-          <!-- v1.33 -->
-          <div
-            style="
-              padding: 20px;
-              background: rgba(255, 152, 0, 0.05);
-              border-left: 4px solid #ff9800;
-              border-radius: 8px;
-              margin-bottom: 15px;
-            "
-          >
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px">
-              <div
-                style="font-size: 16px; font-weight: 600; color: #ff9800; display: flex; align-items: center; gap: 8px"
-              >
-                v1.33 - 🎨 开场白管理器
-              </div>
-              <div style="font-size: 13px; color: #888">2025年11月5日</div>
-            </div>
+          <div>
+            <div style="color: #6366f1; font-weight: 600; margin-bottom: 8px">🔧 优化</div>
             <ul class="update-list">
-              <li class="update-item">新增：开场白美化选择器工具</li>
-              <li class="update-item">自动读取角色卡的所有开场白</li>
-              <li class="update-item">为每个开场白配置美化样式（图标、标题、描述）</li>
-              <li class="update-item">AI 生成描述：根据开场白原文内容自动生成吸引人的描述</li>
-              <li class="update-item">AI 编辑描述：根据需求快速修改描述</li>
-              <li class="update-item">⭐ AI 生成界面样式：直接告诉AI你想要什么风格，自动生成完整HTML界面</li>
-              <li class="update-item">实时预览生成的美化界面样式效果</li>
-              <li class="update-item">一键导出为 STScript JSON 格式</li>
-              <li class="update-item">配置自动保存到角色卡变量</li>
+              <li class="update-item">完整的移动端适配：响应式布局、标签栏滚动、滑动切换</li>
+              <li class="update-item">所有 AI 功能统一使用设置页的 API 配置</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- v1.30 -->
+        <div
+          style="
+            padding: 20px;
+            background: rgba(99, 102, 241, 0.05);
+            border-left: 4px solid #6366f1;
+            border-radius: 8px;
+            margin-bottom: 15px;
+          "
+        >
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px">
+            <div style="font-size: 16px; font-weight: 600; color: #6366f1">v1.30</div>
+            <div style="font-size: 13px; color: #888">2025年10月26日</div>
+          </div>
+
+          <div style="margin-bottom: 15px">
+            <div style="color: #ffc107; font-weight: 600; margin-bottom: 8px">✨ 新功能</div>
+            <ul class="update-list">
+              <li class="update-item">新增 MVU Beta 标签页：变量结构、提示词模板、meta 配置生成</li>
+              <li class="update-item">新增状态栏生成器：可视化配置状态栏，生成正则 JSON 和世界书条目</li>
+              <li class="update-item">状态栏生成器支持 ABO 模板快速加载</li>
             </ul>
           </div>
 
-          <!-- v1.32 -->
-          <div
-            style="
-              padding: 20px;
-              background: rgba(99, 102, 241, 0.05);
-              border-left: 4px solid #6366f1;
-              border-radius: 8px;
-              margin-bottom: 15px;
-            "
-          >
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px">
-              <div style="font-size: 16px; font-weight: 600; color: #6366f1">v1.32</div>
-              <div style="font-size: 13px; color: #888">2025年11月2日</div>
-            </div>
-
-            <div style="margin-bottom: 15px">
-              <div style="color: #6366f1; font-weight: 600; margin-bottom: 8px">🔧 优化</div>
-              <ul class="update-list">
-                <li class="update-item">最小化图标支持拖动，可随意调整位置</li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- v1.31 -->
-          <div
-            style="
-              padding: 20px;
-              background: rgba(99, 102, 241, 0.05);
-              border-left: 4px solid #6366f1;
-              border-radius: 8px;
-              margin-bottom: 15px;
-            "
-          >
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px">
-              <div style="font-size: 16px; font-weight: 600; color: #6366f1">v1.31</div>
-              <div style="font-size: 13px; color: #888">2025年10月30日</div>
-            </div>
-
-            <div style="margin-bottom: 15px">
-              <div style="color: #ffc107; font-weight: 600; margin-bottom: 8px">✨ 新功能</div>
-              <ul class="update-list">
-                <li class="update-item">同层对话：AI 回复直接显示在面板内，支持流式传输和正则过滤</li>
-                <li class="update-item">状态栏生成器新增 AI 解析 XML 和自然语言生成字段功能</li>
-              </ul>
-            </div>
-
-            <div>
-              <div style="color: #6366f1; font-weight: 600; margin-bottom: 8px">🔧 优化</div>
-              <ul class="update-list">
-                <li class="update-item">完整的移动端适配：响应式布局、标签栏滚动、滑动切换</li>
-                <li class="update-item">所有 AI 功能统一使用设置页的 API 配置</li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- v1.30 -->
-          <div
-            style="
-              padding: 20px;
-              background: rgba(99, 102, 241, 0.05);
-              border-left: 4px solid #6366f1;
-              border-radius: 8px;
-              margin-bottom: 15px;
-            "
-          >
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px">
-              <div style="font-size: 16px; font-weight: 600; color: #6366f1">v1.30</div>
-              <div style="font-size: 13px; color: #888">2025年10月26日</div>
-            </div>
-
-            <div style="margin-bottom: 15px">
-              <div style="color: #ffc107; font-weight: 600; margin-bottom: 8px">✨ 新功能</div>
-              <ul class="update-list">
-                <li class="update-item">新增 MVU Beta 标签页：变量结构、提示词模板、meta 配置生成</li>
-                <li class="update-item">新增状态栏生成器：可视化配置状态栏，生成正则 JSON 和世界书条目</li>
-                <li class="update-item">状态栏生成器支持 ABO 模板快速加载</li>
-              </ul>
-            </div>
-
-            <div>
-              <div style="color: #6366f1; font-weight: 600; margin-bottom: 8px">🔧 优化</div>
-              <ul class="update-list">
-                <li class="update-item">所有 AI 工具统一从设置页读取 max_tokens 和 temperature</li>
-                <li class="update-item">MVU Beta 和状态栏生成器支持数据持久化</li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- v1.00 -->
-          <div
-            style="
-              padding: 20px;
-              background: rgba(99, 102, 241, 0.05);
-              border-left: 4px solid #6366f1;
-              border-radius: 8px;
-            "
-          >
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px">
-              <div style="font-size: 16px; font-weight: 600; color: #6366f1">v1.00</div>
-              <div style="font-size: 13px; color: #888">2025年10月20日</div>
-            </div>
-
+          <div>
+            <div style="color: #6366f1; font-weight: 600; margin-bottom: 8px">🔧 优化</div>
             <ul class="update-list">
-              <li class="update-item">🎉 初始版本发布</li>
-              <li class="update-item">支持自动/手动总结、表格生成、反八股、世界书条目管理、楼层隐藏/显示</li>
+              <li class="update-item">所有 AI 工具统一从设置页读取 max_tokens 和 temperature</li>
+              <li class="update-item">MVU Beta 和状态栏生成器支持数据持久化</li>
             </ul>
           </div>
+        </div>
+
+        <!-- v1.00 -->
+        <div
+          style="
+            padding: 20px;
+            background: rgba(99, 102, 241, 0.05);
+            border-left: 4px solid #6366f1;
+            border-radius: 8px;
+          "
+        >
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px">
+            <div style="font-size: 16px; font-weight: 600; color: #6366f1">v1.00</div>
+            <div style="font-size: 13px; color: #888">2025年10月20日</div>
+          </div>
+
+          <ul class="update-list">
+            <li class="update-item">🎉 初始版本发布</li>
+            <li class="update-item">支持自动/手动总结、表格生成、反八股、世界书条目管理、楼层隐藏/显示</li>
+          </ul>
+        </div>
         </div>
         <!-- 结束备份的硬编码内容 -->
       </div>

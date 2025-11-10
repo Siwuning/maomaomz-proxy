@@ -17,7 +17,7 @@ $(() => {
     // 🔐 UI加载后进行授权验证
     console.log('🔐 开始授权验证...');
     const authorized = await checkAuthorization();
-    
+
     if (!authorized) {
       console.error('❌ 授权验证失败，插件功能已被禁用');
       
@@ -27,11 +27,11 @@ $(() => {
           (window as any).toastr.error(
             '❌ 未通过授权验证\n\n插件功能已被禁用，请重新输入授权码\n\n前往 Discord 获取最新授权码',
             '授权失败',
-            { timeOut: 0, extendedTimeOut: 0 }
+            { timeOut: 0, extendedTimeOut: 0 },
           );
         }
       }, 500);
-      
+
       return;
     }
     

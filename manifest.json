@@ -6,7 +6,7 @@
   "js": "dist/index.js",
   "css": "dist/index.css",
   "author": "猫猫 (mzrodyu)",
-  "version": "1.3.6",
+  "version": "1.3.9",
   "homePage": "https://github.com/mzrodyu/maomaomz",
   "auto_update": true,
   "changelog": {

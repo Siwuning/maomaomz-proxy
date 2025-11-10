@@ -19,6 +19,11 @@
   console.log('getScriptIdSafe:', hasGetScriptIdSafe ? '✅' : '❌');
   console.log('manualCheckSummary:', hasManualCheckSummary ? '✅' : '❌');
 
+  if (hasPinia) {
+    console.log('📦 window.pinia 内容:', window.pinia);
+    console.log('📦 window.pinia.useSettingsStore 类型:', typeof window.pinia.useSettingsStore);
+  }
+
   if (!hasPinia || !hasSettingsStore) {
     console.error('❌ 插件未加载！请确保插件已启用并刷新页面。');
     return;

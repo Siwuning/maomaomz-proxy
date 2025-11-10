@@ -1255,11 +1255,13 @@ import { storeToRefs } from 'pinia';
 import { onMounted, ref } from 'vue';
 import { useSettingsStore, useSummaryHistoryStore } from '../settings';
 import { getChatIdSafe, getScriptIdSafe } from '../utils';
+import { useTaskStore } from '../taskStore';
 import ProgressDialog from './ProgressDialog.vue';
 
 const settingsStore = useSettingsStore();
 const { settings } = storeToRefs(settingsStore);
 const summaryHistoryStore = useSummaryHistoryStore();
+const taskStore = useTaskStore();
 
 // 折叠展开状态
 const expandedSections = ref<Record<string, boolean>>({
@@ -1965,12 +1967,20 @@ const handle_test_connection = async () => {
 };
 
 const handle_summarize = async () => {
+  let taskId: string | null = null;
   try {
     if (is_summarizing.value) return;
 
     console.log('开始手动总结...');
     is_summarizing.value = true;
     saveGenerationStatus();
+
+    // 创建任务
+    taskId = taskStore.addTask({
+      title: '生成总结',
+      description: `正在总结楼层 ${settings.value.start_message_id} - ${settings.value.end_message_id}`,
+      category: '总结',
+    });
 
     // 验证 API 配置
     if (!settings.value.api_endpoint || !settings.value.api_key) {
@@ -2038,11 +2048,19 @@ const handle_summarize = async () => {
     setTimeout(() => {
       showProgress.value = false;
       window.toastr.success('总结完成并已保存到历史！');
+      // 标记任务完成
+      if (taskId) {
+        taskStore.completeTask(taskId);
+      }
     }, 800);
   } catch (error) {
     console.error('总结失败:', error);
     showProgress.value = false;
     window.toastr.error('总结失败: ' + (error as Error).message);
+    // 标记任务失败
+    if (taskId) {
+      taskStore.failTask(taskId, (error as Error).message);
+    }
   } finally {
     is_summarizing.value = false;
     saveGenerationStatus();

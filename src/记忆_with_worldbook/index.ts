@@ -222,7 +222,7 @@ $(() => {
             return false;
           }
 
-          domObserver = new MutationObserver((mutations) => {
+          domObserver = new MutationObserver(mutations => {
             // 检查是否有新的消息节点添加
             let hasNewMessage = false;
             for (const mutation of mutations) {
@@ -623,7 +623,7 @@ $(() => {
       (window as any).pinia = globalPinia;
       (window as any).getScriptIdSafe = getScriptIdSafe;
       (window as any).getChatIdSafe = getChatIdSafe;
-      
+
       console.log('✅ 全局对象已暴露:', {
         pinia: '✅ Pinia 实例',
         getScriptIdSafe: '✅ 获取脚本ID',

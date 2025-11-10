@@ -1796,16 +1796,25 @@ body {
       'script.js': `// 聊天历史
 let chatHistory = [];
 
-// 从酒馆变量加载历史
+// 从 localStorage 加载历史
 function loadHistory() {
-  const saved = getVariables({ type: 'chat' });
-  chatHistory = saved.chatHistory || [];
+  try {
+    const saved = localStorage.getItem('chat_history_demo');
+    chatHistory = saved ? JSON.parse(saved) : [];
+  } catch (e) {
+    console.error('加载历史失败:', e);
+    chatHistory = [];
+  }
   renderMessages();
 }
 
-// 保存到酒馆变量
+// 保存到 localStorage
 function saveHistory() {
-  insertOrAssignVariables({ chatHistory }, { type: 'chat' });
+  try {
+    localStorage.setItem('chat_history_demo', JSON.stringify(chatHistory));
+  } catch (e) {
+    console.error('保存历史失败:', e);
+  }
 }
 
 // 渲染消息
@@ -2000,9 +2009,10 @@ h2 {
   font-size: 13px;
   color: #94a3b8;
 }`,
-      'script.js': `// 从酒馆变量加载数据
+      'script.js': `// 从 localStorage 加载数据
 function loadStats() {
-  const data = getVariables({ type: 'chat' });
+  const saved = localStorage.getItem('rpg_stats_demo');
+  const data = saved ? JSON.parse(saved) : {};
 
   const hp = data.hp || 850;
   const maxHp = data.maxHp || 1000;
@@ -2122,9 +2132,10 @@ h2 {
   font-size: 13px;
   color: #94a3b8;
 }`,
-      'script.js': `// 从酒馆变量加载角色数据
+      'script.js': `// 从 localStorage 加载角色数据
 function loadCharacters() {
-  const data = getVariables({ type: 'chat' });
+  const saved = localStorage.getItem('characters_affection_demo');
+  const data = saved ? JSON.parse(saved) : {};
   const characters = data.characters || [
     { name: '角色 A', affection: 75 },
     { name: '角色 B', affection: 50 },
@@ -2362,37 +2373,33 @@ $(function() {
   console.log('页面加载完成');
 
   // ========== 检测是否在酒馆环境中 ==========
-  const isInTavern = typeof SillyTavern !== 'undefined' && typeof getVariables !== 'undefined';
+  const isInTavern = typeof SillyTavern !== 'undefined';
 
   if (!isInTavern) {
     console.log('预览模式：当前在预览窗口中，酒馆 API 不可用');
-    // 预览模式下的逻辑（使用 localStorage 或不保存数据）
   }
 
-  // ========== 数据持久化示例（仅在酒馆环境中可用）==========
+  // ========== 数据持久化示例（使用 localStorage）==========
   const storageKey = 'my_project_data'; // 自定义存储键名
 
   // 加载数据
   function loadData() {
-    if (isInTavern) {
-      const data = getVariables({ type: 'chat' });
-      return data[storageKey] || { count: 0 };
-    } else {
-      // 预览模式：使用 localStorage
+    try {
       const stored = localStorage.getItem(storageKey);
       return stored ? JSON.parse(stored) : { count: 0 };
+    } catch (e) {
+      console.error('加载数据失败:', e);
+      return { count: 0 };
     }
   }
 
-  // 保存数据
+  // 保存数据到 localStorage
   function saveData(data) {
-    if (isInTavern) {
-      insertOrAssignVariables({ [storageKey]: data }, { type: 'chat' });
-      console.log('数据已保存到酒馆变量:', data);
-    } else {
-      // 预览模式：使用 localStorage
+    try {
       localStorage.setItem(storageKey, JSON.stringify(data));
-      console.log('数据已保存到 localStorage（预览模式）:', data);
+      console.log('数据已保存到 localStorage:', data);
+    } catch (e) {
+      console.error('保存数据失败:', e);
     }
   }
 
@@ -2997,10 +3004,11 @@ async function fixBugWithAI() {
       throw new Error('无法获取脚本 ID');
     }
 
-    const vars = getVariables({ type: 'script', script_id: scriptId });
-    const apiEndpoint = vars?.api_endpoint;
-    const apiKey = vars?.api_key;
-    const model = vars?.model || 'gpt-4o-mini';
+    // 从 settings store 读取 API 配置
+    const settings = useSettingsStore().settings;
+    const apiEndpoint = settings.api_endpoint;
+    const apiKey = settings.api_key;
+    const model = settings.model || 'gpt-4o-mini';
 
     if (!apiEndpoint || !apiKey) {
       throw new Error('请先在"设置"标签中配置 API');
@@ -3246,12 +3254,13 @@ async function generateWithAI() {
       return;
     }
 
-    const vars = getVariables({ type: 'script', script_id: scriptId });
-    const apiEndpoint = vars?.api_endpoint;
-    const apiKey = vars?.api_key;
-    const model = vars?.model || 'gpt-4o-mini';
-    const temperature = vars?.temperature || 0.7;
-    const maxTokens = vars?.max_tokens || 4000;
+    // 从 settings store 读取 API 配置
+    const settings = useSettingsStore().settings;
+    const apiEndpoint = settings.api_endpoint;
+    const apiKey = settings.api_key;
+    const model = settings.model || 'gpt-4o-mini';
+    const temperature = settings.temperature || 0.7;
+    const maxTokens = settings.max_tokens || 4000;
 
     if (!apiEndpoint || !apiKey) {
       toastr.error('请先在"设置"标签页配置 API');

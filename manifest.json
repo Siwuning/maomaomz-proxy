@@ -6,10 +6,11 @@
   "js": "dist/index.js",
   "css": "dist/index.css",
   "author": "猫猫 (mzrodyu)",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "homePage": "https://github.com/mzrodyu/maomaomz",
   "auto_update": true,
   "changelog": {
+    "1.4.5": "支持多文件项目模板（HTML/CSS/JS），后台可视化编辑",
     "1.4.4": "后端支持编写模板代码，前端自动获取并使用",
     "1.4.3": "项目模板支持后端动态管理，方便更新模板",
     "1.4.2": "修复后端 API URL 拼写错误（关键修复）",

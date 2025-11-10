@@ -1,6 +1,6 @@
 {
   "name": "<猫猫的写卡小工具>",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "scripts": {
     "build": "vite build",
     "watch": "vite build --watch --mode development",

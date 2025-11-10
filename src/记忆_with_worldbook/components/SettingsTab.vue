@@ -1380,8 +1380,8 @@ const saveGenerationStatus = () => {
     // 插件环境：保存到 localStorage
     const storageKey = `${scriptId}_generation_status`;
     const status = {
-        is_summarizing: is_summarizing.value,
-        is_generating_table: is_generating_table.value,
+      is_summarizing: is_summarizing.value,
+      is_generating_table: is_generating_table.value,
     };
     localStorage.setItem(storageKey, JSON.stringify(status));
     console.log('✅ 已保存生成状态到 localStorage');
@@ -1415,11 +1415,11 @@ const loadHeaderTemplates = () => {
     if (savedData) {
       try {
         let templates = JSON.parse(savedData);
-    // 将 null、undefined 或不为数组的情况都归为 []
-    if (!Array.isArray(templates)) {
-      templates = [];
-    }
-    headerTemplates.value = templates;
+        // 将 null、undefined 或不为数组的情况都归为 []
+        if (!Array.isArray(templates)) {
+          templates = [];
+        }
+        headerTemplates.value = templates;
         console.log('✅ 从 localStorage 加载列头模板:', headerTemplates.value.length, '个');
       } catch (parseError) {
         console.error('解析列头模板失败:', parseError);
@@ -2542,7 +2542,7 @@ const handle_hide_messages = async () => {
       // 使用 TavernHelper 获取消息
       if (typeof (window as any).TavernHelper !== 'undefined') {
         const lastMessageId = (window as any).TavernHelper.getLastMessageId?.() ?? 0;
-      console.log('最新消息ID:', lastMessageId);
+        console.log('最新消息ID:', lastMessageId);
 
         if (typeof (window as any).TavernHelper.getChatMessages === 'function') {
           chatMessages = (window as any).TavernHelper.getChatMessages(`0-${lastMessageId}`);
@@ -2653,7 +2653,7 @@ const handle_show_messages = async () => {
       // 使用 TavernHelper 获取消息
       if (typeof (window as any).TavernHelper !== 'undefined') {
         const lastMessageId = (window as any).TavernHelper.getLastMessageId?.() ?? 0;
-      console.log('最新消息ID:', lastMessageId);
+        console.log('最新消息ID:', lastMessageId);
 
         if (typeof (window as any).TavernHelper.getChatMessages === 'function') {
           chatMessages = (window as any).TavernHelper.getChatMessages(`0-${lastMessageId}`);
@@ -2742,7 +2742,7 @@ const handle_refresh_hidden = async (showToast: boolean = false) => {
       // 使用 TavernHelper 获取消息
       if (typeof (window as any).TavernHelper !== 'undefined') {
         const lastMessageId = (window as any).TavernHelper.getLastMessageId?.() ?? 0;
-      console.log('最新消息ID:', lastMessageId);
+        console.log('最新消息ID:', lastMessageId);
 
         if (typeof (window as any).TavernHelper.getChatMessages === 'function') {
           chatMessages = (window as any).TavernHelper.getChatMessages(`0-${lastMessageId}`);

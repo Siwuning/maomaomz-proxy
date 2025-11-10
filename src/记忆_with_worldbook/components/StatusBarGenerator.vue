@@ -2933,7 +2933,7 @@ function loadSavedConfig() {
     if (savedDataString) {
       try {
         const savedConfig = JSON.parse(savedDataString);
-      config.value = { ...config.value, ...savedConfig };
+        config.value = { ...config.value, ...savedConfig };
         console.log('✅ 已从 localStorage 加载保存的状态栏配置');
       } catch (e) {
         console.error('解析状态栏配置失败:', e);

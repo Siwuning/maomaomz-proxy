@@ -2997,10 +2997,7 @@ async function fixBugWithAI() {
   let normalizedEndpoint = '';
 
   // 创建任务
-  const taskId = taskStore.createTask(
-    'ui_modify',
-    `🐛 修复 Bug: ${bugDescription.value.slice(0, 30)}...`,
-  );
+  const taskId = taskStore.createTask('ui_modify', `🐛 修复 Bug: ${bugDescription.value.slice(0, 30)}...`);
 
   try {
     // 阶段 1: 准备请求
@@ -3263,10 +3260,7 @@ async function generateWithAI() {
   let normalizedEndpoint = ''; // 提到外层作用域
 
   // 创建任务
-  const taskId = taskStore.createTask(
-    'ui_generate',
-    `🤖 AI 生成: ${aiPrompt.value.slice(0, 30)}...`,
-  );
+  const taskId = taskStore.createTask('ui_generate', `🤖 AI 生成: ${aiPrompt.value.slice(0, 30)}...`);
 
   try {
     // 阶段1: 准备请求

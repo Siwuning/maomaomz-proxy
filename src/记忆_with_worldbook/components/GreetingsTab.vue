@@ -916,9 +916,9 @@ function getCurrentCharacter() {
     // 插件环境：优先使用 TavernHelper 接口
     if (typeof (window as any).TavernHelper !== 'undefined') {
       const char = (window as any).TavernHelper.getCharData('current');
-    if (char) {
+      if (char) {
         console.log('找到角色卡 (TavernHelper):', char.name);
-    return char;
+        return char;
       }
     }
 
@@ -1017,8 +1017,8 @@ function saveConfig() {
     const storageKey = `${scriptId}_greetings_${character.avatar}`;
 
     const configData = {
-        greetings_config: klona(greetings.value),
-        ui_config: klona(uiConfig.value),
+      greetings_config: klona(greetings.value),
+      ui_config: klona(uiConfig.value),
     };
 
     localStorage.setItem(storageKey, JSON.stringify(configData));
@@ -1191,9 +1191,9 @@ ${greetingContent}
       body: JSON.stringify({
         model: settings.value.model,
         messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
         temperature: settings.value.temperature,
         max_tokens: settings.value.max_tokens,
         top_p: settings.value.top_p,
@@ -1340,9 +1340,9 @@ ${requirement}
       body: JSON.stringify({
         model: settings.value.model,
         messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
         temperature: settings.value.temperature,
         max_tokens: settings.value.max_tokens,
         top_p: settings.value.top_p,
@@ -1640,9 +1640,9 @@ ${switchGreetingCode}
       body: JSON.stringify({
         model: settings.value.model,
         messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
         temperature: settings.value.temperature,
         max_tokens: settings.value.max_tokens,
         top_p: settings.value.top_p,

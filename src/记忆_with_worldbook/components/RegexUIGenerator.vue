@@ -397,10 +397,10 @@ const loadData = () => {
     if (savedDataString) {
       try {
         const savedData = JSON.parse(savedDataString);
-        triggerKeyword.value = savedData.triggerKeyword || '【开场白】';
-        interfaceDescription.value = savedData.interfaceDescription || '';
-        generatedCode.value = savedData.generatedCode || '';
-        generatedRegex.value = savedData.generatedRegex || '';
+      triggerKeyword.value = savedData.triggerKeyword || '【开场白】';
+      interfaceDescription.value = savedData.interfaceDescription || '';
+      generatedCode.value = savedData.generatedCode || '';
+      generatedRegex.value = savedData.generatedRegex || '';
         console.log('✅ [界面生成器] 数据已从 localStorage 加载');
       } catch (parseError) {
         console.error('❌ [界面生成器] 解析数据失败:', parseError);

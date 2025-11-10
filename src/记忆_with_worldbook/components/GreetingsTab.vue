@@ -802,6 +802,7 @@ import { computed, onMounted, ref } from 'vue';
 import { z } from 'zod';
 import { useSettingsStore } from '../settings';
 import { copyToClipboard, getScriptIdSafe } from '../utils';
+import { useTaskStore } from '../taskStore';
 import AIGenerateDialog from './AIGenerateDialog.vue';
 import AIModifyDialog from './AIModifyDialog.vue';
 
@@ -824,6 +825,9 @@ type UIConfig = z.infer<typeof UIConfig>;
 // 获取settings store
 const settingsStore = useSettingsStore();
 const { settings } = storeToRefs(settingsStore);
+
+// 获取task store
+const taskStore = useTaskStore();
 
 // 响应式数据
 const greetings = ref<GreetingConfig[]>([]);
@@ -912,9 +916,9 @@ function getCurrentCharacter() {
     // 插件环境：优先使用 TavernHelper 接口
     if (typeof (window as any).TavernHelper !== 'undefined') {
       const char = (window as any).TavernHelper.getCharData('current');
-      if (char) {
+    if (char) {
         console.log('找到角色卡 (TavernHelper):', char.name);
-        return char;
+    return char;
       }
     }
 
@@ -1013,8 +1017,8 @@ function saveConfig() {
     const storageKey = `${scriptId}_greetings_${character.avatar}`;
 
     const configData = {
-      greetings_config: klona(greetings.value),
-      ui_config: klona(uiConfig.value),
+        greetings_config: klona(greetings.value),
+        ui_config: klona(uiConfig.value),
     };
 
     localStorage.setItem(storageKey, JSON.stringify(configData));
@@ -1098,6 +1102,9 @@ function closeAiGenerateDialog() {
 async function generateDescription(index: number) {
   currentEditingIndex.value = index;
 
+  // 创建任务
+  const taskId = taskStore.createTask('ui_generate', `生成开场白#${index}描述`);
+
   // 初始化进度
   aiProgress.value.startTime = Date.now();
   aiProgress.value.total = 4;
@@ -1112,21 +1119,25 @@ async function generateDescription(index: number) {
   if (idx < 0 || idx >= greetings.value.length) {
     isGeneratingAi.value = false;
     showAiGenerateDialog.value = false;
+    taskStore.failTask(taskId, '无效的开场白索引');
     return;
   }
 
   try {
     updateProgress(1, '检查配置', '正在验证 API 配置和权限...');
+    taskStore.updateTaskProgress(taskId, 10, '检查配置');
 
     // 检查 API 配置
     if (!settings.value.api_endpoint || !settings.value.api_key) {
       toastr.error('请先在设置页面配置 API 端点和 API Key');
       showAiGenerateDialog.value = false;
       isGeneratingAi.value = false;
+      taskStore.failTask(taskId, 'API 未配置');
       return;
     }
 
     updateProgress(2, '读取数据', `正在读取开场白 #${idx} 的内容...`);
+    taskStore.updateTaskProgress(taskId, 30, '读取开场白内容');
 
     // 获取开场白内容
     const character = getCurrentCharacter();
@@ -1134,6 +1145,7 @@ async function generateDescription(index: number) {
       toastr.error('未找到角色卡');
       showAiGenerateDialog.value = false;
       isGeneratingAi.value = false;
+      taskStore.failTask(taskId, '未找到角色卡');
       return;
     }
 
@@ -1144,10 +1156,12 @@ async function generateDescription(index: number) {
       toastr.warning('该开场白内容为空');
       showAiGenerateDialog.value = false;
       isGeneratingAi.value = false;
+      taskStore.failTask(taskId, '开场白内容为空');
       return;
     }
 
     updateProgress(3, '调用 AI', `正在请求 ${settings.value.model} 生成描述...`);
+    taskStore.updateTaskProgress(taskId, 50, `调用 AI (${settings.value.model})`);
 
     // 构建提示词
     const systemPrompt = `你是一个专业的文案编辑助手，擅长为小说、游戏等创作简洁吸引人的开场白描述。
@@ -1177,9 +1191,9 @@ ${greetingContent}
       body: JSON.stringify({
         model: settings.value.model,
         messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
         temperature: settings.value.temperature,
         max_tokens: settings.value.max_tokens,
         top_p: settings.value.top_p,
@@ -1202,6 +1216,7 @@ ${greetingContent}
     }
 
     updateProgress(4, '处理结果', '正在清理和应用生成的描述...');
+    taskStore.updateTaskProgress(taskId, 80, '处理结果');
 
     // 清理AI返回的内容
     // 移除可能的引号包裹
@@ -1223,6 +1238,9 @@ ${greetingContent}
     const elapsed = ((Date.now() - aiProgress.value.startTime) / 1000).toFixed(1);
     toastr.success(`描述生成成功！耗时 ${elapsed} 秒`, '', { timeOut: 3000 });
 
+    // 标记任务完成
+    taskStore.completeTask(taskId, { description: aiDescription });
+
     // 延迟关闭对话框，让用户看到完成状态
     setTimeout(() => {
       showAiGenerateDialog.value = false;
@@ -1231,6 +1249,7 @@ ${greetingContent}
     console.error('❌ [生成] AI 生成失败:', error);
     const errorMsg = '生成失败: ' + (error as Error).message;
     toastr.error(errorMsg);
+    taskStore.failTask(taskId, errorMsg);
     // 延长显示时间
     setTimeout(() => {}, 5000);
   } finally {
@@ -1250,6 +1269,9 @@ async function confirmEditDescription(requirement: string) {
   const index = currentEditingIndex.value;
   if (index < 0 || index >= greetings.value.length) return;
 
+  // 创建任务
+  const taskId = taskStore.createTask('ui_modify', `编辑开场白#${index}描述`);
+
   // 初始化进度
   aiProgress.value.startTime = Date.now();
   aiProgress.value.total = 4;
@@ -1260,6 +1282,7 @@ async function confirmEditDescription(requirement: string) {
 
   try {
     updateProgress(1, '检查配置', '正在验证 API 配置和权限...');
+    taskStore.updateTaskProgress(taskId, 10, '检查配置');
 
     // 检查 API 配置
     if (!settings.value.api_endpoint || !settings.value.api_key) {
@@ -1267,10 +1290,12 @@ async function confirmEditDescription(requirement: string) {
       showAiEditDialog.value = false;
       isEditingAi.value = false;
       stopElapsedTimer();
+      taskStore.failTask(taskId, 'API 未配置');
       return;
     }
 
     updateProgress(2, '读取数据', '正在读取当前描述内容...');
+    taskStore.updateTaskProgress(taskId, 30, '读取当前描述');
 
     const currentDesc = greetings.value[index].description;
 
@@ -1279,10 +1304,12 @@ async function confirmEditDescription(requirement: string) {
       showAiEditDialog.value = false;
       isEditingAi.value = false;
       stopElapsedTimer();
+      taskStore.failTask(taskId, '当前描述为空');
       return;
     }
 
     updateProgress(3, '调用 AI', `正在请求 ${settings.value.model} 编辑描述...`);
+    taskStore.updateTaskProgress(taskId, 50, `调用 AI (${settings.value.model})`);
 
     // 构建提示词
     const systemPrompt = `你是一个专业的文案编辑助手，擅长根据用户需求修改文案。
@@ -1313,9 +1340,9 @@ ${requirement}
       body: JSON.stringify({
         model: settings.value.model,
         messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
         temperature: settings.value.temperature,
         max_tokens: settings.value.max_tokens,
         top_p: settings.value.top_p,
@@ -1338,6 +1365,7 @@ ${requirement}
     }
 
     updateProgress(4, '处理结果', '正在清理和应用编辑后的描述...');
+    taskStore.updateTaskProgress(taskId, 80, '处理结果');
 
     // 清理AI返回的内容
     // 移除可能的引号包裹
@@ -1359,6 +1387,9 @@ ${requirement}
     const elapsed = ((Date.now() - aiProgress.value.startTime) / 1000).toFixed(1);
     toastr.success(`描述修改成功！耗时 ${elapsed} 秒`, '', { timeOut: 3000 });
 
+    // 标记任务完成
+    taskStore.completeTask(taskId, { description: aiDescription });
+
     // 延迟关闭对话框，让用户看到完成状态
     setTimeout(() => {
       showAiEditDialog.value = false;
@@ -1367,6 +1398,7 @@ ${requirement}
     console.error('❌ [编辑] AI 编辑失败:', error);
     const errorMsg = '编辑失败: ' + (error as Error).message;
     toastr.error(errorMsg);
+    taskStore.failTask(taskId, errorMsg);
   } finally {
     stopElapsedTimer(); // 停止耗时计算
     isEditingAi.value = false;
@@ -1380,6 +1412,9 @@ async function generateStyleWithAI(styleDescription: string) {
     return;
   }
 
+  // 创建任务
+  const taskId = taskStore.createTask('ui_generate', '生成开场白界面样式');
+
   // 初始化进度
   aiProgress.value.startTime = Date.now();
   aiProgress.value.total = 5;
@@ -1391,6 +1426,7 @@ async function generateStyleWithAI(styleDescription: string) {
     toastr.error('请先在设置页面配置 API 端点和 API Key');
     showAiStyleDialog.value = false;
     stopElapsedTimer();
+    taskStore.failTask(taskId, 'API 未配置');
     return;
   }
 
@@ -1398,6 +1434,7 @@ async function generateStyleWithAI(styleDescription: string) {
 
   try {
     updateProgress(1, '准备数据', '正在收集开场白卡片信息...');
+    taskStore.updateTaskProgress(taskId, 10, '准备数据');
 
     // 生成卡片列表HTML
     const cards = greetings.value
@@ -1586,10 +1623,12 @@ ${switchGreetingCode}
 请生成完整的HTML代码，确保包含以上所有要求：`;
 
     updateProgress(2, '构建提示', '正在准备 AI 提示词和示例代码...');
+    taskStore.updateTaskProgress(taskId, 30, '构建提示');
 
     console.log('🚀 直接调用 AI API (插件环境)...');
 
     updateProgress(3, '调用 AI', `正在请求 ${settings.value.model} 生成界面样式...`);
+    taskStore.updateTaskProgress(taskId, 50, `调用 AI (${settings.value.model})`);
 
     // 插件环境：直接调用 API (生成样式)
     const response = await fetch(settings.value.api_endpoint + '/chat/completions', {
@@ -1601,9 +1640,9 @@ ${switchGreetingCode}
       body: JSON.stringify({
         model: settings.value.model,
         messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
         temperature: settings.value.temperature,
         max_tokens: settings.value.max_tokens,
         top_p: settings.value.top_p,
@@ -1626,6 +1665,7 @@ ${switchGreetingCode}
     }
 
     updateProgress(4, '处理结果', '正在清理和验证生成的代码...');
+    taskStore.updateTaskProgress(taskId, 75, '处理结果');
 
     // 清理AI返回的内容
     // 移除可能的markdown代码块标记
@@ -1638,6 +1678,7 @@ ${switchGreetingCode}
     console.log('✨ [样式生成] AI 清理后的HTML长度:', generatedHtml.length);
 
     updateProgress(5, '保存配置', '正在保存生成的界面样式...');
+    taskStore.updateTaskProgress(taskId, 90, '保存配置');
 
     // 保存生成的HTML
     uiConfig.value.customHtml = generatedHtml;
@@ -1650,6 +1691,9 @@ ${switchGreetingCode}
     const elapsed = ((Date.now() - aiProgress.value.startTime) / 1000).toFixed(1);
     toastr.success(`界面样式生成成功！耗时 ${elapsed} 秒`, '', { timeOut: 3000 });
 
+    // 标记任务完成
+    taskStore.completeTask(taskId, { htmlLength: generatedHtml.length });
+
     // 延迟关闭对话框，让用户看到完成状态
     setTimeout(() => {
       showAiStyleDialog.value = false;
@@ -1657,6 +1701,7 @@ ${switchGreetingCode}
   } catch (error) {
     console.error('❌ [样式生成] AI 生成失败:', error);
     toastr.error('生成失败: ' + (error as Error).message, '', { timeOut: 5000 });
+    taskStore.failTask(taskId, (error as Error).message);
   } finally {
     stopElapsedTimer(); // 停止耗时计算
     isGeneratingStyle.value = false;

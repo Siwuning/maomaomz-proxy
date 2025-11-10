@@ -1103,6 +1103,7 @@ import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref, watch } from 'vue';
 import { normalizeApiEndpoint, useSettingsStore } from '../settings';
 import { copyToClipboard, getScriptIdSafe } from '../utils';
+import { useTaskStore } from '../taskStore';
 import AIModifyDialog from './AIModifyDialog.vue';
 import ProgressDialog from './ProgressDialog.vue';
 
@@ -1126,6 +1127,9 @@ interface CodeFile {
 // 初始化 settings store
 const settingsStore = useSettingsStore();
 const { settings } = storeToRefs(settingsStore);
+
+// 初始化 task store
+const taskStore = useTaskStore();
 
 // 预设模板
 const templates = {
@@ -1535,6 +1539,9 @@ async function parseXmlWithAI() {
     return;
   }
 
+  // 创建任务
+  const taskId = taskStore.createTask('ui_generate', 'AI解析XML生成字段');
+
   // 保存原始输入（用于增量修改）
   originalXmlInput.value = xmlInput.value;
 
@@ -1545,6 +1552,7 @@ async function parseXmlWithAI() {
     progressDialogRef.value?.setProgress(10);
     progressDialogRef.value?.setMessage('正在准备解析 XML...');
     progressDialogRef.value?.addDetail(`XML 长度: ${xmlInput.value.length} 字符`);
+    taskStore.updateTaskProgress(taskId, 10, '准备解析XML');
     const systemPrompt = `你是一个专业的 XML 解析助手。用户会给你一个 XML 格式的状态栏代码，你需要：
 
 1. **识别所有标签**：提取所有的 XML 标签名（如 <i>、<2i>、<日期>、<角色生理状态> 等）
@@ -1595,6 +1603,7 @@ ${xmlInput.value.trim()}
 
     progressDialogRef.value?.setProgress(20);
     progressDialogRef.value?.setMessage('正在发送 XML 到 AI 服务器...');
+    taskStore.updateTaskProgress(taskId, 20, '发送XML到AI');
 
     // 规范化 API 端点
     const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
@@ -1603,6 +1612,7 @@ ${xmlInput.value.trim()}
     // 调用 AI API
     progressDialogRef.value?.setProgress(30);
     progressDialogRef.value?.setMessage('等待 AI 解析 XML 结构...');
+    taskStore.updateTaskProgress(taskId, 40, `调用AI (${settings.value.model})`);
 
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -1692,6 +1702,7 @@ ${xmlInput.value.trim()}
     progressDialogRef.value?.setProgress(100);
     progressDialogRef.value?.setMessage('✅ 解析完成！');
     progressDialogRef.value?.addDetail(`成功解析 ${validFields.length} 个字段`);
+    taskStore.completeTask(taskId, { fieldCount: validFields.length });
 
     setTimeout(() => {
       showProgress.value = false;
@@ -1705,6 +1716,7 @@ ${xmlInput.value.trim()}
 
     // 显示详细错误信息
     const errorMsg = error.message || '未知错误';
+    taskStore.failTask(taskId, errorMsg);
 
     // 检查是否是 API 相关错误
     if (
@@ -1853,6 +1865,9 @@ async function generateFieldsWithAI() {
     return;
   }
 
+  // 创建任务
+  const taskId = taskStore.createTask('ui_generate', 'AI智能生成字段');
+
   // 保存原始输入（用于增量修改）
   originalFieldDescription.value = aiFieldDescription.value;
 
@@ -1863,6 +1878,7 @@ async function generateFieldsWithAI() {
     progressDialogRef.value?.setProgress(10);
     progressDialogRef.value?.setMessage('正在准备智能生成...');
     progressDialogRef.value?.addDetail('AI 正在分析你的需求');
+    taskStore.updateTaskProgress(taskId, 10, '准备智能生成');
     const systemPrompt = `你是一个专业的状态栏字段设计助手。用户会用自然语言描述他们想要的状态栏，你需要：
 
 1. **理解用户需求**：分析用户描述的场景、类型（如修仙、现代、ABO等）
@@ -1916,6 +1932,7 @@ ${aiFieldDescription.value.trim()}
 
     progressDialogRef.value?.setProgress(20);
     progressDialogRef.value?.setMessage('正在发送需求到 AI...');
+    taskStore.updateTaskProgress(taskId, 20, '发送需求到AI');
 
     // 规范化 API 端点
     const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
@@ -1923,6 +1940,7 @@ ${aiFieldDescription.value.trim()}
 
     progressDialogRef.value?.setProgress(30);
     progressDialogRef.value?.setMessage('等待 AI 设计字段...');
+    taskStore.updateTaskProgress(taskId, 40, `调用AI (${settings.value.model})`);
 
     // 调用 AI API
     const response = await fetch(apiUrl, {
@@ -2013,6 +2031,7 @@ ${aiFieldDescription.value.trim()}
     progressDialogRef.value?.setProgress(100);
     progressDialogRef.value?.setMessage('✅ 生成完成！');
     progressDialogRef.value?.addDetail(`成功生成 ${validFields.length} 个字段`);
+    taskStore.completeTask(taskId, { fieldCount: validFields.length });
 
     setTimeout(() => {
       showProgress.value = false;
@@ -2026,6 +2045,7 @@ ${aiFieldDescription.value.trim()}
 
     // 显示详细错误信息
     const errorMsg = error.message || '未知错误';
+    taskStore.failTask(taskId, errorMsg);
 
     // 检查是否是 API 相关错误
     if (
@@ -2397,6 +2417,9 @@ async function generateWithAI() {
     return;
   }
 
+  // 创建任务
+  const taskId = taskStore.createTask('ui_generate', 'AI生成状态栏界面');
+
   // 保存原始输入（用于增量修改）
   originalAiPrompt.value = aiPrompt.value;
 
@@ -2408,6 +2431,7 @@ async function generateWithAI() {
     if (!settings.value.api_endpoint || !settings.value.api_key) {
       window.toastr.error('请先在设置页面配置 API 端点和 API Key');
       showProgress.value = false;
+      taskStore.failTask(taskId, 'API未配置');
       return;
     }
 
@@ -2416,6 +2440,7 @@ async function generateWithAI() {
     progressDialogRef.value?.setMessage('正在准备 AI 请求...');
     progressDialogRef.value?.addDetail(`字段数量: ${config.value.fields.length} 个`);
     progressDialogRef.value?.addDetail(`模型: ${settings.value.model}`);
+    taskStore.updateTaskProgress(taskId, 10, '准备AI请求');
 
     // 构建当前代码内容
     const currentFiles = files.value.map(f => `=== ${f.path} ===\n${f.content}`).join('\n\n');
@@ -2505,6 +2530,7 @@ ${currentFiles}
     progressDialogRef.value?.setProgress(20);
     progressDialogRef.value?.setMessage('正在发送请求到 AI 服务器...');
     progressDialogRef.value?.addDetail(`API 端点: ${settings.value.api_endpoint}`);
+    taskStore.updateTaskProgress(taskId, 20, '发送请求到AI');
 
     const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
     const response = await fetch(apiUrl, {
@@ -2528,6 +2554,7 @@ ${currentFiles}
     progressDialogRef.value?.setProgress(40);
     progressDialogRef.value?.setMessage('等待 AI 响应...');
     progressDialogRef.value?.addDetail('这可能需要 10-30 秒，请耐心等待');
+    taskStore.updateTaskProgress(taskId, 50, `等待AI响应 (${settings.value.model})`);
 
     if (!response.ok) {
       throw new Error(`API 错误: ${response.statusText}`);
@@ -2540,6 +2567,7 @@ ${currentFiles}
     progressDialogRef.value?.setProgress(70);
     progressDialogRef.value?.setMessage('正在解析 AI 生成的代码...');
     progressDialogRef.value?.addDetail(`收到响应，长度: ${resultText.length} 字符`);
+    taskStore.updateTaskProgress(taskId, 70, '解析AI生成的代码');
 
     // 解析 AI 回复
     const FILE_START_REGEX = /FILE_START:\s*([^\n]+)\n([\s\S]*?)(?=FILE_START:|FILE_END:|$)/g;
@@ -2584,6 +2612,7 @@ ${currentFiles}
     progressDialogRef.value?.setProgress(90);
     progressDialogRef.value?.setMessage('正在更新预览界面...');
     progressDialogRef.value?.addDetail(`已生成 ${matches.length} 个文件`);
+    taskStore.updateTaskProgress(taskId, 90, '更新预览界面');
 
     const htmlFile = files.value.find(f => f.path === 'index.html') || files.value[0];
     currentFile.value = htmlFile;
@@ -2592,6 +2621,7 @@ ${currentFiles}
     // 完成
     progressDialogRef.value?.setProgress(100);
     progressDialogRef.value?.setMessage('✅ AI 生成完成！');
+    taskStore.completeTask(taskId, { fileCount: matches.length });
 
     setTimeout(() => {
       showProgress.value = false;
@@ -2601,6 +2631,7 @@ ${currentFiles}
   } catch (error: any) {
     console.error('AI 生成失败:', error);
     showProgress.value = false;
+    taskStore.failTask(taskId, error.message);
     window.toastr.error('AI 生成失败: ' + error.message);
   }
 }
@@ -2902,7 +2933,7 @@ function loadSavedConfig() {
     if (savedDataString) {
       try {
         const savedConfig = JSON.parse(savedDataString);
-        config.value = { ...config.value, ...savedConfig };
+      config.value = { ...config.value, ...savedConfig };
         console.log('✅ 已从 localStorage 加载保存的状态栏配置');
       } catch (e) {
         console.error('解析状态栏配置失败:', e);

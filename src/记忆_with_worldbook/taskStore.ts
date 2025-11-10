@@ -35,9 +35,9 @@ const loadTasksFromVariables = (): Task[] => {
     if (savedDataString) {
       try {
         const savedTasks = JSON.parse(savedDataString);
-        if (Array.isArray(savedTasks)) {
+    if (Array.isArray(savedTasks)) {
           console.log('📥 [任务管理] 从 localStorage 加载任务:', savedTasks.length);
-          return savedTasks;
+      return savedTasks;
         }
       } catch (parseError) {
         console.error('❌ [任务管理] 解析任务数据失败:', parseError);

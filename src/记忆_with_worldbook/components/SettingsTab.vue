@@ -1380,8 +1380,8 @@ const saveGenerationStatus = () => {
     // 插件环境：保存到 localStorage
     const storageKey = `${scriptId}_generation_status`;
     const status = {
-      is_summarizing: is_summarizing.value,
-      is_generating_table: is_generating_table.value,
+        is_summarizing: is_summarizing.value,
+        is_generating_table: is_generating_table.value,
     };
     localStorage.setItem(storageKey, JSON.stringify(status));
     console.log('✅ 已保存生成状态到 localStorage');
@@ -1415,11 +1415,11 @@ const loadHeaderTemplates = () => {
     if (savedData) {
       try {
         let templates = JSON.parse(savedData);
-        // 将 null、undefined 或不为数组的情况都归为 []
-        if (!Array.isArray(templates)) {
-          templates = [];
-        }
-        headerTemplates.value = templates;
+    // 将 null、undefined 或不为数组的情况都归为 []
+    if (!Array.isArray(templates)) {
+      templates = [];
+    }
+    headerTemplates.value = templates;
         console.log('✅ 从 localStorage 加载列头模板:', headerTemplates.value.length, '个');
       } catch (parseError) {
         console.error('解析列头模板失败:', parseError);
@@ -2068,12 +2068,20 @@ const handle_summarize = async () => {
 };
 
 const handle_generate_table = async () => {
+  let taskId: string | null = null;
   try {
     if (is_generating_table.value) return;
 
     console.log('开始生成表格...');
     is_generating_table.value = true;
     saveGenerationStatus();
+
+    // 创建任务
+    taskId = taskStore.addTask({
+      title: '生成表格',
+      description: `正在生成楼层 ${settings.value.table_start_message_id} - ${settings.value.table_end_message_id} 的表格`,
+      category: '表格',
+    });
 
     // 验证 API 配置
     if (!settings.value.api_endpoint || !settings.value.api_key) {
@@ -2397,6 +2405,10 @@ ${messagesText}
       setTimeout(() => {
         showProgress.value = false;
         window.toastr.success(`表格生成成功！共${tableData.data.length}行数据`);
+        // 标记任务完成
+        if (taskId) {
+          taskStore.completeTask(taskId);
+        }
       }, 800);
 
       console.log('表格已保存到聊天变量:', table_history);
@@ -2408,6 +2420,10 @@ ${messagesText}
     console.error('生成表格失败:', error);
     showProgress.value = false;
     window.toastr.error('生成表格失败: ' + (error as Error).message);
+    // 标记任务失败
+    if (taskId) {
+      taskStore.failTask(taskId, (error as Error).message);
+    }
   } finally {
     is_generating_table.value = false;
     saveGenerationStatus();
@@ -2526,7 +2542,7 @@ const handle_hide_messages = async () => {
       // 使用 TavernHelper 获取消息
       if (typeof (window as any).TavernHelper !== 'undefined') {
         const lastMessageId = (window as any).TavernHelper.getLastMessageId?.() ?? 0;
-        console.log('最新消息ID:', lastMessageId);
+      console.log('最新消息ID:', lastMessageId);
 
         if (typeof (window as any).TavernHelper.getChatMessages === 'function') {
           chatMessages = (window as any).TavernHelper.getChatMessages(`0-${lastMessageId}`);
@@ -2637,7 +2653,7 @@ const handle_show_messages = async () => {
       // 使用 TavernHelper 获取消息
       if (typeof (window as any).TavernHelper !== 'undefined') {
         const lastMessageId = (window as any).TavernHelper.getLastMessageId?.() ?? 0;
-        console.log('最新消息ID:', lastMessageId);
+      console.log('最新消息ID:', lastMessageId);
 
         if (typeof (window as any).TavernHelper.getChatMessages === 'function') {
           chatMessages = (window as any).TavernHelper.getChatMessages(`0-${lastMessageId}`);
@@ -2726,7 +2742,7 @@ const handle_refresh_hidden = async (showToast: boolean = false) => {
       // 使用 TavernHelper 获取消息
       if (typeof (window as any).TavernHelper !== 'undefined') {
         const lastMessageId = (window as any).TavernHelper.getLastMessageId?.() ?? 0;
-        console.log('最新消息ID:', lastMessageId);
+      console.log('最新消息ID:', lastMessageId);
 
         if (typeof (window as any).TavernHelper.getChatMessages === 'function') {
           chatMessages = (window as any).TavernHelper.getChatMessages(`0-${lastMessageId}`);

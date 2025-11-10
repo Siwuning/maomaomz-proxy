@@ -2106,7 +2106,7 @@ function showProjectTemplateDialog() {
 function createProjectFromTemplate(templateKey: string) {
   // 优先使用后端模板
   const backendTemplate = backendTemplates.value.find(t => t.title === templateKey);
-  
+
   if (backendTemplate && backendTemplate.code) {
     // 使用后端模板代码
     const name = prompt('项目名称:', backendTemplate.title);

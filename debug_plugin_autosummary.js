@@ -34,9 +34,11 @@
   try {
     const settingsStore = window.pinia.useSettingsStore();
     const settings = settingsStore.settings;
-    console.log('启用自动总结:', settings.auto_summary_enable ? '✅' : '❌');
-    console.log('总结间隔:', settings.auto_summary_interval_floor, '条消息');
-    console.log('总结模式:', settings.auto_summary_type === 'latest' ? '最新消息' : '完整对话');
+    console.log('启用自动总结:', settings.auto_summarize_enabled ? '✅' : '❌');
+    console.log('总结间隔:', settings.summarize_interval, '条消息');
+    console.log('模型:', settings.model);
+    console.log('API 端点:', settings.api_endpoint);
+    console.log('API Key:', settings.api_key ? `***${settings.api_key.slice(-4)}` : '未设置');
     console.log('完整设置:', settings);
   } catch (error) {
     console.error('❌ 获取插件设置失败:', error);
@@ -75,8 +77,7 @@
 
   // 5. 测试 jQuery 监听
   console.log('\n【5. 测试 jQuery 监听】');
-  let jqueryEventCount = 0;
-  let customEventCount = 0;
+  window._debugCounters = { jquery: 0, custom: 0, dom: 0 };
 
   // 注册测试监听器
   if (typeof TavernHelper !== 'undefined' && TavernHelper.tavern_events) {
@@ -84,8 +85,8 @@
     console.log('尝试监听 jQuery 事件:', eventName);
 
     $(document).on(eventName, function (e) {
-      jqueryEventCount++;
-      console.log(`🎉 jQuery 事件触发 #${jqueryEventCount}:`, eventName, e);
+      window._debugCounters.jquery++;
+      console.log(`🎉 jQuery 事件触发 #${window._debugCounters.jquery}:`, eventName, e);
     });
 
     console.log('✅ jQuery 监听器已注册');
@@ -97,8 +98,8 @@
     console.log('尝试监听 CustomEvent:', eventName);
 
     document.addEventListener(eventName, function (e) {
-      customEventCount++;
-      console.log(`🎉 CustomEvent 触发 #${customEventCount}:`, eventName, e);
+      window._debugCounters.custom++;
+      console.log(`🎉 CustomEvent 触发 #${window._debugCounters.custom}:`, eventName, e);
     });
 
     console.log('✅ CustomEvent 监听器已注册');
@@ -112,14 +113,13 @@
     console.log('当前子节点数:', chatContainer.children.length);
 
     // 模拟插件的 DOM 监控
-    let domChangeCount = 0;
     const testObserver = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
         if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
           mutation.addedNodes.forEach(node => {
             if (node.nodeType === 1 && node.matches('.mes')) {
-              domChangeCount++;
-              console.log(`🎉 DOM 监控检测到新消息 #${domChangeCount}:`, node);
+              window._debugCounters.dom++;
+              console.log(`🎉 DOM 监控检测到新消息 #${window._debugCounters.dom}:`, node);
             }
           });
         }
@@ -159,9 +159,10 @@
   // 8. 统计函数
   window.showEventStats = () => {
     console.log('\n======== 事件统计 ========');
-    console.log('jQuery 事件触发次数:', jqueryEventCount);
-    console.log('CustomEvent 触发次数:', customEventCount);
-    console.log('DOM 变化检测次数:', domChangeCount);
+    console.log('jQuery 事件触发次数:', window._debugCounters?.jquery || 0);
+    console.log('CustomEvent 触发次数:', window._debugCounters?.custom || 0);
+    console.log('DOM 变化检测次数:', window._debugCounters?.dom || 0);
+    console.log('插件 DOM 监控:', `已检测到 ${window._debugCounters?.dom || 0} 次新消息`);
   };
 
   console.log('\n============================================================');

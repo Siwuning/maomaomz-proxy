@@ -60,8 +60,16 @@ $(() => {
             return;
           }
 
-          // TavernHelper环境：使用 getLastMessageId()
-          const last_message_id = typeof getLastMessageId === 'function' ? getLastMessageId() : 0;
+          // 插件环境：使用 SillyTavern.chat.length
+          let last_message_id = 0;
+          if (typeof SillyTavern !== 'undefined' && Array.isArray(SillyTavern.chat)) {
+            last_message_id = SillyTavern.chat.length - 1;
+          } else if (typeof getLastMessageId === 'function') {
+            last_message_id = getLastMessageId();
+          } else {
+            console.warn('⚠️ 无法获取最后一条消息ID');
+            return;
+          }
 
           // 插件环境：使用 getChatIdSafe() 获取聊天ID
           const current_chat_id = getChatIdSafe();
@@ -245,9 +253,17 @@ $(() => {
               console.log('📨 检测到新消息节点，延迟检查自动总结...');
               // 延迟500ms等待消息完全渲染
               setTimeout(() => {
-                const currentMessageId = typeof getLastMessageId === 'function' ? getLastMessageId() : -1;
-                if (currentMessageId !== lastCheckedMessageId) {
+                // 插件环境：使用 SillyTavern.chat.length 获取消息数量
+                let currentMessageId = -1;
+                if (typeof SillyTavern !== 'undefined' && Array.isArray(SillyTavern.chat)) {
+                  currentMessageId = SillyTavern.chat.length - 1;
+                } else if (typeof getLastMessageId === 'function') {
+                  currentMessageId = getLastMessageId();
+                }
+                
+                if (currentMessageId >= 0 && currentMessageId !== lastCheckedMessageId) {
                   lastCheckedMessageId = currentMessageId;
+                  console.log(`🔄 DOM 监控触发自动总结检查，当前消息ID: ${currentMessageId}`);
                   checkAutoSummarize();
                 }
               }, 500);
@@ -271,10 +287,17 @@ $(() => {
       const startPolling = () => {
         setInterval(() => {
           try {
-            const currentMessageId = typeof getLastMessageId === 'function' ? getLastMessageId() : -1;
-            if (currentMessageId !== lastCheckedMessageId && currentMessageId >= 0) {
+            // 插件环境：使用 SillyTavern.chat.length 获取消息数量
+            let currentMessageId = -1;
+            if (typeof SillyTavern !== 'undefined' && Array.isArray(SillyTavern.chat)) {
+              currentMessageId = SillyTavern.chat.length - 1;
+            } else if (typeof getLastMessageId === 'function') {
+              currentMessageId = getLastMessageId();
+            }
+            
+            if (currentMessageId >= 0 && currentMessageId !== lastCheckedMessageId) {
               lastCheckedMessageId = currentMessageId;
-              console.log('🔄 轮询检测到消息变化，检查自动总结...');
+              console.log(`🔄 轮询检测到消息变化，检查自动总结... 当前消息ID: ${currentMessageId}`);
               checkAutoSummarize();
             }
           } catch (error) {
@@ -326,8 +349,13 @@ $(() => {
 
                 // 只有在没有设置过起始楼层时才设置
                 if (!auto_summary_start_id) {
-                  // TavernHelper环境：使用 getLastMessageId()
-                  const last_message_id = typeof getLastMessageId === 'function' ? getLastMessageId() : 0;
+                  // 插件环境：使用 SillyTavern.chat.length 获取消息数量
+                  let last_message_id = 0;
+                  if (typeof SillyTavern !== 'undefined' && Array.isArray(SillyTavern.chat)) {
+                    last_message_id = SillyTavern.chat.length - 1;
+                  } else if (typeof getLastMessageId === 'function') {
+                    last_message_id = getLastMessageId();
+                  }
                   localStorage.setItem(storageKey, String(last_message_id));
                   console.log(`✅ 首次开启自动总结，起始楼层设置为: ${last_message_id}`);
                   window.toastr?.info(`自动总结已开启，将从第 ${last_message_id} 层开始`);
@@ -373,9 +401,16 @@ $(() => {
             return;
           }
 
-          // TavernHelper环境：使用 getLastMessageId()
-          const lastMessageId = typeof getLastMessageId === 'function' ? getLastMessageId() : 0;
-          const messages = typeof getChatMessages === 'function' ? getChatMessages('0-{{lastMessageId}}') : [];
+          // 插件环境：使用 SillyTavern.chat
+          let lastMessageId = 0;
+          let messages: any[] = [];
+          if (typeof SillyTavern !== 'undefined' && Array.isArray(SillyTavern.chat)) {
+            lastMessageId = SillyTavern.chat.length - 1;
+            messages = SillyTavern.chat;
+          } else if (typeof getLastMessageId === 'function' && typeof getChatMessages === 'function') {
+            lastMessageId = getLastMessageId();
+            messages = getChatMessages('0-{{lastMessageId}}');
+          }
           console.log('最新消息ID:', lastMessageId);
           console.log('获取到的消息数量:', messages.length);
 
@@ -428,9 +463,16 @@ $(() => {
             保存到世界书: settings.auto_save_to_worldbook,
           });
 
-          // TavernHelper环境：使用 getLastMessageId() 和 getChatMessages()
-          const lastMessageId = typeof getLastMessageId === 'function' ? getLastMessageId() : 0;
-          const messages = typeof getChatMessages === 'function' ? getChatMessages('0-{{lastMessageId}}') : [];
+          // 插件环境：使用 SillyTavern.chat
+          let lastMessageId = 0;
+          let messages: any[] = [];
+          if (typeof SillyTavern !== 'undefined' && Array.isArray(SillyTavern.chat)) {
+            lastMessageId = SillyTavern.chat.length - 1;
+            messages = SillyTavern.chat;
+          } else if (typeof getLastMessageId === 'function' && typeof getChatMessages === 'function') {
+            lastMessageId = getLastMessageId();
+            messages = getChatMessages('0-{{lastMessageId}}');
+          }
           const chat_id = getChatIdSafe();
 
           const scriptId = getScriptIdSafe();
@@ -486,9 +528,16 @@ $(() => {
         try {
           console.log('🔍 开始检查楼层...');
 
-          // TavernHelper环境：使用 getLastMessageId() 和 getChatMessages()
-          const lastMessageId = typeof getLastMessageId === 'function' ? getLastMessageId() : 0;
-          const messages = typeof getChatMessages === 'function' ? getChatMessages('0-{{lastMessageId}}') : [];
+          // 插件环境：使用 SillyTavern.chat
+          let lastMessageId = 0;
+          let messages: any[] = [];
+          if (typeof SillyTavern !== 'undefined' && Array.isArray(SillyTavern.chat)) {
+            lastMessageId = SillyTavern.chat.length - 1;
+            messages = SillyTavern.chat;
+          } else if (typeof getLastMessageId === 'function' && typeof getChatMessages === 'function') {
+            lastMessageId = getLastMessageId();
+            messages = getChatMessages('0-{{lastMessageId}}');
+          }
           if (lastMessageId < 0) {
             console.warn('⚠️ 当前聊天没有消息');
             window.toastr.warning('当前聊天没有消息');
@@ -523,8 +572,13 @@ $(() => {
           const store = useSettingsStore();
           const settings = store.settings;
 
-          // TavernHelper环境：使用 getLastMessageId()
-          const lastMessageId = typeof getLastMessageId === 'function' ? getLastMessageId() : 0;
+          // 插件环境：使用 SillyTavern.chat
+          let lastMessageId = 0;
+          if (typeof SillyTavern !== 'undefined' && Array.isArray(SillyTavern.chat)) {
+            lastMessageId = SillyTavern.chat.length - 1;
+          } else if (typeof getLastMessageId === 'function') {
+            lastMessageId = getLastMessageId();
+          }
           const current_floor = lastMessageId;
 
           const scriptId = getScriptIdSafe();
@@ -559,9 +613,16 @@ $(() => {
           const store = useSettingsStore();
           const settings = store.settings;
 
-          // TavernHelper环境：使用 getLastMessageId() 和 getChatMessages()
-          const lastMessageId = typeof getLastMessageId === 'function' ? getLastMessageId() : 0;
-          const messages = typeof getChatMessages === 'function' ? getChatMessages('0-{{lastMessageId}}') : [];
+          // 插件环境：使用 SillyTavern.chat
+          let lastMessageId = 0;
+          let messages: any[] = [];
+          if (typeof SillyTavern !== 'undefined' && Array.isArray(SillyTavern.chat)) {
+            lastMessageId = SillyTavern.chat.length - 1;
+            messages = SillyTavern.chat;
+          } else if (typeof getLastMessageId === 'function' && typeof getChatMessages === 'function') {
+            lastMessageId = getLastMessageId();
+            messages = getChatMessages('0-{{lastMessageId}}');
+          }
           const chat_id = getChatIdSafe();
 
           const scriptId = getScriptIdSafe();

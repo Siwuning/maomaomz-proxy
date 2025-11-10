@@ -379,7 +379,7 @@ import { ref, computed, watch } from 'vue';
 import { useTaskStore } from '../taskStore';
 
 const taskStore = useTaskStore();
-const isCollapsed = ref(true);
+const isCollapsed = ref(false); // 默认展开
 // 初始时就显示任务中心（如果有任务或等待任务加载）
 const isVisible = ref(true);
 

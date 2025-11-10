@@ -619,6 +619,17 @@ $(() => {
         'manualCheckSummary',
       ]);
 
+      // ===== 暴露关键对象和函数到 window，供调试和控制台使用 =====
+      (window as any).pinia = globalPinia;
+      (window as any).getScriptIdSafe = getScriptIdSafe;
+      (window as any).getChatIdSafe = getChatIdSafe;
+      
+      console.log('✅ 全局对象已暴露:', {
+        pinia: '✅ Pinia 实例',
+        getScriptIdSafe: '✅ 获取脚本ID',
+        getChatIdSafe: '✅ 获取聊天ID',
+      });
+
       window.toastr.success('mzrodyu猫猫的小破烂脚本已加载');
     }, 200);
   }, 100);

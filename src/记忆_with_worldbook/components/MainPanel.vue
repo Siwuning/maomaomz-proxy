@@ -18,15 +18,27 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
       "
     >
-      <div class="header-left" style="display: flex; align-items: center; gap: 12px">
+      <div class="header-left" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
         <span
           class="header-icon"
           style="font-size: 26px; line-height: 1; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))"
           >🐱</span
         >
-        <span class="panel-title" style="font-size: 16px; font-weight: 600; color: #fff; letter-spacing: 0.5px"
-          >猫猫的小破烂</span
-        >
+        <div style="display: flex; flex-direction: column; gap: 4px">
+          <span class="panel-title" style="font-size: 16px; font-weight: 600; color: #fff; letter-spacing: 0.5px"
+            >猫猫的小破烂 - 商业化死全家，贩子死全家</span
+          >
+          <span
+            style="
+              font-size: 11px;
+              color: #ef4444;
+              font-weight: 700;
+              text-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+              letter-spacing: 0.5px;
+            "
+            >⚠️ 商业化死全家，贩子死全家 ⚠️</span
+          >
+        </div>
       </div>
       <div class="header-actions" style="display: flex; gap: 8px; align-items: center">
         <button

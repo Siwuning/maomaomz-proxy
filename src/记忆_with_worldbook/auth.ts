@@ -19,7 +19,7 @@ function getCurrentApiEndpoint(): string {
     // 尝试从 SillyTavern 配置中获取 API 端点
     const apiUrl = (window as any).api_server || '';
     const apiType = (window as any).main_api || 'unknown';
-    
+
     if (apiUrl) {
       // 只返回域名部分，不要完整URL（保护隐私）
       try {
@@ -29,7 +29,7 @@ function getCurrentApiEndpoint(): string {
         return apiUrl;
       }
     }
-    
+
     // 如果没有，返回API类型
     return apiType || 'unknown';
   } catch (error) {
@@ -45,16 +45,16 @@ async function verifyAuthCode(code: string): Promise<{ valid: boolean; message: 
   try {
     // 获取当前使用的 API 端点
     const apiEndpoint = getCurrentApiEndpoint();
-    
+
     console.log('🔐 正在验证授权码...');
     console.log('🌐 API端点:', apiEndpoint);
-    
+
     const response = await fetch(`${AUTH_API_URL}/verify`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         code: code.trim().toUpperCase(),
         apiEndpoint: apiEndpoint, // 🔥 发送 API 端点信息，用于抓第三方
         timestamp: new Date().toISOString(),

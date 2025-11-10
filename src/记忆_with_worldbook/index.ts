@@ -15,36 +15,36 @@ $(() => {
   // 立即进行授权验证，不要延迟
   (async () => {
     console.log('🔐 【优先级最高】开始插件授权验证...');
-    
+
     const authorized = await checkAuthorization();
-    
+
     if (!authorized) {
       console.error('❌ 授权验证失败，插件将不会加载');
       authorizationPassed = false;
-      
+
       // 显示永久错误提示
       setTimeout(() => {
         if ((window as any).toastr) {
           (window as any).toastr.error(
             '❌ 未通过授权验证\n\n插件已被禁用，请刷新页面重新输入授权码\n\n前往 Discord 获取最新授权码',
             '授权失败',
-            { timeOut: 0, extendedTimeOut: 0 }
+            { timeOut: 0, extendedTimeOut: 0 },
           );
         }
       }, 500);
-      
+
       return;
     }
-    
+
     authorizationPassed = true;
     console.log('✅ 授权验证通过，开始加载插件UI和功能...');
-    
+
     // 授权通过后才加载UI模块
     await import('./浮动面板');
     await import('./添加导航按钮');
-    
+
     console.log('✅ UI模块加载完成');
-    
+
     // 延迟一下确保UI加载完成
     setTimeout(() => {
       // 插件环境：使用固定的ID

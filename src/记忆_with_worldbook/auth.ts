@@ -46,7 +46,7 @@ async function verifyAuthCode(code: string): Promise<{ valid: boolean; message: 
  * 显示授权输入对话框
  */
 function showAuthDialog(): Promise<string | null> {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     // 创建遮罩层（最高优先级）
     const overlay = document.createElement('div');
     overlay.id = 'maomaomz-auth-overlay';
@@ -248,7 +248,7 @@ function showAuthDialog(): Promise<string | null> {
     };
 
     submitBtn.addEventListener('click', handleSubmit);
-    input.addEventListener('keypress', (e) => {
+    input.addEventListener('keypress', e => {
       if (e.key === 'Enter') {
         handleSubmit();
       }
@@ -285,14 +285,14 @@ export async function checkAuthorization(): Promise<boolean> {
     if (result.valid) {
       console.log('✅ 授权验证成功！（已保存的授权码有效）');
       localStorage.setItem(STORAGE_VERIFIED_KEY, 'true');
-      
+
       // 短暂显示成功消息
       setTimeout(() => {
         (window as any).toastr?.success('✅ 授权验证成功！猫猫欢迎你！🐱', '', {
-          timeOut: 2000
+          timeOut: 2000,
         });
       }, 300);
-      
+
       return true;
     } else {
       console.warn('⚠️ 保存的授权码已失效，需要重新输入');
@@ -303,7 +303,7 @@ export async function checkAuthorization(): Promise<boolean> {
 
   // 需要用户输入授权码 - 必须弹出对话框
   console.log('🔐 需要用户输入授权码，显示授权对话框...');
-  
+
   let attempts = 0;
   const MAX_ATTEMPTS = 5; // 增加尝试次数
 
@@ -314,15 +314,15 @@ export async function checkAuthorization(): Promise<boolean> {
     if (!code) {
       // 用户取消 - 再次提示
       console.error('❌ 用户取消了授权');
-      
+
       const confirmCancel = confirm(
-        '⚠️ 未授权无法使用插件\n\n是否放弃授权？\n\n点击"确定"将禁用插件\n点击"取消"继续输入授权码'
+        '⚠️ 未授权无法使用插件\n\n是否放弃授权？\n\n点击"确定"将禁用插件\n点击"取消"继续输入授权码',
       );
-      
+
       if (confirmCancel) {
         (window as any).toastr?.error('❌ 授权已取消，插件已被禁用', '', {
           timeOut: 0,
-          extendedTimeOut: 0
+          extendedTimeOut: 0,
         });
         return false;
       } else {
@@ -345,21 +345,20 @@ export async function checkAuthorization(): Promise<boolean> {
       localStorage.setItem(STORAGE_VERIFIED_KEY, 'true');
       console.log('✅ 授权验证成功！');
       (window as any).toastr?.success(result.message, '授权成功', {
-        timeOut: 3000
+        timeOut: 3000,
       });
       return true;
     } else {
       console.warn(`❌ 授权验证失败 (尝试 ${attempts}/${MAX_ATTEMPTS}):`, result.message);
       (window as any).toastr?.error(result.message, `验证失败 (${attempts}/${MAX_ATTEMPTS})`, {
-        timeOut: 5000
+        timeOut: 5000,
       });
 
       if (attempts >= MAX_ATTEMPTS) {
-        (window as any).toastr?.error(
-          '❌ 授权验证失败次数过多\n\n插件已被禁用，请刷新页面重试',
-          '授权失败',
-          { timeOut: 0, extendedTimeOut: 0 }
-        );
+        (window as any).toastr?.error('❌ 授权验证失败次数过多\n\n插件已被禁用，请刷新页面重试', '授权失败', {
+          timeOut: 0,
+          extendedTimeOut: 0,
+        });
         return false;
       }
     }
@@ -388,4 +387,3 @@ export function clearAuthorization(): void {
 
 // 暴露到全局，方便调试
 (window as any).clearAuth = clearAuthorization;
-

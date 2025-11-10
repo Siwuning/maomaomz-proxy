@@ -1538,6 +1538,7 @@ interface BackendTemplate {
   icon: string;
   title: string;
   description: string;
+  code?: string;
   enabled: boolean;
 }
 
@@ -2103,6 +2104,38 @@ function showProjectTemplateDialog() {
 
 // 使用模板创建项目
 function createProjectFromTemplate(templateKey: string) {
+  // 优先使用后端模板
+  const backendTemplate = backendTemplates.value.find(t => t.title === templateKey);
+  
+  if (backendTemplate && backendTemplate.code) {
+    // 使用后端模板代码
+    const name = prompt('项目名称:', backendTemplate.title);
+    if (!name || !name.trim()) return;
+
+    const newProj: Project = {
+      id: Date.now().toString(),
+      name: name.trim(),
+      files: [
+        {
+          path: 'index.vue',
+          name: 'index.vue',
+          content: backendTemplate.code,
+        },
+      ],
+    };
+
+    projects.value.push(newProj);
+    currentId.value = newProj.id;
+    currentFile.value = 'index.vue';
+    code.value = backendTemplate.code;
+    saveToChatVar();
+
+    showProjectTemplate.value = false;
+    window.toastr.success('✅ 项目"' + name.trim() + '"创建成功！');
+    return;
+  }
+
+  // 降级：使用旧的硬编码模板
   const template = projectTemplates[templateKey as keyof typeof projectTemplates];
   if (!template) return;
 

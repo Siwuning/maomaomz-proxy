@@ -1140,7 +1140,8 @@ function handleAdmin(env) {
             const listHtml = currentTemplates.map((template, index) => {
                 const borderColor = template.enabled ? '#4a9eff' : '#6b7280';
                 const checkedAttr = template.enabled ? 'checked' : '';
-                return '<div style="background: #1a1a1a; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid ' + borderColor + ';">' +
+                const codeValue = (template.code || '').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                return '<div style="background: #1a1a1a; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid ' + borderColor + ';">' +
                     '<div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">' +
                         '<div style="flex: 1;">' +
                             '<input type="text" id="template-icon-' + index + '" value="' + template.icon + '" ' +
@@ -1156,7 +1157,13 @@ function handleAdmin(env) {
                                'style="width: 100%; padding: 8px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px; color: #e0e0e0; font-size: 13px;" ' +
                                'placeholder="模板描述" />' +
                     '</div>' +
-                    '<div style="display: flex; justify-content: space-between; align-items: center;">' +
+                    '<div style="margin-bottom: 10px;">' +
+                        '<label style="display: block; color: #888; font-size: 12px; margin-bottom: 6px;">📝 模板代码（Vue 组件）</label>' +
+                        '<textarea id="template-code-' + index + '" ' +
+                                  'style="width: 100%; min-height: 300px; padding: 12px; background: #0a0a0a; border: 1px solid #3a3a3a; border-radius: 6px; color: #10b981; font-size: 13px; font-family: Courier New, monospace; line-height: 1.5; resize: vertical;" ' +
+                                  'placeholder="<template>\n  <div>\n    <!-- 你的 Vue 组件代码 -->\n  </div>\n</template>\n\n<script setup>\n// 你的 JS 代码\n</script>\n\n<style scoped>\n/* 你的样式 */\n</style>">' + codeValue + '</textarea>' +
+                    '</div>' +
+                    '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">' +
                         '<label style="display: flex; align-items: center; cursor: pointer;">' +
                             '<input type="checkbox" id="template-enabled-' + index + '" ' + checkedAttr + ' ' +
                                    'style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;" />' +
@@ -1167,10 +1174,10 @@ function handleAdmin(env) {
                             '🗑️ 删除' +
                         '</button>' +
                     '</div>' +
-                    '<div style="margin-top: 8px; padding: 8px; background: #2a2a2a; border-radius: 4px;">' +
+                    '<div style="padding: 8px; background: #2a2a2a; border-radius: 4px;">' +
                         '<span style="color: #666; font-size: 11px;">ID: </span>' +
                         '<input type="text" id="template-id-' + index + '" value="' + template.id + '" ' +
-                               'style="width: calc(100% - 40px); padding: 4px 8px; background: #1a1a1a; border: 1px solid #3a3a3a; border-radius: 4px; color: #888; font-size: 11px; font-family: \'Courier New\', monospace;" ' +
+                               'style="width: calc(100% - 40px); padding: 4px 8px; background: #1a1a1a; border: 1px solid #3a3a3a; border-radius: 4px; color: #888; font-size: 11px; font-family: Courier New, monospace;" ' +
                                'placeholder="template-id" />' +
                     '</div>' +
                 '</div>';
@@ -1190,6 +1197,7 @@ function handleAdmin(env) {
                 icon: '📝',
                 title: '新模板',
                 description: '描述',
+                code: '<template>\n  <div class="new-template">\n    <h2>新模板</h2>\n    <p>在这里编写你的代码...</p>\n  </div>\n</template>\n\n<script setup>\n// 你的逻辑代码\n</script>\n\n<style scoped>\n.new-template {\n  padding: 20px;\n}\n</style>',
                 enabled: true
             });
             renderTemplates();
@@ -1213,6 +1221,7 @@ function handleAdmin(env) {
                         icon: document.getElementById('template-icon-' + index).value.trim(),
                         title: document.getElementById('template-title-' + index).value.trim(),
                         description: document.getElementById('template-desc-' + index).value.trim(),
+                        code: document.getElementById('template-code-' + index).value,
                         enabled: document.getElementById('template-enabled-' + index).checked
                     };
                 });
@@ -1488,6 +1497,7 @@ async function handleGetTemplates(request, env, corsHeaders) {
               icon: '💬',
               title: '同层对话界面',
               description: '流式对话、消息历史、正则清洗',
+              code: '<template>\n  <div class="chat-interface">\n    <div class="messages">\n      <!-- 消息列表 -->\n    </div>\n    <div class="input-area">\n      <input type="text" placeholder="输入消息..." />\n      <button>发送</button>\n    </div>\n  </div>\n</template>\n\n<script setup>\n// 对话逻辑\n</script>\n\n<style scoped>\n.chat-interface {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n}\n</style>',
               enabled: true,
             },
             {
@@ -1495,6 +1505,7 @@ async function handleGetTemplates(request, env, corsHeaders) {
               icon: '📊',
               title: '状态栏面板',
               description: 'HP/MP/经验槽，进度条动画',
+              code: '<template>\n  <div class="status-bar">\n    <div class="stat-item">\n      <span>HP</span>\n      <div class="bar">\n        <div class="fill hp" :style="{ width: hp + \'%\' }"></div>\n      </div>\n    </div>\n    <div class="stat-item">\n      <span>MP</span>\n      <div class="bar">\n        <div class="fill mp" :style="{ width: mp + \'%\' }"></div>\n      </div>\n    </div>\n  </div>\n</template>\n\n<script setup>\nimport { ref } from \'vue\';\nconst hp = ref(75);\nconst mp = ref(50);\n</script>\n\n<style scoped>\n.status-bar {\n  padding: 10px;\n}\n.bar {\n  height: 20px;\n  background: #333;\n  border-radius: 10px;\n}\n.fill {\n  height: 100%;\n  border-radius: 10px;\n  transition: width 0.3s;\n}\n.hp { background: #ef4444; }\n.mp { background: #3b82f6; }\n</style>',
               enabled: true,
             },
             {
@@ -1502,6 +1513,7 @@ async function handleGetTemplates(request, env, corsHeaders) {
               icon: '💖',
               title: '好感度面板',
               description: '多角色卡片，爱心图标',
+              code: '<template>\n  <div class="favorability">\n    <div class="character-card">\n      <h3>角色名称</h3>\n      <div class="hearts">\n        <span v-for="i in 5" :key="i">❤️</span>\n      </div>\n      <p>好感度: 100/100</p>\n    </div>\n  </div>\n</template>\n\n<script setup>\n// 好感度逻辑\n</script>\n\n<style scoped>\n.favorability {\n  padding: 20px;\n}\n.character-card {\n  background: #2a2a2a;\n  padding: 15px;\n  border-radius: 8px;\n}\n.hearts {\n  font-size: 24px;\n}\n</style>',
               enabled: true,
             },
           ],
@@ -1546,6 +1558,7 @@ async function handleUpdateTemplates(request, env, corsHeaders) {
         icon: t.icon,
         title: t.title,
         description: t.description,
+        code: t.code || '',
         enabled: t.enabled !== false,
       })),
       lastUpdated: new Date().toISOString(),

@@ -6149,7 +6149,13 @@ async function loadTemplatesFromBackend() {
     } else {
       console.warn('⚠️ 后端模板加载失败，使用默认模板');
       backendTemplates.value = [
-        { id: 'chat-interface', icon: '💬', title: '同层对话界面', description: '流式对话、消息历史、正则清洗', enabled: true },
+        {
+          id: 'chat-interface',
+          icon: '💬',
+          title: '同层对话界面',
+          description: '流式对话、消息历史、正则清洗',
+          enabled: true,
+        },
         { id: 'status-bar', icon: '📊', title: '状态栏面板', description: 'HP/MP/经验槽，进度条动画', enabled: true },
         { id: 'favorability', icon: '💖', title: '好感度面板', description: '多角色卡片，爱心图标', enabled: true },
       ];
@@ -6158,7 +6164,13 @@ async function loadTemplatesFromBackend() {
     console.error('❌ 获取项目模板失败:', error);
     // 使用默认模板
     backendTemplates.value = [
-      { id: 'chat-interface', icon: '💬', title: '同层对话界面', description: '流式对话、消息历史、正则清洗', enabled: true },
+      {
+        id: 'chat-interface',
+        icon: '💬',
+        title: '同层对话界面',
+        description: '流式对话、消息历史、正则清洗',
+        enabled: true,
+      },
       { id: 'status-bar', icon: '📊', title: '状态栏面板', description: 'HP/MP/经验槽，进度条动画', enabled: true },
       { id: 'favorability', icon: '💖', title: '好感度面板', description: '多角色卡片，爱心图标', enabled: true },
     ];

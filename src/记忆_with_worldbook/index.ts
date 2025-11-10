@@ -14,14 +14,14 @@ import './添加导航按钮';
 $(() => {
   setTimeout(async () => {
     console.log('🐱 猫猫的记忆管理工具开始初始化');
-    
+
     // 🔐 UI加载后进行授权验证
     console.log('🔐 开始授权验证...');
     const authorized = await checkAuthorization();
 
     if (!authorized) {
       console.error('❌ 授权验证失败，插件功能已被禁用');
-      
+
       // 显示错误提示
       setTimeout(() => {
         if ((window as any).toastr) {
@@ -35,9 +35,9 @@ $(() => {
 
       return;
     }
-    
+
     console.log('✅ 授权验证通过，初始化插件功能...');
-    
+
     // 延迟一下确保UI完全加载
     setTimeout(() => {
       // 插件环境：使用固定的ID
@@ -871,7 +871,7 @@ $(() => {
       };
       (window as any).getScriptIdSafe = getScriptIdSafe;
       (window as any).getChatIdSafe = getChatIdSafe;
-      
+
       // 暴露授权相关函数
       (window as any).clearAuth = clearAuth;
       (window as any).isAuthorized = isAuthorized;

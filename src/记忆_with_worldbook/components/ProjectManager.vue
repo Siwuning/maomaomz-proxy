@@ -6277,13 +6277,13 @@ function exportToQR() {
     console.log('导出的 QR JSON:', qrJson);
     toastr.success(
       `项目 "${proj.name}" 已导出为 QR + 正则！\n\n` +
-      `✅ 已下载 2 个文件：\n` +
-      `1. ${proj.name}_regex.json（正则脚本）\n` +
-      `2. ${proj.name}_qr.json（快速回复）\n\n` +
-      `📝 使用方法：\n` +
-      `1. 在 SillyTavern 的正则脚本中导入 regex.json\n` +
-      `2. 在快速回复设置中导入 qr.json\n` +
-      `3. 点击 QR 按钮即可显示前端界面（节省 token）`
+        `✅ 已下载 2 个文件：\n` +
+        `1. ${proj.name}_regex.json（正则脚本）\n` +
+        `2. ${proj.name}_qr.json（快速回复）\n\n` +
+        `📝 使用方法：\n` +
+        `1. 在 SillyTavern 的正则脚本中导入 regex.json\n` +
+        `2. 在快速回复设置中导入 qr.json\n` +
+        `3. 点击 QR 按钮即可显示前端界面（节省 token）`,
     );
   } catch (error: any) {
     console.error('导出 QR 失败:', error);

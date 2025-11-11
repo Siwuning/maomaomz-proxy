@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="神秘塔罗牌占卜 - 探索角色的秘密" />
+    <title>🔮 塔罗秘占 | Tarot Divination</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  </head>
+  <body>
+    <!-- 星空背景 -->
+    <div class="stars"></div>
+    <div class="stars2"></div>
+    <div class="stars3"></div>
+
+    <div class="container">
+      <!-- 头部 -->
+      <header class="header">
+        <div class="mystical-circle">
+          <i class="fas fa-eye"></i>
+        </div>
+        <h1>塔罗秘占</h1>
+        <p class="subtitle">窥探命运与欲望的奥秘</p>
+      </header>
+
+      <!-- 主占卜区域 -->
+      <div class="divination-container">
+        <!-- 输入区域 -->
+        <div id="inputSection" class="input-section">
+          <div class="mystic-border">
+            <div class="form-group">
+              <label for="characterName"> <i class="fas fa-user-secret"></i> 输入角色名字 </label>
+              <input type="text" id="characterName" placeholder="告诉我你想占卜谁..." maxlength="30" />
+            </div>
+
+            <div class="form-group">
+              <label> <i class="fas fa-star"></i> 选择占卜类型 </label>
+              <div class="divination-types">
+                <button class="type-card" data-type="selfpleasure">
+                  <div class="type-icon">💦</div>
+                  <div class="type-title">私密时刻</div>
+                  <div class="type-desc">今天有没有...</div>
+                </button>
+
+                <button class="type-card" data-type="lewd-thoughts">
+                  <div class="type-icon">💭</div>
+                  <div class="type-title">色色想法</div>
+                  <div class="type-desc">在想什么涩涩的</div>
+                </button>
+
+                <button class="type-card" data-type="dream">
+                  <div class="type-icon">🌙</div>
+                  <div class="type-title">昨夜春梦</div>
+                  <div class="type-desc">梦到了什么</div>
+                </button>
+
+                <button class="type-card" data-type="crush">
+                  <div class="type-icon">💕</div>
+                  <div class="type-title">暗恋对象</div>
+                  <div class="type-desc">心里藏着谁</div>
+                </button>
+
+                <button class="type-card" data-type="browsing">
+                  <div class="type-icon">📱</div>
+                  <div class="type-title">浏览记录</div>
+                  <div class="type-desc">最近在看什么</div>
+                </button>
+
+                <button class="type-card" data-type="fetish">
+                  <div class="type-icon">🎭</div>
+                  <div class="type-title">隐藏癖好</div>
+                  <div class="type-desc">不为人知的喜好</div>
+                </button>
+
+                <button class="type-card" data-type="experience">
+                  <div class="type-icon">💋</div>
+                  <div class="type-title">亲密经验</div>
+                  <div class="type-desc">有过什么经历</div>
+                </button>
+
+                <button class="type-card" data-type="desire">
+                  <div class="type-icon">🔥</div>
+                  <div class="type-title">欲望指数</div>
+                  <div class="type-desc">现在有多想要</div>
+                </button>
+              </div>
+            </div>
+
+            <button id="startDivination" class="btn-start" disabled>
+              <i class="fas fa-magic"></i>
+              开始占卜
+            </button>
+          </div>
+        </div>
+
+        <!-- 塔罗牌区域 -->
+        <div id="cardSection" class="card-section" style="display: none">
+          <div class="instruction">
+            <i class="fas fa-hand-pointer"></i>
+            选择一张牌，揭示 <span id="targetName"></span> 的秘密...
+          </div>
+
+          <div class="tarot-cards">
+            <div class="tarot-card" data-card="1">
+              <div class="card-inner">
+                <div class="card-back">
+                  <div class="card-pattern"></div>
+                  <i class="fas fa-moon"></i>
+                </div>
+                <div class="card-front">
+                  <div class="card-result"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tarot-card" data-card="2">
+              <div class="card-inner">
+                <div class="card-back">
+                  <div class="card-pattern"></div>
+                  <i class="fas fa-star"></i>
+                </div>
+                <div class="card-front">
+                  <div class="card-result"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tarot-card" data-card="3">
+              <div class="card-inner">
+                <div class="card-back">
+                  <div class="card-pattern"></div>
+                  <i class="fas fa-sun"></i>
+                </div>
+                <div class="card-front">
+                  <div class="card-result"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 结果区域 -->
+        <div id="resultSection" class="result-section" style="display: none">
+          <div class="result-card">
+            <div class="result-header">
+              <i class="fas fa-crystal-ball"></i>
+              <h2>占卜结果</h2>
+            </div>
+
+            <div class="result-content">
+              <div class="result-character">
+                <i class="fas fa-user-circle"></i>
+                <span id="resultName"></span>
+              </div>
+
+              <div class="result-type">
+                <span id="resultType"></span>
+              </div>
+
+              <div class="result-text" id="resultText"></div>
+
+              <div class="result-note">
+                <i class="fas fa-info-circle"></i>
+                塔罗占卜仅供娱乐，请勿过度解读
+              </div>
+            </div>
+
+            <div class="result-actions">
+              <button class="btn-primary" onclick="copyResult()"><i class="fas fa-copy"></i> 复制结果</button>
+              <button class="btn-success" onclick="sendToChat()"><i class="fas fa-comment"></i> 发送到聊天</button>
+              <button class="btn-qr" onclick="createQuickReply()"><i class="fas fa-bolt"></i> 创建快速回复</button>
+              <button class="btn-secondary" onclick="resetDivination()"><i class="fas fa-redo"></i> 重新占卜</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部装饰 -->
+      <footer class="footer">
+        <div class="mystical-symbols">
+          <span>✦</span>
+          <span>◈</span>
+          <span>✧</span>
+          <span>◈</span>
+          <span>✦</span>
+        </div>
+        <p>命运的齿轮已经转动</p>
+      </footer>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

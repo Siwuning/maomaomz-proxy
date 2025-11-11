@@ -22,10 +22,17 @@ async function redisGet(key) {
 
 async function redisSet(key, value) {
   const valueStr = typeof value === 'string' ? value : JSON.stringify(value);
-  const response = await fetch(`${UPSTASH_REDIS_REST_URL}/SET/${key}/${encodeURIComponent(valueStr)}`, {
-    headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` },
+  // 使用 Pipeline API 避免 URL 长度限制
+  const response = await fetch(`${UPSTASH_REDIS_REST_URL}/pipeline`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify([['SET', key, valueStr]]),
   });
-  return await response.json();
+  const data = await response.json();
+  return data[0]; // Pipeline 返回数组，取第一个结果
 }
 
 async function redisKeys(pattern) {
@@ -1207,7 +1214,7 @@ function handleAdmin(env) {
             }
         }
 
-          console.log('✅ Worker.js 已加载最新版本 2024-11-12-03:30 - Upstash Redis 版本');
+          console.log('✅ Worker.js 已加载最新版本 2024-11-12-05:00 - Upstash Redis Pipeline 版本');
 
         // 全局存储模板数据
         let currentTemplates = [];

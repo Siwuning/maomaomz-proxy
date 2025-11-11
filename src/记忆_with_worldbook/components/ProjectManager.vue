@@ -57,6 +57,26 @@
           v-if="currentId"
           style="
             padding: 8px 16px;
+            background: #f59e0b;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+          "
+          @click="exportToQR"
+          @mouseenter="(e: any) => (e.currentTarget.style.background = '#d97706')"
+          @mouseleave="(e: any) => (e.currentTarget.style.background = '#f59e0b')"
+        >
+          <i class="fa-solid fa-bolt" style="margin-right: 6px"></i>
+          导出为 QR
+        </button>
+        <button
+          v-if="currentId"
+          style="
+            padding: 8px 16px;
             background: #444;
             border: none;
             border-radius: 8px;
@@ -6140,6 +6160,90 @@ function exportToRegex() {
     toastr.success(`项目 "${proj.name}" 已导出为正则 JSON`);
   } catch (error: any) {
     console.error('导出失败:', error);
+    toastr.error(`导出失败: ${error.message}`);
+  }
+}
+
+/**
+ * 导出项目为快速回复（QR）格式
+ */
+function exportToQR() {
+  const proj = currentProject.value;
+  if (!proj) {
+    toastr.error('请先选择一个项目');
+    return;
+  }
+
+  // 提醒用户先手动保存
+  const fileObj = proj.files.find(f => f.name === currentFile.value);
+  if (fileObj && code.value !== fileObj.content) {
+    const shouldContinue = confirm('检测到有未保存的修改，建议先手动保存。\n\n是否继续导出（将使用上次保存的版本）？');
+    if (!shouldContinue) {
+      return;
+    }
+  }
+
+  // 弹出对话框让用户输入 QR 标签
+  const qrLabel = prompt(
+    `正在导出项目为快速回复（QR）：${proj.name}\n\n请输入 QR 按钮标签：\n例如：🎨 ${proj.name}`,
+    `🎨 ${proj.name}`,
+  );
+  if (!qrLabel) {
+    toastr.info('已取消导出');
+    return;
+  }
+
+  try {
+    // 构建完整的 HTML
+    const fullHtml = buildPreviewFromFiles(proj.files);
+
+    // 生成 QR ID (正整数)
+    const qrId = Math.floor(Math.random() * 100000) + 1;
+
+    // 清理 HTML: 去除 \r 和 <!DOCTYPE html>
+    let cleanHtml = fullHtml.replace(/\r/g, '');
+    cleanHtml = cleanHtml.replace(/^<!DOCTYPE html>\n/, '');
+
+    // 构建 QR 的 message: /pass 包裹 HTML 代码块
+    const qrMessage = `/pass \`\`\`html\n\n${cleanHtml}\n\`\`\``;
+
+    // 构建 QR JSON
+    const qrJson = {
+      id: qrId,
+      showLabel: true,
+      label: qrLabel,
+      title: '',
+      message: qrMessage,
+      contextList: [],
+      preventAutoExecute: false,
+      isHidden: false,
+      executeOnStartup: false,
+      executeOnUser: false,
+      executeOnAi: false,
+      executeOnChatChange: false,
+      executeOnGroupMemberDraft: false,
+      executeOnNewChat: false,
+      executeBeforeGeneration: false,
+      automationId: '',
+    };
+
+    // 创建下载链接
+    const dataStr = JSON.stringify(qrJson, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${proj.name}_qr.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    console.log('导出的 QR JSON:', qrJson);
+    toastr.success(`项目 "${proj.name}" 已导出为快速回复（QR）\n\n请在 SillyTavern 的快速回复设置中导入 JSON 文件`);
+  } catch (error: any) {
+    console.error('导出 QR 失败:', error);
     toastr.error(`导出失败: ${error.message}`);
   }
 }

@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>角色创建系统 - Character Creator</title>
+    <meta name="description" content="像素科技风角色创建系统 - 打造你的独特角色" />
+    <title>🎮 角色创建系统 | Pixel Tech Character Creator</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   </head>
@@ -12,7 +13,7 @@
       <!-- 顶部标题 -->
       <header class="header">
         <h1><i class="fas fa-user-circle"></i> 角色创建系统</h1>
-        <p class="subtitle">创建属于你的独特角色</p>
+        <p class="subtitle">[ CREATE YOUR UNIQUE CHARACTER ]</p>
       </header>
 
       <!-- 进度条 -->
@@ -88,6 +89,9 @@
           <div class="form-group">
             <label for="avatar">头像链接</label>
             <input type="url" id="avatar" name="avatar" placeholder="https://example.com/avatar.jpg" />
+            <small style="color: var(--text-secondary); display: block; margin-top: 5px">
+              💡 支持直链图片，实时预览
+            </small>
             <div id="avatarPreview" class="avatar-preview"></div>
           </div>
         </div>
@@ -274,7 +278,9 @@
           <h2><i class="fas fa-star"></i> 技能与能力</h2>
 
           <div class="form-group">
-            <label>属性值</label>
+            <label
+              >属性值 <small style="font-weight: normal; color: var(--text-secondary)">(拖动滑块调整数值)</small></label
+            >
             <div class="stats-grid">
               <div class="stat-item">
                 <label for="strength">力量</label>
@@ -341,10 +347,16 @@
 
         <!-- 导航按钮 -->
         <div class="form-navigation">
-          <button type="button" class="btn btn-secondary" id="prevBtn" onclick="changeStep(-1)">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            id="prevBtn"
+            onclick="changeStep(-1)"
+            title="快捷键: Ctrl + ←"
+          >
             <i class="fas fa-arrow-left"></i> 上一步
           </button>
-          <button type="button" class="btn btn-primary" id="nextBtn" onclick="changeStep(1)">
+          <button type="button" class="btn btn-primary" id="nextBtn" onclick="changeStep(1)" title="快捷键: Ctrl + →">
             下一步 <i class="fas fa-arrow-right"></i>
           </button>
           <button
@@ -353,6 +365,7 @@
             id="submitBtn"
             onclick="generateCharacter()"
             style="display: none"
+            title="快捷键: Ctrl + Enter"
           >
             <i class="fas fa-check"></i> 生成角色卡
           </button>
@@ -362,11 +375,22 @@
       <!-- 预览和导出区域 -->
       <div id="resultSection" class="result-section" style="display: none">
         <h2><i class="fas fa-file-export"></i> 角色卡预览</h2>
+        <div style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem">
+          ✅ 角色生成成功！选择下方按钮导出或复制数据
+        </div>
         <div class="result-actions">
-          <button class="btn btn-primary" onclick="copyToClipboard()"><i class="fas fa-copy"></i> 复制 JSON</button>
-          <button class="btn btn-success" onclick="downloadJSON()"><i class="fas fa-download"></i> 下载 JSON</button>
-          <button class="btn btn-info" onclick="downloadYAML()"><i class="fas fa-download"></i> 下载 YAML</button>
-          <button class="btn btn-secondary" onclick="resetForm()"><i class="fas fa-redo"></i> 重新创建</button>
+          <button class="btn btn-primary" onclick="copyToClipboard()" title="复制 JSON 格式到剪贴板">
+            <i class="fas fa-copy"></i> 复制 JSON
+          </button>
+          <button class="btn btn-success" onclick="downloadJSON()" title="下载 JSON 格式文件">
+            <i class="fas fa-download"></i> 下载 JSON
+          </button>
+          <button class="btn btn-info" onclick="downloadYAML()" title="下载 YAML 格式文件">
+            <i class="fas fa-download"></i> 下载 YAML
+          </button>
+          <button class="btn btn-secondary" onclick="resetForm()" title="清空表单重新创建">
+            <i class="fas fa-redo"></i> 重新创建
+          </button>
         </div>
         <pre id="resultOutput" class="result-output"></pre>
       </div>

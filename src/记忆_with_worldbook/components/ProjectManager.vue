@@ -6227,16 +6227,16 @@ function exportToQR() {
     };
 
     // 2. 构建 QR JSON（只包含触发词，节省 token）
-    // 使用 /pass 包裹触发词，让正则在输入阶段就替换，不进入对话流
+    // 在 AI 生成前执行，显示内容后立即中止生成，彻底阻止 AI 回复
     const qrId = Math.floor(Math.random() * 100000) + 1;
     const qrJson = {
       id: qrId,
       showLabel: true,
       label: `🎨 ${proj.name}`,
       title: '',
-      message: `/pass ${triggerWord}`, // 使用 /pass 命令包裹触发词
+      message: `${triggerWord} | /abort`, // 显示触发词（会被正则替换为HTML），然后立即中止 AI 生成
       contextList: [],
-      preventAutoExecute: true, // 防止自动执行
+      preventAutoExecute: false, // 必须为 false 才能执行命令
       isHidden: false,
       executeOnStartup: false,
       executeOnUser: false,
@@ -6244,7 +6244,7 @@ function exportToQR() {
       executeOnChatChange: false,
       executeOnGroupMemberDraft: false,
       executeOnNewChat: false,
-      executeBeforeGeneration: false,
+      executeBeforeGeneration: true, // 在 AI 生成前执行
       automationId: '',
     };
 

@@ -453,9 +453,13 @@ const renderMarkdown = (text: string): string => {
 
   // 引用块（> 开头的行）- 转义后变成 &gt;
   html = html.replace(/^&gt; (.+)$/gm, '<blockquote-line>$1</blockquote-line>');
-  html = html.replace(/(<blockquote-line>[\s\S]+?<\/blockquote-line>\n?)+/g, (match) => {
+  html = html.replace(/(<blockquote-line>[\s\S]+?<\/blockquote-line>\n?)+/g, match => {
     const content = match.replace(/<blockquote-line>/g, '').replace(/<\/blockquote-line>\n?/g, '<br>');
-    return '<blockquote style="border-left: 4px solid #4a9eff; background: rgba(74, 158, 255, 0.1); padding: 12px 16px; margin: 12px 0; border-radius: 4px; color: #e0e0e0;">' + content + '</blockquote>';
+    return (
+      '<blockquote style="border-left: 4px solid #4a9eff; background: rgba(74, 158, 255, 0.1); padding: 12px 16px; margin: 12px 0; border-radius: 4px; color: #e0e0e0;">' +
+      content +
+      '</blockquote>'
+    );
   });
 
   // 标题（# ## ###）

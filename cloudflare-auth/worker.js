@@ -778,6 +778,20 @@ function handleAdmin(env) {
             }
         }
 
+        // 折叠/展开单个模板卡片
+        function toggleTemplateCard(index) {
+            const content = document.getElementById('template-card-' + index);
+            const icon = document.getElementById('template-collapse-' + index);
+
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.textContent = '▼';
+            } else {
+                content.style.display = 'none';
+                icon.textContent = '▶';
+            }
+        }
+
         // 恢复卡片折叠状态
         function restoreCardStates() {
             const cardIds = ['plugin-info', 'update-code', 'current-code', 'stats', 'code-usage', 'api-endpoints', 'logs', 'history', 'templates'];
@@ -1132,7 +1146,7 @@ function handleAdmin(env) {
             }
         }
 
-        console.log('✅ Worker.js 已加载最新版本 2024-11-10-22:00 - 安全版模板管理');
+        console.log('✅ Worker.js 已加载最新版本 2024-11-11-01:30 - 模板卡片可折叠');
 
         // 全局存储模板数据
         let currentTemplates = [];
@@ -1183,37 +1197,48 @@ function handleAdmin(env) {
                 }).join('');
 
                 return '<div style="background: #1a1a1a; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid ' + borderColor + ';">' +
-                    '<div style="display: flex; gap: 10px; margin-bottom: 10px;">' +
-                        '<input type="text" id="template-icon-' + index + '" value="' + template.icon + '" ' +
-                               'style="width: 60px; padding: 8px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px; color: #e0e0e0; font-size: 20px; text-align: center;" ' +
-                               'placeholder="📁" />' +
-                        '<input type="text" id="template-title-' + index + '" value="' + template.title + '" ' +
-                               'style="flex: 1; padding: 8px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px; color: #e0e0e0; font-size: 14px;" ' +
-                               'placeholder="Template Title" />' +
+                    // 模板标题区域 - 可点击折叠
+                    '<div onclick="toggleTemplateCard(' + index + ')" style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center; cursor: pointer; padding: 8px; background: #252525; border-radius: 6px; transition: background 0.2s;" ' +
+                         'onmouseover="this.style.background=' + "'" + '#2a2a2a' + "'" + '" onmouseout="this.style.background=' + "'" + '#252525' + "'" + '">' +
+                        '<span style="color: #888; font-size: 16px;" id="template-collapse-' + index + '">▶</span>' +
+                        '<span style="font-size: 20px;">' + template.icon + '</span>' +
+                        '<span style="flex: 1; color: #e0e0e0; font-size: 14px; font-weight: 600;">' + template.title + '</span>' +
+                        '<span style="color: #888; font-size: 12px;">' + files.length + ' file(s)</span>' +
                     '</div>' +
-                    '<div style="margin-bottom: 10px;">' +
-                        '<input type="text" id="template-desc-' + index + '" value="' + template.description + '" ' +
-                               'style="width: 100%; padding: 8px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px; color: #e0e0e0; font-size: 13px;" ' +
-                               'placeholder="Description" />' +
-                    '</div>' +
-                    '<div style="margin-bottom: 10px;">' +
-                        '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">' +
-                            '<label style="display: block; color: #888; font-size: 12px;">Files:</label>' +
-                            '<button onclick="addFile(' + index + ')" ' +
-                                    'style="padding: 4px 12px; background: #065f46; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">+ Add File</button>' +
+                    // 可折叠的内容区域
+                    '<div id="template-card-' + index + '" style="display: none; animation: slideDown 0.3s ease-out;">' +
+                        '<div style="display: flex; gap: 10px; margin-bottom: 10px;">' +
+                            '<input type="text" id="template-icon-' + index + '" value="' + template.icon + '" ' +
+                                   'style="width: 60px; padding: 8px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px; color: #e0e0e0; font-size: 20px; text-align: center;" ' +
+                                   'placeholder="📁" onclick="event.stopPropagation()" />' +
+                            '<input type="text" id="template-title-' + index + '" value="' + template.title + '" ' +
+                                   'style="flex: 1; padding: 8px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px; color: #e0e0e0; font-size: 14px;" ' +
+                                   'placeholder="Template Title" onclick="event.stopPropagation()" />' +
                         '</div>' +
-                        '<div id="template-' + index + '-files">' +
-                            filesHtml +
+                        '<div style="margin-bottom: 10px;">' +
+                            '<input type="text" id="template-desc-' + index + '" value="' + template.description + '" ' +
+                                   'style="width: 100%; padding: 8px; background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 6px; color: #e0e0e0; font-size: 13px;" ' +
+                                   'placeholder="Description" onclick="event.stopPropagation()" />' +
                         '</div>' +
-                    '</div>' +
-                    '<div style="display: flex; justify-content: space-between; align-items: center;">' +
-                        '<label style="display: flex; align-items: center; cursor: pointer;">' +
-                            '<input type="checkbox" id="template-enabled-' + index + '" ' + checkedAttr + ' ' +
-                                   'style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;" />' +
-                            '<span style="color: #888; font-size: 13px;">Enabled</span>' +
-                        '</label>' +
-                        '<button onclick="removeTemplate(' + index + ')" ' +
-                                'style="padding: 6px 12px; background: #dc2626; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">Delete Template</button>' +
+                        '<div style="margin-bottom: 10px;">' +
+                            '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">' +
+                                '<label style="display: block; color: #888; font-size: 12px;">Files:</label>' +
+                                '<button onclick="addFile(' + index + ')" ' +
+                                        'style="padding: 4px 12px; background: #065f46; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">+ Add File</button>' +
+                            '</div>' +
+                            '<div id="template-' + index + '-files">' +
+                                filesHtml +
+                            '</div>' +
+                        '</div>' +
+                        '<div style="display: flex; justify-content: space-between; align-items: center;">' +
+                            '<label style="display: flex; align-items: center; cursor: pointer;">' +
+                                '<input type="checkbox" id="template-enabled-' + index + '" ' + checkedAttr + ' ' +
+                                       'style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;" onclick="event.stopPropagation()" />' +
+                                '<span style="color: #888; font-size: 13px;">Enabled</span>' +
+                            '</label>' +
+                            '<button onclick="removeTemplate(' + index + ')" ' +
+                                    'style="padding: 6px 12px; background: #dc2626; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">Delete Template</button>' +
+                        '</div>' +
                     '</div>' +
                 '</div>';
             }).join('');
@@ -1613,7 +1638,7 @@ async function handleUpdateTemplates(request, env, corsHeaders) {
         icon: t.icon,
         title: t.title,
         description: t.description,
-        code: t.code || '',
+        files: t.files || [],
         enabled: t.enabled !== false,
       })),
       lastUpdated: new Date().toISOString(),

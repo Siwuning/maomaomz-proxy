@@ -1675,7 +1675,7 @@ ${xmlInput.value.trim()}
       parsedFields = JSON.parse(jsonText);
     } catch (parseError: any) {
       throw new Error(
-        `AI 返回的不是有效的 JSON 格式\n\n请检查 AI 配置，或者手动添加字段。\n\n原始返回（前200字符）:\n${result.slice(0, 200)}`,
+        `AI 返回的不是有效的 JSON 格式\n\n请检查 AI 配置，或者手动添加字段。\n\n原始返回（前200字符）:\n${aiResponse.slice(0, 200)}`,
       );
     }
 

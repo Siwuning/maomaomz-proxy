@@ -662,7 +662,7 @@ const createSummaryWorldbook = async () => {
 
     console.log('准备创建世界书:', worldbookName);
 
-    const existingWorldbooks = getWorldbookNames();
+    const existingWorldbooks = (window as any).getWorldbookNames();
     if (existingWorldbooks.includes(worldbookName)) {
       window.toastr.warning(`世界书 "${worldbookName}" 已存在`);
       return;
@@ -686,7 +686,7 @@ const createSummaryWorldbook = async () => {
 // 绑定总结到世界书
 const bindToWorldbook = async (content: string, summaryIndex: number) => {
   try {
-    const worldbookNames = getWorldbookNames();
+    const worldbookNames = (window as any).getWorldbookNames();
     if (worldbookNames.length === 0) {
       window.toastr.warning('没有可用的世界书，请先创建总结世界书');
       return;

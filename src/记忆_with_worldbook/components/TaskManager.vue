@@ -395,8 +395,8 @@
                 cursor: 'pointer',
                 transition: 'all 0.2s',
               }"
-              @mouseenter="e => e.target.style.background = '#3a8edf'"
-              @mouseleave="e => e.target.style.background = '#4a9eff'"
+              @mouseenter="e => (e.target.style.background = '#3a8edf')"
+              @mouseleave="e => (e.target.style.background = '#4a9eff')"
             >
               <i class="fa-solid fa-eye" style="margin-right: 4px"></i>预览
             </button>
@@ -412,8 +412,8 @@
                 cursor: 'pointer',
                 transition: 'all 0.2s',
               }"
-              @mouseenter="e => e.target.style.background = '#40c057'"
-              @mouseleave="e => e.target.style.background = '#51cf66'"
+              @mouseenter="e => (e.target.style.background = '#40c057')"
+              @mouseleave="e => (e.target.style.background = '#51cf66')"
             >
               <i class="fa-solid fa-copy" style="margin-right: 4px"></i>复制
             </button>
@@ -429,8 +429,8 @@
                 cursor: 'pointer',
                 transition: 'all 0.2s',
               }"
-              @mouseenter="e => e.target.style.background = '#ff8c00'"
-              @mouseleave="e => e.target.style.background = '#ffa500'"
+              @mouseenter="e => (e.target.style.background = '#ff8c00')"
+              @mouseleave="e => (e.target.style.background = '#ffa500')"
             >
               <i class="fa-solid fa-download" style="margin-right: 4px"></i>CSV
             </button>
@@ -454,17 +454,19 @@
           <div :style="{ color: '#888', fontSize: '11px', marginBottom: '8px' }">
             楼层 {{ task.result.startId }}-{{ task.result.endId }}，{{ task.result.summaryLength }} 字
           </div>
-          <div :style="{
-            color: '#ccc',
-            fontSize: '12px',
-            marginBottom: '8px',
-            maxHeight: '100px',
-            overflowY: 'auto',
-            padding: '6px',
-            background: 'rgba(0, 0, 0, 0.3)',
-            borderRadius: '4px',
-            lineHeight: '1.4'
-          }">
+          <div
+            :style="{
+              color: '#ccc',
+              fontSize: '12px',
+              marginBottom: '8px',
+              maxHeight: '100px',
+              overflowY: 'auto',
+              padding: '6px',
+              background: 'rgba(0, 0, 0, 0.3)',
+              borderRadius: '4px',
+              lineHeight: '1.4',
+            }"
+          >
             {{ getSummaryPreview(task) }}
           </div>
           <div :style="{ display: 'flex', gap: '8px', flexWrap: 'wrap' }">
@@ -480,8 +482,8 @@
                 cursor: 'pointer',
                 transition: 'all 0.2s',
               }"
-              @mouseenter="e => e.target.style.background = '#3a8edf'"
-              @mouseleave="e => e.target.style.background = '#4a9eff'"
+              @mouseenter="e => (e.target.style.background = '#3a8edf')"
+              @mouseleave="e => (e.target.style.background = '#4a9eff')"
             >
               <i class="fa-solid fa-eye" style="margin-right: 4px"></i>查看全文
             </button>
@@ -497,8 +499,8 @@
                 cursor: 'pointer',
                 transition: 'all 0.2s',
               }"
-              @mouseenter="e => e.target.style.background = '#40c057'"
-              @mouseleave="e => e.target.style.background = '#51cf66'"
+              @mouseenter="e => (e.target.style.background = '#40c057')"
+              @mouseleave="e => (e.target.style.background = '#51cf66')"
             >
               <i class="fa-solid fa-copy" style="margin-right: 4px"></i>复制
             </button>
@@ -690,16 +692,12 @@ const getSummaryPreview = (task: any) => {
   if (!summaryHistoryStore) return '无法获取总结内容';
 
   const summaries = summaryHistoryStore.summaries || [];
-  const summary = summaries.find(s =>
-    s.start_id === task.result.startId && s.end_id === task.result.endId
-  );
+  const summary = summaries.find(s => s.start_id === task.result.startId && s.end_id === task.result.endId);
 
   if (!summary) return '无法获取总结内容';
 
   // 返回前200个字符作为预览
-  return summary.summary.length > 200
-    ? summary.summary.substring(0, 200) + '...'
-    : summary.summary;
+  return summary.summary.length > 200 ? summary.summary.substring(0, 200) + '...' : summary.summary;
 };
 
 // 查看完整总结
@@ -711,9 +709,7 @@ const viewSummary = (task: any) => {
   if (!summaryHistoryStore) return;
 
   const summaries = summaryHistoryStore.summaries || [];
-  const summary = summaries.find(s =>
-    s.start_id === task.result.startId && s.end_id === task.result.endId
-  );
+  const summary = summaries.find(s => s.start_id === task.result.startId && s.end_id === task.result.endId);
 
   if (!summary) {
     window.toastr.error('无法获取总结内容');
@@ -781,9 +777,7 @@ const copySummary = async (task: any) => {
   if (!summaryHistoryStore) return;
 
   const summaries = summaryHistoryStore.summaries || [];
-  const summary = summaries.find(s =>
-    s.start_id === task.result.startId && s.end_id === task.result.endId
-  );
+  const summary = summaries.find(s => s.start_id === task.result.startId && s.end_id === task.result.endId);
 
   if (!summary) {
     window.toastr.error('无法获取总结内容');

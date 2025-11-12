@@ -253,6 +253,119 @@
           </select>
         </div>
 
+        <!-- API 模板管理 -->
+        <div
+          class="form-group"
+          style="
+            margin-top: 25px;
+            margin-bottom: 18px !important;
+            padding: 18px;
+            background: rgba(74, 158, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(74, 158, 255, 0.2);
+          "
+        >
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px">
+            <label style="display: flex; align-items: center; gap: 8px; color: #4a9eff; font-size: 14px; font-weight: 600; margin: 0">
+              <i class="fa-solid fa-bookmark"></i>
+              API 模板管理
+            </label>
+            <button
+              @click="showSaveTemplateDialog = true"
+              style="
+                padding: 8px 16px;
+                background: linear-gradient(135deg, #4a9eff 0%, #357abd 100%);
+                border: none;
+                border-radius: 8px;
+                color: white;
+                font-size: 12px;
+                cursor: pointer;
+                transition: all 0.2s;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+              "
+              onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(74, 158, 255, 0.4)'"
+              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'"
+            >
+              <i class="fa-solid fa-plus"></i>
+              保存当前配置
+            </button>
+          </div>
+
+          <!-- 模板列表 -->
+          <div v-if="apiTemplates.length > 0" style="display: flex; flex-direction: column; gap: 10px">
+            <div
+              v-for="(template, index) in apiTemplates"
+              :key="template.id"
+              style="
+                padding: 12px 16px;
+                background: #2a2a2a;
+                border: 1px solid #3a3a3a;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                transition: all 0.2s;
+              "
+              onmouseover="this.style.borderColor='#4a9eff'; this.style.background='#2f2f2f'"
+              onmouseout="this.style.borderColor='#3a3a3a'; this.style.background='#2a2a2a'"
+            >
+              <div style="flex: 1; min-width: 0">
+                <div style="color: #e0e0e0; font-size: 13px; font-weight: 500; margin-bottom: 4px">
+                  {{ template.name }}
+                </div>
+                <div style="color: #888; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">
+                  {{ template.endpoint }} • {{ template.model }}
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px; margin-left: 12px">
+                <button
+                  @click="loadApiTemplate(template)"
+                  style="
+                    padding: 6px 12px;
+                    background: #51cf66;
+                    border: none;
+                    border-radius: 6px;
+                    color: white;
+                    font-size: 11px;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                  "
+                  onmouseover="this.style.background='#40c057'; this.style.transform='scale(1.05)'"
+                  onmouseout="this.style.background='#51cf66'; this.style.transform='scale(1)'"
+                  title="加载此模板"
+                >
+                  <i class="fa-solid fa-download"></i>
+                </button>
+                <button
+                  @click="deleteApiTemplate(template.id)"
+                  style="
+                    padding: 6px 12px;
+                    background: #ff6b6b;
+                    border: none;
+                    border-radius: 6px;
+                    color: white;
+                    font-size: 11px;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                  "
+                  onmouseover="this.style.background='#fa5252'; this.style.transform='scale(1.05)'"
+                  onmouseout="this.style.background='#ff6b6b'; this.style.transform='scale(1)'"
+                  title="删除此模板"
+                >
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div v-else style="padding: 20px; text-align: center; color: #888; font-size: 12px">
+            <i class="fa-solid fa-inbox" style="font-size: 24px; margin-bottom: 8px; opacity: 0.5"></i>
+            <div>暂无保存的模板</div>
+            <div style="margin-top: 4px; font-size: 11px; color: #666">点击"保存当前配置"创建第一个模板</div>
+          </div>
+        </div>
+
         <div class="form-group" style="margin-bottom: 18px !important">
           <label style="display: block; margin-bottom: 6px; color: #ccc; font-size: 13px"
             >最大 Token 数（建议4000以上获得更详细的总结）</label
@@ -1248,6 +1361,90 @@
     <!-- 进度对话框 -->
     <ProgressDialog ref="progressDialogRef" :show="showProgress" title="AI 正在处理" />
   </div>
+
+  <!-- 保存模板对话框 -->
+  <div
+    v-if="showSaveTemplateDialog"
+    style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    "
+    @click.self="showSaveTemplateDialog = false"
+  >
+    <div
+      style="
+        background: #2a2a2a;
+        border-radius: 12px;
+        padding: 24px;
+        width: 90%;
+        max-width: 500px;
+        border: 1px solid #3a3a3a;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      "
+    >
+      <h3 style="color: #fff; margin: 0 0 20px 0; font-size: 16px; display: flex; align-items: center; gap: 8px">
+        <i class="fa-solid fa-bookmark" style="color: #4a9eff"></i>
+        保存 API 模板
+      </h3>
+      <div class="form-group" style="margin-bottom: 18px">
+        <label style="display: block; margin-bottom: 6px; color: #ccc; font-size: 13px">模板名称</label>
+        <input
+          v-model="newTemplateName"
+          type="text"
+          placeholder="例如：OpenAI 官方、Gemini、公益站1等"
+          style="
+            width: 100%;
+            padding: 10px 12px;
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 13px;
+          "
+          @keyup.enter="saveApiTemplate"
+        />
+      </div>
+      <div style="display: flex; gap: 10px; justify-content: flex-end">
+        <button
+          @click="showSaveTemplateDialog = false"
+          style="
+            padding: 10px 20px;
+            background: #3a3a3a;
+            border: none;
+            border-radius: 8px;
+            color: #ccc;
+            font-size: 13px;
+            cursor: pointer;
+          "
+        >
+          取消
+        </button>
+        <button
+          @click="saveApiTemplate"
+          style="
+            padding: 10px 20px;
+            background: #4a9eff;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 500;
+          "
+        >
+          保存
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -1275,6 +1472,121 @@ const expandedSections = ref<Record<string, boolean>>({
 // 切换分类展开/折叠
 const toggleSection = (section: string) => {
   expandedSections.value[section] = !expandedSections.value[section];
+};
+
+// API 模板管理
+interface ApiTemplate {
+  id: string;
+  name: string;
+  endpoint: string;
+  api_key: string;
+  model: string;
+  api_provider: string;
+  max_tokens?: number;
+  temperature?: number;
+  top_p?: number;
+  presence_penalty?: number;
+  frequency_penalty?: number;
+  createdAt: number;
+}
+
+const apiTemplates = ref<ApiTemplate[]>([]);
+const showSaveTemplateDialog = ref(false);
+const newTemplateName = ref('');
+
+// 加载 API 模板列表
+const loadApiTemplates = () => {
+  try {
+    const saved = localStorage.getItem('maomao_api_templates');
+    if (saved) {
+      apiTemplates.value = JSON.parse(saved);
+      // 按创建时间倒序排列
+      apiTemplates.value.sort((a, b) => b.createdAt - a.createdAt);
+    }
+  } catch (e) {
+    console.error('加载 API 模板失败:', e);
+    apiTemplates.value = [];
+  }
+};
+
+// 保存 API 模板列表
+const saveApiTemplates = () => {
+  try {
+    localStorage.setItem('maomao_api_templates', JSON.stringify(apiTemplates.value));
+  } catch (e) {
+    console.error('保存 API 模板失败:', e);
+    window.toastr.error('保存模板失败: ' + (e as Error).message);
+  }
+};
+
+// 保存当前配置为模板
+const saveApiTemplate = () => {
+  if (!newTemplateName.value.trim()) {
+    window.toastr.warning('请输入模板名称');
+    return;
+  }
+
+  if (!settings.value.api_endpoint || !settings.value.api_key) {
+    window.toastr.warning('请先配置 API 端点和 API Key');
+    return;
+  }
+
+  const template: ApiTemplate = {
+    id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 9),
+    name: newTemplateName.value.trim(),
+    endpoint: settings.value.api_endpoint,
+    api_key: settings.value.api_key,
+    model: settings.value.model,
+    api_provider: settings.value.api_provider,
+    max_tokens: settings.value.max_tokens,
+    temperature: settings.value.temperature,
+    top_p: settings.value.top_p,
+    presence_penalty: settings.value.presence_penalty,
+    frequency_penalty: settings.value.frequency_penalty,
+    createdAt: Date.now(),
+  };
+
+  apiTemplates.value.push(template);
+  saveApiTemplates();
+
+  showSaveTemplateDialog.value = false;
+  newTemplateName.value = '';
+  window.toastr.success(`模板 "${template.name}" 已保存！`);
+};
+
+// 加载 API 模板
+const loadApiTemplate = (template: ApiTemplate) => {
+  if (!confirm(`确定要加载模板 "${template.name}" 吗？\n\n当前配置将被覆盖。`)) {
+    return;
+  }
+
+  settings.value.api_endpoint = template.endpoint;
+  settings.value.api_key = template.api_key;
+  settings.value.model = template.model;
+  settings.value.api_provider = template.api_provider;
+  if (template.max_tokens !== undefined) settings.value.max_tokens = template.max_tokens;
+  if (template.temperature !== undefined) settings.value.temperature = template.temperature;
+  if (template.top_p !== undefined) settings.value.top_p = template.top_p;
+  if (template.presence_penalty !== undefined) settings.value.presence_penalty = template.presence_penalty;
+  if (template.frequency_penalty !== undefined) settings.value.frequency_penalty = template.frequency_penalty;
+
+  // 自动保存设置
+  settingsStore.saveSettings();
+  window.toastr.success(`已加载模板 "${template.name}"`);
+};
+
+// 删除 API 模板
+const deleteApiTemplate = (templateId: string) => {
+  const template = apiTemplates.value.find(t => t.id === templateId);
+  if (!template) return;
+
+  if (!confirm(`确定要删除模板 "${template.name}" 吗？`)) {
+    return;
+  }
+
+  apiTemplates.value = apiTemplates.value.filter(t => t.id !== templateId);
+  saveApiTemplates();
+  window.toastr.success(`模板 "${template.name}" 已删除`);
 };
 
 // 导入酒馆API函数
@@ -1572,6 +1884,7 @@ const initApiProvider = () => {
 onMounted(() => {
   console.log('SettingsTab 组件已挂载，开始加载数据');
   initApiProvider(); // 初始化 API 提供商
+  loadApiTemplates(); // 加载 API 模板列表
   loadHiddenMessages();
   loadHeaderTemplates();
   loadGenerationStatus();

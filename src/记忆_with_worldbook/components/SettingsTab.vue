@@ -2341,42 +2341,44 @@ const handle_summarize = async () => {
     saveGenerationStatus();
 
     // 创建任务
-    taskId = taskStore.createTask({
-      title: '生成总结',
-      description: `正在总结楼层 ${settings.value.start_message_id} - ${settings.value.end_message_id}`,
-      category: '总结',
-    });
+    taskId = taskStore.createTask('summary', `生成总结 (${settings.value.start_message_id}-${settings.value.end_message_id})`);
+    taskStore.updateTaskProgress(taskId, 0, '准备生成总结...');
+    taskStore.addTaskDetail(taskId, `楼层范围: ${settings.value.start_message_id} - ${settings.value.end_message_id}`);
 
     // 验证 API 配置
     if (!settings.value.api_endpoint || !settings.value.api_key) {
-      window.toastr.warning('请先配置 API 端点和 API Key');
+      const errorMsg = '请先配置 API 端点和 API Key';
+      window.toastr.warning(errorMsg);
+      if (taskId) taskStore.failTask(taskId, errorMsg);
       return;
     }
 
     // 验证楼层范围
     if (settings.value.start_message_id === undefined || settings.value.end_message_id === undefined) {
-      window.toastr.warning('请设置开始楼层和结束楼层');
+      const errorMsg = '请设置开始楼层和结束楼层';
+      window.toastr.warning(errorMsg);
+      if (taskId) taskStore.failTask(taskId, errorMsg);
       return;
     }
 
     // 验证楼层范围的有效性
     if (settings.value.start_message_id < 0 || settings.value.end_message_id < settings.value.start_message_id) {
-      window.toastr.warning('楼层范围无效，请确保结束楼层大于等于开始楼层');
+      const errorMsg = '楼层范围无效，请确保结束楼层大于等于开始楼层';
+      window.toastr.warning(errorMsg);
+      if (taskId) taskStore.failTask(taskId, errorMsg);
       return;
     }
 
-    console.log(`总结范围: ${settings.value.start_message_id} - ${settings.value.end_message_id}`);
-
-    console.log(`开始总结楼层范围: ${settings.value.start_message_id} - ${settings.value.end_message_id}`);
-
-    console.log('正在调用 AI 生成总结...');
+    taskStore.updateTaskProgress(taskId, 10, '正在获取消息...');
 
     // 调用总结功能
     const { summarizeMessages } = await import('../总结功能');
+    taskStore.updateTaskProgress(taskId, 30, '正在调用 AI 生成总结...');
     const summary = await summarizeMessages(settings.value.start_message_id, settings.value.end_message_id);
 
     console.log('总结完成:', summary);
-    console.log('正在保存总结结果...');
+    taskStore.updateTaskProgress(taskId, 90, '正在保存总结结果...');
+    taskStore.addTaskDetail(taskId, `总结长度: ${summary.length} 字符`);
 
     // 保存总结结果（插件环境 - 使用 localStorage）
     const scriptId = getScriptIdSafe();
@@ -2396,17 +2398,26 @@ const handle_summarize = async () => {
     // 通知其他组件更新
     window.dispatchEvent(new CustomEvent('summary-history-updated'));
 
+    taskStore.updateTaskProgress(taskId, 100, '总结完成！');
+    taskStore.addTaskDetail(taskId, '已保存到历史记录');
+
     window.toastr.success('总结完成并已保存到历史！');
     // 标记任务完成
     if (taskId) {
-      taskStore.completeTask(taskId);
+      taskStore.completeTask(taskId, {
+        summaryLength: summary.length,
+        startId: settings.value.start_message_id,
+        endId: settings.value.end_message_id
+      });
     }
   } catch (error) {
     console.error('总结失败:', error);
-    window.toastr.error('总结失败: ' + (error as Error).message);
+    const errorMsg = `总结失败: ${(error as Error).message}`;
+    window.toastr.error(errorMsg);
     // 标记任务失败
     if (taskId) {
       taskStore.failTask(taskId, (error as Error).message);
+      taskStore.addTaskDetail(taskId, `错误堆栈: ${(error as Error).stack}`);
     }
   } finally {
     is_summarizing.value = false;
@@ -2424,21 +2435,23 @@ const handle_generate_table = async () => {
     saveGenerationStatus();
 
     // 创建任务
-    taskId = taskStore.createTask({
-      title: '生成表格',
-      description: `正在生成楼层 ${settings.value.table_start_message_id} - ${settings.value.table_end_message_id} 的表格`,
-      category: '表格',
-    });
+    taskId = taskStore.createTask('table', `生成表格 (${settings.value.table_start_message_id}-${settings.value.table_end_message_id})`);
+    taskStore.updateTaskProgress(taskId, 0, '准备生成表格...');
+    taskStore.addTaskDetail(taskId, `楼层范围: ${settings.value.table_start_message_id} - ${settings.value.table_end_message_id}`);
 
     // 验证 API 配置
     if (!settings.value.api_endpoint || !settings.value.api_key) {
-      window.toastr.warning('请先配置 API 端点和 API Key');
+      const errorMsg = '请先配置 API 端点和 API Key';
+      window.toastr.warning(errorMsg);
+      if (taskId) taskStore.failTask(taskId, errorMsg);
       return;
     }
 
     // 验证表格参数
     if (!settings.value.table_start_message_id || !settings.value.table_end_message_id) {
-      window.toastr.warning('请设置开始楼层和结束楼层');
+      const errorMsg = '请设置开始楼层和结束楼层';
+      window.toastr.warning(errorMsg);
+      if (taskId) taskStore.failTask(taskId, errorMsg);
       return;
     }
 
@@ -2471,11 +2484,16 @@ const handle_generate_table = async () => {
       .filter((h: string) => h);
 
     if (headers.length === 0) {
-      window.toastr.warning('请设置有效的表格列头');
+      const errorMsg = '请设置有效的表格列头';
+      window.toastr.warning(errorMsg);
+      if (taskId) taskStore.failTask(taskId, errorMsg);
       return;
     }
 
-    console.log(`楼层范围: ${settings.value.table_start_message_id} - ${settings.value.table_end_message_id}`);
+    // 更新任务进度
+    taskStore.updateTaskProgress(taskId, 5, '开始获取聊天消息...');
+    taskStore.addTaskDetail(taskId, `表格列头: ${headers.join(', ')}`);
+    taskStore.addTaskDetail(taskId, `楼层范围: ${settings.value.table_start_message_id} - ${settings.value.table_end_message_id}`);
 
     // 获取指定范围的消息
     let chatMessages;
@@ -2580,14 +2598,23 @@ const handle_generate_table = async () => {
       }
 
       console.log(`获取到 ${chatMessages.length} 条消息`);
+      taskStore.updateTaskProgress(taskId, 20, `成功获取 ${chatMessages.length} 条聊天消息`);
+      taskStore.addTaskDetail(taskId, `消息获取方式: ${messagesRetrieved ? 'TavernHelper' : '降级方案'}`);
     } catch (error) {
       console.error('获取聊天消息失败:', error);
-      window.toastr.error('获取聊天消息失败: ' + (error as Error).message);
+      const errorMsg = `获取聊天消息失败: ${(error as Error).message}`;
+      window.toastr.error(errorMsg);
+      if (taskId) {
+        taskStore.failTask(taskId, errorMsg);
+        taskStore.addTaskDetail(taskId, `错误详情: ${error}`);
+      }
       return;
     }
 
     if (!chatMessages || chatMessages.length === 0) {
-      window.toastr.warning('指定范围内没有消息');
+      const errorMsg = '指定范围内没有消息';
+      window.toastr.warning(errorMsg);
+      if (taskId) taskStore.failTask(taskId, errorMsg);
       return;
     }
 
@@ -2656,6 +2683,10 @@ ${messagesText}
     const { normalizeApiEndpoint, filterApiParams } = await import('../settings');
     const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
 
+    taskStore.updateTaskProgress(taskId, 30, '准备发送请求到 AI...');
+    taskStore.addTaskDetail(taskId, `API 端点: ${apiUrl}`);
+    taskStore.addTaskDetail(taskId, `使用模型: ${settings.value.model}`);
+
     console.log('等待 AI 分析并生成表格...');
 
     const requestParams = {
@@ -2681,6 +2712,9 @@ ${messagesText}
     const filteredParams = filterApiParams(requestParams, settings.value.api_endpoint);
 
     // 调用AI生成表格
+    taskStore.updateTaskProgress(taskId, 40, '发送请求到 AI 服务器...');
+    taskStore.addTaskDetail(taskId, '正在等待 AI 响应...');
+
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
@@ -2694,29 +2728,39 @@ ${messagesText}
       const errorText = await response.text();
       console.error('❌ API请求失败:', response.status, response.statusText);
       console.error('错误详情:', errorText);
+      const errorMsg = `API请求失败 (${response.status}): ${response.statusText}`;
       window.toastr.error(
         `API请求失败！\n\n状态码: ${response.status}\n错误: ${response.statusText}\n\n请检查：\n1. API端点是否正确\n2. API Key是否有效\n3. 网络连接是否正常`,
         '',
         { timeOut: 10000 },
       );
+      if (taskId) {
+        taskStore.failTask(taskId, errorMsg);
+        taskStore.addTaskDetail(taskId, `错误详情: ${errorText.slice(0, 500)}`);
+      }
       return;
     }
 
-    console.log('正在接收 AI 响应...');
+    taskStore.updateTaskProgress(taskId, 60, '正在解析 AI 响应...');
 
     const result = await response.json();
     console.log('AI响应:', result);
 
     if (!result.choices || !result.choices[0] || !result.choices[0].message) {
+      const errorMsg = 'AI响应格式错误，请检查API是否为OpenAI兼容格式';
       console.error('❌ AI响应格式错误:', result);
-      window.toastr.error('AI响应格式错误，请检查API是否为OpenAI兼容格式', '', { timeOut: 8000 });
+      window.toastr.error(errorMsg, '', { timeOut: 8000 });
+      if (taskId) {
+        taskStore.failTask(taskId, errorMsg);
+        taskStore.addTaskDetail(taskId, `响应内容: ${JSON.stringify(result, null, 2).slice(0, 500)}`);
+      }
       return;
     }
 
     const aiResponse = result.choices[0].message.content;
     console.log('AI返回内容:', aiResponse);
 
-    console.log('正在解析表格数据...');
+    taskStore.updateTaskProgress(taskId, 80, '正在解析表格数据...');
 
     // 解析AI返回的JSON
     let aiTableData;
@@ -2756,13 +2800,21 @@ ${messagesText}
     } catch (parseError) {
       console.error('解析AI响应失败:', parseError);
       console.log('AI原始响应:', aiResponse);
+      const errorMsg = `AI返回的数据格式不正确`;
       window.toastr.error(`AI返回的数据格式不正确！\n\n原始响应：\n${aiResponse.slice(0, 200)}`, '', { timeOut: 8000 });
+      if (taskId) {
+        taskStore.failTask(taskId, errorMsg);
+        taskStore.addTaskDetail(taskId, `解析错误: ${parseError}`);
+        taskStore.addTaskDetail(taskId, `原始响应: ${aiResponse.slice(0, 500)}`);
+      }
       return;
     }
 
     // 验证表格数据
     if (!aiTableData.data || !Array.isArray(aiTableData.data)) {
-      window.toastr.error('AI返回的表格数据格式不正确：缺少data数组');
+      const errorMsg = 'AI返回的表格数据格式不正确：缺少data数组';
+      window.toastr.error(errorMsg);
+      if (taskId) taskStore.failTask(taskId, errorMsg);
       return;
     }
 
@@ -2816,22 +2868,34 @@ ${messagesText}
       localStorage.setItem(storageKey, JSON.stringify(table_history));
       console.log('✅ 表格已保存到 localStorage，chat_id:', chat_id);
 
+      taskStore.updateTaskProgress(taskId, 100, '表格生成完成！');
+      taskStore.addTaskDetail(taskId, `共生成 ${tableData.data.length} 行数据`);
+      taskStore.addTaskDetail(taskId, `已保存到聊天历史`);
+
       window.toastr.success(`表格生成成功！共${tableData.data.length}行数据`);
       // 标记任务完成
       if (taskId) {
-        taskStore.completeTask(taskId);
+        taskStore.completeTask(taskId, {
+          rowCount: tableData.data.length,
+          headers: tableData.headers,
+          chatId: chat_id
+        });
       }
 
       console.log('表格已保存到聊天变量:', table_history);
     } else {
-      window.toastr.warning('无法获取聊天ID，表格生成失败');
+      const errorMsg = '无法获取聊天ID，表格生成失败';
+      window.toastr.warning(errorMsg);
+      if (taskId) taskStore.failTask(taskId, errorMsg);
     }
   } catch (error) {
     console.error('生成表格失败:', error);
-    window.toastr.error('生成表格失败: ' + (error as Error).message);
+    const errorMsg = `生成表格失败: ${(error as Error).message}`;
+    window.toastr.error(errorMsg);
     // 标记任务失败
     if (taskId) {
       taskStore.failTask(taskId, (error as Error).message);
+      taskStore.addTaskDetail(taskId, `错误堆栈: ${(error as Error).stack}`);
     }
   } finally {
     is_generating_table.value = false;

@@ -3,7 +3,7 @@ import { ref, watch } from 'vue';
 import { getScriptIdSafe } from './utils';
 
 // 任务类型
-export type TaskType = 'ui_generate' | 'ui_modify' | 'character_generate' | 'worldbook_generate' | 'anti_cliche';
+export type TaskType = 'ui_generate' | 'ui_modify' | 'character_generate' | 'worldbook_generate' | 'anti_cliche' | 'table' | 'summary';
 
 // 任务状态
 export type TaskStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';

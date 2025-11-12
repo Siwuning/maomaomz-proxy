@@ -2540,7 +2540,7 @@ const handle_generate_table = async () => {
       }
 
       // 方式2: 降级到 SillyTavern.chat（如果可用）
-      if (!messagesRetrieved && typeof (window as any).SillyTavern !== 'undefined' && Array.isArray((window as any).SillyTavern.chat)) {
+      if (!messagesRetrieved && typeof (window as any).SillyTavern !== 'undefined' && (window as any).SillyTavern.chat && Array.isArray((window as any).SillyTavern.chat)) {
         console.log('📝 尝试从 SillyTavern.chat 获取消息...');
         const chat = (window as any).SillyTavern.chat;
         const startIdx = Math.max(0, settings.value.table_start_message_id);
@@ -2580,7 +2580,25 @@ const handle_generate_table = async () => {
       }
 
       if (!messagesRetrieved) {
-        throw new Error('无法获取聊天消息：请确保在支持的聊天环境中使用（如 SillyTavern）');
+        // 调试：输出当前可用的全局对象
+        console.log('🔍 调试信息：');
+        console.log('- window.TavernHelper:', typeof (window as any).TavernHelper);
+        console.log('- window.SillyTavern:', typeof (window as any).SillyTavern);
+        console.log('- window.chat:', typeof (window as any).chat);
+        console.log('- window.SillyTavern?.chat:', Array.isArray((window as any).SillyTavern?.chat));
+
+        // 检查其他可能的消息存储位置
+        if (typeof (window as any).eventsource !== 'undefined') {
+          console.log('- window.eventsource 存在');
+        }
+        if (typeof (window as any).this_chat !== 'undefined') {
+          console.log('- window.this_chat 存在');
+        }
+        if (typeof (window as any).character !== 'undefined') {
+          console.log('- window.character 存在');
+        }
+
+        throw new Error('无法获取聊天消息：请确保在支持的聊天环境中使用（如 SillyTavern）\n调试信息已输出到控制台');
       }
 
       progressDialogRef.value?.addDetail(`获取到 ${chatMessages.length} 条消息`);

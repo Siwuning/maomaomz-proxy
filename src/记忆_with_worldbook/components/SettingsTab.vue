@@ -2341,7 +2341,10 @@ const handle_summarize = async () => {
     saveGenerationStatus();
 
     // 创建任务
-    taskId = taskStore.createTask('summary', `生成总结 (${settings.value.start_message_id}-${settings.value.end_message_id})`);
+    taskId = taskStore.createTask(
+      'summary',
+      `生成总结 (${settings.value.start_message_id}-${settings.value.end_message_id})`,
+    );
     taskStore.updateTaskProgress(taskId, 0, '准备生成总结...');
     taskStore.addTaskDetail(taskId, `楼层范围: ${settings.value.start_message_id} - ${settings.value.end_message_id}`);
 
@@ -2407,7 +2410,7 @@ const handle_summarize = async () => {
       taskStore.completeTask(taskId, {
         summaryLength: summary.length,
         startId: settings.value.start_message_id,
-        endId: settings.value.end_message_id
+        endId: settings.value.end_message_id,
       });
     }
   } catch (error) {
@@ -2435,9 +2438,15 @@ const handle_generate_table = async () => {
     saveGenerationStatus();
 
     // 创建任务
-    taskId = taskStore.createTask('table', `生成表格 (${settings.value.table_start_message_id}-${settings.value.table_end_message_id})`);
+    taskId = taskStore.createTask(
+      'table',
+      `生成表格 (${settings.value.table_start_message_id}-${settings.value.table_end_message_id})`,
+    );
     taskStore.updateTaskProgress(taskId, 0, '准备生成表格...');
-    taskStore.addTaskDetail(taskId, `楼层范围: ${settings.value.table_start_message_id} - ${settings.value.table_end_message_id}`);
+    taskStore.addTaskDetail(
+      taskId,
+      `楼层范围: ${settings.value.table_start_message_id} - ${settings.value.table_end_message_id}`,
+    );
 
     // 验证 API 配置
     if (!settings.value.api_endpoint || !settings.value.api_key) {
@@ -2493,7 +2502,10 @@ const handle_generate_table = async () => {
     // 更新任务进度
     taskStore.updateTaskProgress(taskId, 5, '开始获取聊天消息...');
     taskStore.addTaskDetail(taskId, `表格列头: ${headers.join(', ')}`);
-    taskStore.addTaskDetail(taskId, `楼层范围: ${settings.value.table_start_message_id} - ${settings.value.table_end_message_id}`);
+    taskStore.addTaskDetail(
+      taskId,
+      `楼层范围: ${settings.value.table_start_message_id} - ${settings.value.table_end_message_id}`,
+    );
 
     // 获取指定范围的消息
     let chatMessages;
@@ -2878,7 +2890,7 @@ ${messagesText}
         taskStore.completeTask(taskId, {
           rowCount: tableData.data.length,
           headers: tableData.headers,
-          chatId: chat_id
+          chatId: chat_id,
         });
       }
 

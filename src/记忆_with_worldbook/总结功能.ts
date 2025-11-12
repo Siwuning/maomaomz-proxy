@@ -257,7 +257,12 @@ export async function summarizeMessages(start_id: number, end_id: number): Promi
     }
 
     // 方式2: 降级到 SillyTavern.chat（如果可用）
-    if (!messagesRetrieved && typeof (window as any).SillyTavern !== 'undefined' && (window as any).SillyTavern.chat && Array.isArray((window as any).SillyTavern.chat)) {
+    if (
+      !messagesRetrieved &&
+      typeof (window as any).SillyTavern !== 'undefined' &&
+      (window as any).SillyTavern.chat &&
+      Array.isArray((window as any).SillyTavern.chat)
+    ) {
       console.log('📝 尝试从 SillyTavern.chat 获取消息...');
       const chat = (window as any).SillyTavern.chat;
       const startIdx = Math.max(0, start_id);

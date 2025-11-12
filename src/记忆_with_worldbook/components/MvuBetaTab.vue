@@ -1027,14 +1027,14 @@ async function handleAIGenerateStructure() {
     const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
     // 过滤 API 参数，确保兼容不同的服务提供商
     const requestPayload = {
-        model: settings.value.model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: `需求：${aiStructurePrompt.value}\n\n请生成 [InitVar] JSON。` },
-        ],
-        temperature: settings.value.temperature || 0.7,
-        max_tokens: settings.value.max_tokens || 4000,
-      };
+      model: settings.value.model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `需求：${aiStructurePrompt.value}\n\n请生成 [InitVar] JSON。` },
+      ],
+      temperature: settings.value.temperature || 0.7,
+      max_tokens: settings.value.max_tokens || 4000,
+    };
 
     const filteredPayload = filterApiParams(requestPayload, settings.value.api_endpoint);
 
@@ -1548,14 +1548,14 @@ rule:
     const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
     // 过滤 API 参数，确保兼容不同的服务提供商
     const requestPayload = {
-        model: settings.value.model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: `场景：${aiPromptDescription.value}\n\n请生成 COT 提示词。` },
-        ],
-        temperature: settings.value.temperature || 0.7,
-        max_tokens: settings.value.max_tokens || 3000,
-      };
+      model: settings.value.model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `场景：${aiPromptDescription.value}\n\n请生成 COT 提示词。` },
+      ],
+      temperature: settings.value.temperature || 0.7,
+      max_tokens: settings.value.max_tokens || 3000,
+    };
 
     const filteredPayload = filterApiParams(requestPayload, settings.value.api_endpoint);
 
@@ -1694,14 +1694,14 @@ ${modifyInstruction}
     const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
     // 过滤 API 参数，确保兼容不同的服务提供商
     const requestPayload = {
-        model: settings.value.model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
-        temperature: settings.value.temperature || 0.7,
-        max_tokens: settings.value.max_tokens || 4000,
-      };
+      model: settings.value.model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      temperature: settings.value.temperature || 0.7,
+      max_tokens: settings.value.max_tokens || 4000,
+    };
 
     const filteredPayload = filterApiParams(requestPayload, settings.value.api_endpoint);
 
@@ -1836,14 +1836,14 @@ ${modifyInstruction}
     const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
     // 过滤 API 参数，确保兼容不同的服务提供商
     const requestPayload = {
-        model: settings.value.model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
-        temperature: settings.value.temperature || 0.7,
-        max_tokens: settings.value.max_tokens || 3000,
-      };
+      model: settings.value.model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      temperature: settings.value.temperature || 0.7,
+      max_tokens: settings.value.max_tokens || 3000,
+    };
 
     const filteredPayload = filterApiParams(requestPayload, settings.value.api_endpoint);
 

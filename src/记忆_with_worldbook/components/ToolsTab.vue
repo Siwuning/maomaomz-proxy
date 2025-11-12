@@ -2374,7 +2374,7 @@
 import { debounce } from 'lodash';
 import { storeToRefs } from 'pinia';
 import { onBeforeUnmount, onMounted, ref, Ref, watch } from 'vue';
-import { normalizeApiEndpoint, useSettingsStore, filterApiParams } from '../settings';
+import { normalizeApiEndpoint, useSettingsStore, filterApiParams, detectApiProvider } from '../settings';
 import { copyToClipboard, getScriptIdSafe } from '../utils';
 
 const settingsStore = useSettingsStore();
@@ -3338,8 +3338,42 @@ const generateWithStreaming = async (
   progressRef: Ref<number>,
 ): Promise<string> => {
   const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
+  const provider = detectApiProvider(settings.value.api_endpoint);
+  const wantsStream = requestPayload.stream === true;
+
   // 过滤 API 参数，确保兼容不同的服务提供商
   const filteredPayload = filterApiParams(requestPayload, settings.value.api_endpoint);
+
+  // 如果当前服务不支持流式传输，则自动降级为普通请求
+  if (!wantsStream || provider === 'gemini') {
+    if (wantsStream && provider === 'gemini') {
+      console.warn('⚠️ 当前 API 不支持流式输出，已自动切换为普通模式');
+    }
+
+    delete filteredPayload.stream;
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${settings.value.api_key}`,
+      },
+      body: JSON.stringify(filteredPayload),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`请求失败：${response.status} ${response.statusText}\n${errorText.slice(0, 400)}`);
+    }
+
+    const data = await response.json();
+    progressRef.value = 100;
+    return data.choices?.[0]?.message?.content?.trim() || '';
+  }
+
+  // 对于支持流式的服务，确保 stream 参数存在
+  filteredPayload.stream = true;
+
   const response = await fetch(apiUrl, {
     method: 'POST',
     headers: {

@@ -785,7 +785,6 @@
         </div>
       </div>
     </div>
-
     <!-- Bug 修复对话框 -->
     <div
       v-if="showBugFix"
@@ -1561,7 +1560,7 @@
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch, watchEffect } from 'vue';
-import { normalizeApiEndpoint, useSettingsStore, filterApiParams } from '../settings';
+import { normalizeApiEndpoint, useSettingsStore, filterApiParams, detectApiProvider } from '../settings';
 import { useTaskStore } from '../taskStore';
 import { getChatIdSafe, getScriptIdSafe } from '../utils';
 import ProgressDialog from './ProgressDialog.vue';
@@ -1583,13 +1582,11 @@ interface AIChange {
   oldContent: string;
   newContent: string;
 }
-
 interface AIHistoryRecord {
   timestamp: string;
   prompt: string;
   changes: AIChange[];
 }
-
 interface BackendTemplate {
   id: string;
   icon: string;
@@ -2380,7 +2377,541 @@ h1 {
   color: #667eea;
   margin-bottom: 20px;
 }
+```
+</script>
+<style scoped>
+.project-manager {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
 
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background: #2a2a2a;
+  color: #e0e0e0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 250px;
+  background: #2a2a2a;
+  color: #e0e0e0;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.project-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.project-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-bottom: 5px;
+  transition: background 0.2s;
+}
+
+.project-item:hover {
+  background: #3a3a3a;
+}
+
+.project-item.active {
+  background: #4a9eff;
+  color: white;
+}
+
+.file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.file-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-bottom: 5px;
+  transition: background 0.2s;
+}
+
+.file-item:hover {
+  background: #3a3a3a;
+}
+
+.file-item.active {
+  background: #4a9eff;
+  color: white;
+}
+
+.editor-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background: #2a2a2a;
+  color: #e0e0e0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.editor-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.editor-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.editor-main {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.editor-tabs {
+  display: flex;
+  align-items: center;
+  background: #2a2a2a;
+  color: #e0e0e0;
+  padding: 5px 10px;
+  gap: 10px;
+  overflow-x: auto;
+}
+
+.editor-tab {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.editor-tab:hover {
+  background: #3a3a3a;
+}
+
+.editor-tab.active {
+  background: #4a9eff;
+  color: white;
+}
+
+.editor-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.editor-pane {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.editor-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background: #2a2a2a;
+  color: #e0e0e0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.editor-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.editor-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.preview-container {
+  width: 300px;
+  background: #2a2a2a;
+  color: #e0e0e0;
+  padding: 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.ai-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 400px;
+  background: #2a2a2a;
+  color: #e0e0e0;
+  padding: 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid #3a3a3a;
+  transition: transform 0.3s ease;
+  transform: translateX(100%);
+}
+
+.ai-panel.open {
+  transform: translateX(0);
+}
+
+.ai-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.ai-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.ai-close-btn {
+  cursor: pointer;
+  font-size: 18px;
+  color: #e0e0e0;
+}
+
+.ai-close-btn:hover {
+  color: #4a9eff;
+}
+
+.ai-prompt {
+  margin-bottom: 10px;
+}
+
+.ai-changes {
+  margin-bottom: 10px;
+}
+
+.ai-change-item {
+  margin-bottom: 5px;
+  padding: 8px 12px;
+  background: #3a3a3a;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.ai-change-item:hover {
+  background: #4a4a4a;
+}
+
+.ai-change-item.active {
+  background: #4a9eff;
+  color: white;
+}
+
+.ai-preview {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  background: #1a1a1a;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.ai-preview iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.ai-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ai-history {
+  margin-top: 10px;
+  padding: 10px;
+  background: #3a3a3a;
+  border-radius: 12px;
+  overflow-y: auto;
+  max-height: 200px;
+}
+
+.ai-history-item {
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  background: #2a2a2a;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.ai-history-item:hover {
+  background: #3a3a3a;
+}
+
+.ai-history-item.active {
+  background: #4a9eff;
+  color: white;
+}
+
+.project-template-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #2a2a2a;
+  color: #e0e0e0;
+  padding: 20px;
+  border-radius: 12px;
+  z-index: 1000;
+  width: 80%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.project-template-item {
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.project-template-item:hover {
+  background: #3a3a3a;
+}
+
+.project-template-item.active {
+  background: #4a9eff;
+  color: white;
+}
+
+.project-template-icon {
+  font-size: 24px;
+}
+
+.project-template-info {
+  flex: 1;
+}
+
+.project-template-name {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.project-template-description {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.bug-fix-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #2a2a2a;
+  color: #e0e0e0;
+  padding: 20px;
+  border-radius: 12px;
+  z-index: 1000;
+  width: 80%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.bug-fix-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bug-fix-input {
+  padding: 10px;
+  background: #1a1a1a;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  color: #e0e0e0;
+}
+
+.bug-fix-submit {
+  padding: 10px 20px;
+  background: #4a9eff;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.bug-fix-submit:hover {
+  background: #357abd;
+}
+
+.bug-fix-close {
+  margin-top: 10px;
+  text-align: center;
+  cursor: pointer;
+  color: #94a3b8;
+}
+
+.bug-fix-close:hover {
+  color: #e0e0e0;
+}
+
+.folder-import-input {
+  display: none;
+}
+
+.folder-import-btn {
+  padding: 10px 20px;
+  background: #4a9eff;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.folder-import-btn:hover {
+  background: #357abd;
+}
+
+.quick-suggestions {
+  margin-top: 10px;
+  padding: 10px;
+  background: #3a3a3a;
+  border-radius: 12px;
+  overflow-y: auto;
+  max-height: 200px;
+}
+
+.quick-suggestion-item {
+  margin-bottom: 5px;
+  padding: 8px 12px;
+  background: #2a2a2a;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.quick-suggestion-item:hover {
+  background: #3a3a3a;
+}
+
+.quick-suggestion-item.active {
+  background: #4a9eff;
+  color: white;
+}
+
+.progress-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #2a2a2a;
+  color: #e0e0e0;
+  padding: 20px;
+  border-radius: 12px;
+  z-index: 1000;
+  width: 80%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-dialog-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.progress-dialog-content {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.progress-dialog-close {
+  padding: 10px 20px;
+  background: #4a9eff;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.progress-dialog-close:hover {
+  background: #357abd;
+}
+</style>
 p {
   font-size: 1.2em;
   color: #666;
@@ -2571,7 +3102,6 @@ function createNewFolder() {
 
   window.toastr.success(`文件夹 "${trimmedPath}" 已创建`);
 }
-
 // 新建文件
 function showNewFileDialog() {
   const proj = currentProject.value;
@@ -3159,7 +3689,6 @@ watch(
     }
   },
 );
-
 // 实时自动保存（防抖）
 let autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
 watchEffect(() => {
@@ -3371,7 +3900,476 @@ ${bugFile.value}
 `
     : ''
 }
+```
+</script>
+ 
+<style scoped>
+.project-manager {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
 
+.project-list {
+  flex: 1;
+  overflow-y: auto;
+  border-right: 1px solid #ddd;
+  padding: 10px;
+  background-color: #f9f9f9;
+}
+
+.project-item {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  margin-bottom: 5px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.project-item:hover {
+  background-color: #f0f0f0;
+}
+
+.project-icon {
+  font-size: 20px;
+  margin-right: 10px;
+}
+
+.project-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.project-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.project-description {
+  font-size: 12px;
+  color: #666;
+}
+
+.project-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 5px;
+}
+
+.project-action {
+  margin-left: 10px;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.project-action:hover {
+  color: #333;
+}
+
+.file-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  background-color: #f9f9f9;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  margin-bottom: 5px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.file-item:hover {
+  background-color: #f0f0f0;
+}
+
+.file-icon {
+  font-size: 20px;
+  margin-right: 10px;
+}
+
+.file-name {
+  flex: 1;
+}
+
+.file-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.file-action {
+  margin-left: 10px;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.file-action:hover {
+  color: #333;
+}
+
+.editor-container {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.editor-header {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #ddd;
+}
+
+.editor-title {
+  flex: 1;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.editor-actions {
+  display: flex;
+  align-items: center;
+}
+
+.editor-action {
+  margin-left: 10px;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.editor-action:hover {
+  color: #333;
+}
+
+.editor-wrapper {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.editor {
+  flex: 1;
+  height: 100%;
+  overflow: auto;
+  border: none;
+  outline: none;
+  padding: 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  background-color: #fff;
+  color: #333;
+  tab-size: 2;
+}
+
+.preview-container {
+  flex: 1;
+  overflow: hidden;
+  border-left: 1px solid #ddd;
+  background-color: #f9f9f9;
+}
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #ddd;
+}
+
+.preview-title {
+  flex: 1;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.preview-actions {
+  display: flex;
+  align-items: center;
+}
+
+.preview-action {
+  margin-left: 10px;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.preview-action:hover {
+  color: #333;
+}
+
+.preview-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.ai-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  max-width: 600px;
+  max-height: 80%;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ai-dialog-header {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #ddd;
+}
+
+.ai-dialog-title {
+  flex: 1;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.ai-dialog-close {
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.ai-dialog-close:hover {
+  color: #333;
+}
+
+.ai-dialog-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.ai-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-top: 1px solid #ddd;
+}
+
+.ai-dialog-input {
+  flex: 1;
+  margin-right: 10px;
+  padding: 5px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.ai-dialog-button {
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.ai-dialog-button:hover {
+  background-color: #0056b3;
+}
+
+.bug-fix-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  max-width: 600px;
+  max-height: 80%;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.bug-fix-dialog-header {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #ddd;
+}
+
+.bug-fix-dialog-title {
+  flex: 1;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.bug-fix-dialog-close {
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.bug-fix-dialog-close:hover {
+  color: #333;
+}
+
+.bug-fix-dialog-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.bug-fix-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-top: 1px solid #ddd;
+}
+
+.bug-fix-dialog-button {
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.bug-fix-dialog-button:hover {
+  background-color: #0056b3;
+}
+
+.bug-fix-dialog-textarea {
+  width: 100%;
+  height: 100px;
+  margin-bottom: 10px;
+  padding: 5px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  resize: vertical;
+}
+
+.progress-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  max-width: 600px;
+  max-height: 80%;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.progress-dialog-header {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #ddd;
+}
+
+.progress-dialog-title {
+  flex: 1;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.progress-dialog-close {
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.progress-dialog-close:hover {
+  color: #333;
+}
+
+.progress-dialog-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.progress-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-top: 1px solid #ddd;
+}
+
+.progress-dialog-button {
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.progress-dialog-button:hover {
+  background-color: #0056b3;
+}
+
+.progress-dialog-progress {
+  width: 100%;
+  height: 20px;
+  background-color: #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-dialog-progress-bar {
+  height: 100%;
+  background-color: #007bff;
+  transition: width 0.2s;
+}
+
+.progress-dialog-message {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #666;
+}
+</style>
 # 修复要求：
 1. 专注修复上述 bug，不要改其他地方
 2. 只输出需要修改的文件
@@ -3907,43 +4905,6 @@ function updateStateBarWithAnimation(stateBarHtml: string) {
   });
 }
 \`\`\`
-\`\`\`
-
-**关键点：**
-- 使用 \`getChatMessages()\` 获取所有消息
-- 通过正则表达式从消息文本中提取数据
-- 用 jQuery 更新 DOM 元素显示
-- 监听 MESSAGE_RECEIVED 事件实现自动更新
-
-## 实现同层对话（流式传输前端界面）
-
-**核心概念：**
-同层对话是一个**独立的前端界面**（有自己的 index.html），玩家只在界面内游玩，不看酒馆主聊天。
-
-**🚨🚨🚨 绝对禁止（否则功能完全不工作！）🚨🚨🚨**
-
-\`\`\`javascript
-// ❌❌❌ 绝对禁止！绝对禁止！绝对禁止！
-$(function() {
-  let chatHistory = [];           // ❌ 外部访问不到！
-  function renderMessages() {}    // ❌ 外部访问不到！
-  function handleSend() {}        // ❌ 外部访问不到！
-
-  // 所有代码都在这里 ❌❌❌
-});
-
-// ✅✅✅ 必须这样写！必须这样写！必须这样写！
-let chatHistory = [];              // ✅ 全局变量
-function renderMessages() {}       // ✅ 全局函数
-function handleSend() {}           // ✅ 全局函数
-
-$(function() {
-  // 只在这里调用函数，不定义！
-  loadChatHistory();
-  setupStreamListeners();
-});
-\`\`\`
-
 **代码结构必须严格按以下顺序（不能改！）：**
 1. 全局变量定义（let/const）
 2. 全局函数定义（function）
@@ -4199,7 +5160,8 @@ function applyRegexFilters(text: string): string {
   return text;
 }
 \`\`\`
-
+```
+</script>
 **使用方式（完整示例）：**
 \`\`\`typescript
 // 全局变量
@@ -4618,7 +5580,6 @@ function renderMessages() {
   // 滚动到底部
   container.scrollTop(container[0].scrollHeight);
 }
-
 // ===== 4. 正则过滤（隐藏思维链等） =====
 /**
  * 应用正则脚本来清理 AI 回复
@@ -4996,7 +5957,6 @@ $(window).on('pagehide', () => {
    - 需要创建 \`index.html\` + \`index.ts\`（前端界面项目）
    - 玩家在界面内游玩，不看酒馆主聊天
    - 后台可用 \`setChatMessages(..., { refresh: 'none' })\` 操作消息但不刷新
-
 4. **函数命名必须避免冲突**：
    - ❌ 禁止使用 \`sendChatMessage\`（与酒馆原生函数重名！）
    - ❌ 禁止使用 \`generate\`、\`getChatMessages\` 等酒馆 API 名作为函数名
@@ -5415,7 +6375,6 @@ function renderMessages() {
 
   container.scrollTop(container[0].scrollHeight);
 }
-
 // ===== 6. 监听聊天切换（重要！）=====
 let currentChatId = SillyTavern.getCurrentChatId();
 if (typeof eventOn === 'function') {
@@ -5796,7 +6755,6 @@ FILE_START: NEED_MORE_INFO
 ---
 
 **在你提供这些详细信息之前，我先说明一下核心功能的实现原理：**
-
 ### 核心组件结构
 
 一个基本的对话界面包含：
@@ -5998,7 +6956,6 @@ FILE_END
     const currentFiles = proj.files.map(f => `=== ${f.path} ===\n${f.content}`).join('\n\n');
     const userPrompt = `# 当前项目文件：
 ${currentFiles}
-
 # 用户需求：
 ${aiPrompt.value}
 
@@ -6019,7 +6976,13 @@ ${aiPrompt.value}
     taskStore.updateTaskProgress(taskId, 25, '正在发送请求到 AI 服务器...');
     await new Promise(r => setTimeout(r, 100)); // 等待 DOM 更新
 
-    if (enableStream.value) {
+    const provider = detectApiProvider(apiEndpoint);
+    const useStream = enableStream.value && provider !== 'gemini';
+    if (enableStream.value && !useStream) {
+      console.warn('⚠️ 当前 API 不支持流式输出，自动切换为普通模式');
+    }
+
+    if (useStream) {
       // 流式传输
       progressDialogRef.value?.setProgress(30);
       progressDialogRef.value?.setMessage('等待 AI 流式响应...');
@@ -6478,7 +7441,6 @@ function exportToRegex() {
     toastr.error(`导出失败: ${error.message}`);
   }
 }
-
 /**
  * 导出项目为快速回复（QR）格式
  * QR 只包含触发词，正则脚本包含完整 HTML 代码（节省 token）

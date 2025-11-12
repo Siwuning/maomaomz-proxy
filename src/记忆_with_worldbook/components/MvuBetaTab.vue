@@ -756,7 +756,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { onMounted, ref, watch } from 'vue';
-import { normalizeApiEndpoint, useSettingsStore } from '../settings';
+import { normalizeApiEndpoint, useSettingsStore, filterApiParams } from '../settings';
 import { getScriptIdSafe } from '../utils';
 import AIModifyDialog from './AIModifyDialog.vue';
 
@@ -1025,13 +1025,8 @@ async function handleAIGenerateStructure() {
 现在开始根据用户需求生成 [InitVar] JSON。`;
 
     const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${settings.value.api_key}`,
-      },
-      body: JSON.stringify({
+    // 过滤 API 参数，确保兼容不同的服务提供商
+    const requestPayload = {
         model: settings.value.model,
         messages: [
           { role: 'system', content: systemPrompt },
@@ -1039,7 +1034,17 @@ async function handleAIGenerateStructure() {
         ],
         temperature: settings.value.temperature || 0.7,
         max_tokens: settings.value.max_tokens || 4000,
-      }),
+      };
+
+    const filteredPayload = filterApiParams(requestPayload, settings.value.api_endpoint);
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${settings.value.api_key}`,
+      },
+      body: JSON.stringify(filteredPayload),
     });
 
     // 先读取响应文本
@@ -1541,13 +1546,8 @@ rule:
 直接输出完整的 COT 提示词内容。`;
 
     const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${settings.value.api_key}`,
-      },
-      body: JSON.stringify({
+    // 过滤 API 参数，确保兼容不同的服务提供商
+    const requestPayload = {
         model: settings.value.model,
         messages: [
           { role: 'system', content: systemPrompt },
@@ -1555,7 +1555,17 @@ rule:
         ],
         temperature: settings.value.temperature || 0.7,
         max_tokens: settings.value.max_tokens || 3000,
-      }),
+      };
+
+    const filteredPayload = filterApiParams(requestPayload, settings.value.api_endpoint);
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${settings.value.api_key}`,
+      },
+      body: JSON.stringify(filteredPayload),
     });
 
     // 先读取响应文本
@@ -1682,13 +1692,8 @@ ${modifyInstruction}
 请根据原始需求和修改建议，重新生成 [InitVar] JSON。`;
 
     const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${settings.value.api_key}`,
-      },
-      body: JSON.stringify({
+    // 过滤 API 参数，确保兼容不同的服务提供商
+    const requestPayload = {
         model: settings.value.model,
         messages: [
           { role: 'system', content: systemPrompt },
@@ -1696,7 +1701,17 @@ ${modifyInstruction}
         ],
         temperature: settings.value.temperature || 0.7,
         max_tokens: settings.value.max_tokens || 4000,
-      }),
+      };
+
+    const filteredPayload = filterApiParams(requestPayload, settings.value.api_endpoint);
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${settings.value.api_key}`,
+      },
+      body: JSON.stringify(filteredPayload),
     });
 
     if (!response.ok) {
@@ -1819,13 +1834,8 @@ ${modifyInstruction}
 请根据原始场景描述和修改建议，重新生成 COT 提示词。`;
 
     const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${settings.value.api_key}`,
-      },
-      body: JSON.stringify({
+    // 过滤 API 参数，确保兼容不同的服务提供商
+    const requestPayload = {
         model: settings.value.model,
         messages: [
           { role: 'system', content: systemPrompt },
@@ -1833,7 +1843,17 @@ ${modifyInstruction}
         ],
         temperature: settings.value.temperature || 0.7,
         max_tokens: settings.value.max_tokens || 3000,
-      }),
+      };
+
+    const filteredPayload = filterApiParams(requestPayload, settings.value.api_endpoint);
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${settings.value.api_key}`,
+      },
+      body: JSON.stringify(filteredPayload),
     });
 
     if (!response.ok) {

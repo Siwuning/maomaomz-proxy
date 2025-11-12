@@ -800,7 +800,7 @@ import { storeToRefs } from 'pinia';
 import toastr from 'toastr';
 import { computed, onMounted, ref } from 'vue';
 import { z } from 'zod';
-import { useSettingsStore } from '../settings';
+import { useSettingsStore, normalizeApiEndpoint } from '../settings';
 import { copyToClipboard, getScriptIdSafe } from '../utils';
 import { useTaskStore } from '../taskStore';
 import AIGenerateDialog from './AIGenerateDialog.vue';
@@ -1201,7 +1201,7 @@ ${greetingContent}
     const filteredParams = filterApiParams(requestParams, settings.value.api_endpoint);
 
     // 插件环境：直接调用 API
-    const response = await fetch(settings.value.api_endpoint + '/chat/completions', {
+    const response = await fetch(normalizeApiEndpoint(settings.value.api_endpoint), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1358,7 +1358,7 @@ ${requirement}
     const filteredParams2 = filterApiParams2(requestParams2, settings.value.api_endpoint);
 
     // 插件环境：直接调用 API (编辑描述)
-    const response = await fetch(settings.value.api_endpoint + '/chat/completions', {
+    const response = await fetch(normalizeApiEndpoint(settings.value.api_endpoint), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1666,7 +1666,7 @@ ${switchGreetingCode}
     const filteredParams3 = filterApiParams3(requestParams3, settings.value.api_endpoint);
 
     // 插件环境：直接调用 API (生成样式)
-    const response = await fetch(settings.value.api_endpoint + '/chat/completions', {
+    const response = await fetch(normalizeApiEndpoint(settings.value.api_endpoint), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -2374,7 +2374,7 @@
 import { debounce } from 'lodash';
 import { storeToRefs } from 'pinia';
 import { onBeforeUnmount, onMounted, ref, Ref, watch } from 'vue';
-import { normalizeApiEndpoint, useSettingsStore } from '../settings';
+import { normalizeApiEndpoint, useSettingsStore, filterApiParams } from '../settings';
 import { copyToClipboard, getScriptIdSafe } from '../utils';
 
 const settingsStore = useSettingsStore();
@@ -2853,13 +2853,15 @@ const handleAntiClicheProcess = async () => {
     } else {
       // 非流式生成
       const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
+      // 过滤 API 参数，确保兼容不同的服务提供商
+      const filteredPayload = filterApiParams(requestPayload, settings.value.api_endpoint);
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${settings.value.api_key}`,
         },
-        body: JSON.stringify(requestPayload),
+        body: JSON.stringify(filteredPayload),
       });
 
       if (!response.ok) {
@@ -2937,13 +2939,15 @@ const handleModifyAntiCliche = async () => {
     } else {
       // 非流式生成
       const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
+      // 过滤 API 参数，确保兼容不同的服务提供商
+      const filteredPayload = filterApiParams(requestPayload, settings.value.api_endpoint);
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${settings.value.api_key}`,
         },
-        body: JSON.stringify(requestPayload),
+        body: JSON.stringify(filteredPayload),
       });
 
       if (!response.ok) {
@@ -3138,13 +3142,15 @@ const handleGenerateCharacterCard = async () => {
     } else {
       // 非流式生成
       const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
+      // 过滤 API 参数，确保兼容不同的服务提供商
+      const filteredPayload = filterApiParams(requestPayload, settings.value.api_endpoint);
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${settings.value.api_key}`,
         },
-        body: JSON.stringify(requestPayload),
+        body: JSON.stringify(filteredPayload),
       });
 
       if (!response.ok) {
@@ -3260,13 +3266,15 @@ ${modifyRequest.value}`,
     } else {
       // 非流式生成
       const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
+      // 过滤 API 参数，确保兼容不同的服务提供商
+      const filteredPayload = filterApiParams(requestPayload, settings.value.api_endpoint);
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${settings.value.api_key}`,
         },
-        body: JSON.stringify(requestPayload),
+        body: JSON.stringify(filteredPayload),
       });
 
       if (!response.ok) {
@@ -3330,13 +3338,15 @@ const generateWithStreaming = async (
   progressRef: Ref<number>,
 ): Promise<string> => {
   const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
+  // 过滤 API 参数，确保兼容不同的服务提供商
+  const filteredPayload = filterApiParams(requestPayload, settings.value.api_endpoint);
   const response = await fetch(apiUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${settings.value.api_key}`,
     },
-    body: JSON.stringify(requestPayload),
+    body: JSON.stringify(filteredPayload),
   });
 
   if (!response.ok) {
@@ -3638,13 +3648,15 @@ const handleGenerateWorldbookEntry = async () => {
     } else {
       // 非流式生成
       const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
+      // 过滤 API 参数，确保兼容不同的服务提供商
+      const filteredPayload = filterApiParams(requestPayload, settings.value.api_endpoint);
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${settings.value.api_key}`,
         },
-        body: JSON.stringify(requestPayload),
+        body: JSON.stringify(filteredPayload),
       });
 
       if (!response.ok) {
@@ -3802,13 +3814,15 @@ ${worldbookModifyRequest.value}`,
     } else {
       // 非流式生成
       const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
+      // 过滤 API 参数，确保兼容不同的服务提供商
+      const filteredPayload = filterApiParams(requestPayload, settings.value.api_endpoint);
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${settings.value.api_key}`,
         },
-        body: JSON.stringify(requestPayload),
+        body: JSON.stringify(filteredPayload),
       });
 
       if (!response.ok) {

@@ -1561,7 +1561,7 @@
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch, watchEffect } from 'vue';
-import { normalizeApiEndpoint, useSettingsStore } from '../settings';
+import { normalizeApiEndpoint, useSettingsStore, filterApiParams } from '../settings';
 import { useTaskStore } from '../taskStore';
 import { getChatIdSafe, getScriptIdSafe } from '../utils';
 import ProgressDialog from './ProgressDialog.vue';
@@ -3391,20 +3391,26 @@ ${bugFile.value}
     taskStore.updateTaskProgress(taskId, 30, '等待 AI 分析 bug...');
     await new Promise(r => setTimeout(r, 100));
 
+    // 构建请求参数
+    const requestPayload = {
+      model: model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      temperature: 0.3, // 降低温度，让修复更稳定
+    };
+
+    // 过滤 API 参数，确保兼容不同的服务提供商
+    const filteredPayload = filterApiParams(requestPayload, apiEndpoint);
+
     const response = await fetch(normalizedEndpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        model: model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
-        temperature: 0.3, // 降低温度，让修复更稳定
-      }),
+      body: JSON.stringify(filteredPayload),
     });
 
     if (!response.ok) {
@@ -6020,22 +6026,30 @@ ${aiPrompt.value}
       taskStore.updateTaskProgress(taskId, 30, '等待 AI 流式响应...');
       await new Promise(r => setTimeout(r, 100)); // 等待 DOM 更新
 
+      // 构建请求参数
+      const requestPayload = {
+        model: model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: temperature,
+        max_tokens: maxTokens,
+        stream: true, // 启用流式传输
+      };
+
+      // 过滤 API 参数，确保兼容不同的服务提供商
+      const filteredPayload = filterApiParams(requestPayload, apiEndpoint);
+      // 对于流式请求，确保 stream 参数存在
+      filteredPayload.stream = true;
+
       const response = await fetch(normalizedEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${apiKey}`,
         },
-        body: JSON.stringify({
-          model: model,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt },
-          ],
-          temperature: temperature,
-          max_tokens: maxTokens,
-          stream: true, // 启用流式传输
-        }),
+        body: JSON.stringify(filteredPayload),
       });
 
       if (!response.ok) {
@@ -6101,21 +6115,27 @@ ${aiPrompt.value}
       taskStore.updateTaskProgress(taskId, 30, '等待 AI 响应...');
       await new Promise(r => setTimeout(r, 100)); // 等待 DOM 更新
 
+      // 构建请求参数
+      const requestPayload = {
+        model: model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: temperature,
+        max_tokens: maxTokens,
+      };
+
+      // 过滤 API 参数，确保兼容不同的服务提供商
+      const filteredPayload = filterApiParams(requestPayload, apiEndpoint);
+
       const response = await fetch(normalizedEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${apiKey}`,
         },
-        body: JSON.stringify({
-          model: model,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt },
-          ],
-          temperature: temperature,
-          max_tokens: maxTokens,
-        }),
+        body: JSON.stringify(filteredPayload),
       });
 
       if (!response.ok) {

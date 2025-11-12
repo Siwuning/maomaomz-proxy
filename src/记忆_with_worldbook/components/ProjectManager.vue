@@ -3806,8 +3806,6 @@ async function fixBugWithAI() {
 
   try {
     // 阶段 1: 准备请求
-    progressDialogRef.value?.setProgress(5);
-    progressDialogRef.value?.setMessage('正在准备 Bug 修复请求...');
     taskStore.updateTaskProgress(taskId, 5, '正在准备 Bug 修复请求...');
     await new Promise(r => setTimeout(r, 100));
 
@@ -3829,8 +3827,6 @@ async function fixBugWithAI() {
 
     normalizedEndpoint = normalizeApiEndpoint(apiEndpoint);
 
-    progressDialogRef.value?.setProgress(15);
-    progressDialogRef.value?.setMessage('正在构建 Bug 修复提示词...');
     taskStore.updateTaskProgress(taskId, 15, '正在构建 Bug 修复提示词...');
     await new Promise(r => setTimeout(r, 100));
 

@@ -1134,6 +1134,10 @@ const generateWithAI = async () => {
   const taskId = taskStore.createTask('ui_generate', `AI 生成翻页状态栏: ${userPrompt.substring(0, 50)}...`);
 
   // 构建 AI 提示词（参考普通状态栏生成器的格式）
+  const htmlExample = '<details><summary>标题</summary><div class="status-container">...</div></details>';
+  const cssExample = '.status-container { } .page { display: none; } .page.active { display: block; }';
+  const jsExample = '(function() { /* 翻页逻辑 */ })();';
+
   const systemPrompt = `你是一个富有创意的前端设计师，专门为 SillyTavern 翻页状态栏生成各种风格的代码。
 
 🎨 【核心理念】完全自由！不受任何限制！
@@ -1145,71 +1149,32 @@ const generateWithAI = async () => {
 🎯 任务：
 根据用户描述，生成可翻页的状态栏代码（三个独立文件）。
 
-⚠️ 【重要】必须严格按照以下格式输出，不要添加任何额外的说明文字或代码块标记：
-
-FILE_START: index.html
-<details>
-<summary> 状态栏标题 </summary>
-<div class="status-container">
-  <!-- 翻页按钮区域 -->
-  <div class="page-tabs">
-    <button class="page-tab active" data-page="0">页面1</button>
-    <button class="page-tab" data-page="1">页面2</button>
-  </div>
-
-  <!-- 页面内容区域 -->
-  <div class="page-content">
-    <div class="page active" data-page-id="0">
-      <!-- 第一页内容，使用 $1, $2 等占位符 -->
-    </div>
-    <div class="page" data-page-id="1">
-      <!-- 第二页内容，使用 $3, $4 等占位符 -->
-    </div>
-  </div>
-</div>
-</details>
-FILE_END
-
-FILE_START: style.css
-/* 你的创意样式 */
-.status-container { }
-.page-tabs { }
-.page-tab { }
-.page-content { }
-.page { display: none; }
-.page.active { display: block; }
-FILE_END
-
-FILE_START: script.js
-(function() {
-  // 翻页逻辑
-  document.querySelectorAll('.page-tab').forEach(tab => {
-    tab.addEventListener('click', function() {
-      const pageIndex = this.getAttribute('data-page');
-
-      // 切换按钮状态
-      document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
-      this.classList.add('active');
-
-      // 切换页面显示
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.querySelector(\`.page[data-page-id="\${pageIndex}"]\`).classList.add('active');
-    });
-  });
-})();
-FILE_END
+⚠️ 【格式要求 - 必须严格遵守】
+1. 必须输出 3 个文件：index.html, style.css, script.js
+2. 每个文件必须用 FILE_START 和 FILE_END 包裹
+3. 不要添加任何说明文字、代码块标记或其他内容
+4. 直接从 FILE_START 开始输出
 
 ✅ 核心规则：
-1. HTML 必须以 <details> 开头，</details> 结尾
-2. FILE_START 和 FILE_END 之间直接写代码，**禁止**添加代码块标记（\\\`\\\`\\\`）
-3. 使用 $1, $2, $3 等占位符表示字段值，不要用 {{变量名}}
+1. HTML 必须以 details 标签包裹，包含翻页按钮和页面内容
+2. FILE_START 和 FILE_END 之间直接写代码，禁止添加代码块标记
+3. 使用 $1, $2, $3 等占位符表示字段值
 4. CSS 样式要富有创意，根据用户需求设计独特效果
 5. JS 使用立即执行函数，实现翻页交互
 6. 生成2-4个页面，每个页面显示不同的字段
 
-🎨 创意方向：
-- 卡片风格、可爱风格、科技风格、游戏风格、简约风格
-- 任意形状、任意配色、任意布局、任意动画
+📋 输出格式：
+FILE_START: index.html
+${htmlExample}
+FILE_END
+
+FILE_START: style.css
+${cssExample}
+FILE_END
+
+FILE_START: script.js
+${jsExample}
+FILE_END
 
 用户需求：${userPrompt}
 
@@ -1332,18 +1297,59 @@ FILE_END
     if (files.length === 0) {
       console.log('⚠️ 未找到 FILE_START/FILE_END 标记，尝试从代码块提取...');
 
-      // 尝试提取 HTML (从 <details> 或 <div> 开始)
-      const htmlMatch = content.match(/<details[\s\S]*?<\/details>|<div class="status-container"[\s\S]*?<\/div>/);
-      // 尝试提取 CSS (从 .status-container 或 /* 开始)
-      const cssMatch = content.match(/\/\*[\s\S]*?\*\/[\s\S]*?\.[\w-]+\s*\{[\s\S]*?\}|\.status-container[\s\S]*?\}/);
-      // 尝试提取 JS (从 (function 或 document 开始)
-      const jsMatch = content.match(/\(function\(\)[\s\S]*?\}\)\(\);?|document\.querySelector[\s\S]*?;/);
+      // 尝试提取 HTML (从 <details> 开始，匹配完整标签)
+      const htmlMatch = content.match(/<details[\s\S]*?<\/details>/i);
+
+      // 尝试提取 CSS (匹配所有 CSS 规则)
+      let cssMatch = content.match(/\.[\w-]+\s*\{[\s\S]*?\}(?:\s*\.[\w-]+\s*\{[\s\S]*?\})*/);
+      // 如果没找到，尝试匹配从注释开始的 CSS
+      if (!cssMatch) {
+        cssMatch = content.match(/\/\*[\s\S]*?\*\/[\s\S]*?(?:\.[\w-]+\s*\{[\s\S]*?\})+/);
+      }
+
+      // 尝试提取 JS (从 (function 开始，匹配完整的立即执行函数)
+      const jsMatch = content.match(/\(function\s*\(\)\s*\{[\s\S]*?\}\)\(\);?/);
 
       if (htmlMatch) files.push({ path: 'index.html', content: htmlMatch[0].trim() });
       if (cssMatch) files.push({ path: 'style.css', content: cssMatch[0].trim() });
       if (jsMatch) files.push({ path: 'script.js', content: jsMatch[0].trim() });
 
       console.log(`📦 从代码块提取到 ${files.length} 个文件`);
+      if (files.length > 0) {
+        console.log(
+          '📄 提取的文件:',
+          files.map(f => `${f.path} (${f.content.length} 字符)`),
+        );
+      }
+    }
+
+    // 如果还是只有 2 个文件（缺少 HTML），尝试生成默认 HTML 结构
+    if (files.length === 2 && !files.find(f => f.path === 'index.html')) {
+      console.log('⚠️ 缺少 HTML 文件，尝试生成默认结构...');
+
+      // 生成一个基础的 HTML 结构
+      const defaultHtml = `<details>
+<summary>状态栏</summary>
+<div class="status-container">
+  <div class="page-tabs">
+    <button class="page-tab active" data-page="0">页面1</button>
+    <button class="page-tab" data-page="1">页面2</button>
+  </div>
+  <div class="page-content">
+    <div class="page active" data-page-id="0">
+      <div>字段1: $1</div>
+      <div>字段2: $2</div>
+    </div>
+    <div class="page" data-page-id="1">
+      <div>字段3: $3</div>
+      <div>字段4: $4</div>
+    </div>
+  </div>
+</div>
+</details>`;
+
+      files.unshift({ path: 'index.html', content: defaultHtml });
+      console.log('✅ 已添加默认 HTML 结构');
     }
 
     // 调试：输出 AI 返回的原始内容（前500字符）

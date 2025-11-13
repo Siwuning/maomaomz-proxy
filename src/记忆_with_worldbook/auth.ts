@@ -13,10 +13,6 @@ const SUPABASE_ANON_KEY =
 // LocalStorage 键名
 const STORAGE_KEY = 'maomaomz_auth_code';
 const STORAGE_VERIFIED_KEY = 'maomaomz_auth_verified';
-const STORAGE_VERIFY_TIME_KEY = 'maomaomz_auth_verify_time'; // 上次验证时间
-
-// 缓存时长（毫秒）- 1 小时
-const CACHE_DURATION = 1 * 60 * 60 * 1000;
 
 /**
  * 获取当前使用的 API 端点（用于追踪商业化倒卖）
@@ -84,33 +80,46 @@ async function verifyAuthCode(code: string): Promise<{ valid: boolean; message: 
     // 获取当前使用的 API 端点
     const apiEndpoint = getCurrentApiEndpoint();
 
+    const trimmedCode = code.trim().toUpperCase();
     console.log('🔐 正在验证授权码...');
+    console.log('📝 原始授权码:', code);
+    console.log('📝 处理后授权码:', trimmedCode);
     console.log('🌐 API端点:', apiEndpoint);
+
+    const requestBody = {
+      code: trimmedCode,
+      apiEndpoint: apiEndpoint,
+      timestamp: new Date().toISOString(),
+    };
+
+    console.log('📤 发送请求:', JSON.stringify(requestBody, null, 2));
 
     const response = await fetch(`${AUTH_API_URL}/verify`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`, // Supabase 需要授权头
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
       },
-      body: JSON.stringify({
-        code: code.trim().toUpperCase(),
-        apiEndpoint: apiEndpoint, // 🔥 发送 API 端点信息，用于抓第三方
-        timestamp: new Date().toISOString(),
-      }),
+      body: JSON.stringify(requestBody),
     });
 
+    console.log('📥 响应状态:', response.status, response.statusText);
+
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ 请求失败:', errorText);
       return {
         valid: false,
-        message: '❌ 网络请求失败，请检查网络连接',
+        message: `❌ 网络请求失败 (${response.status}): ${errorText}`,
       };
     }
 
     const data = await response.json();
+    console.log('📥 响应数据:', JSON.stringify(data, null, 2));
     return data;
   } catch (error) {
-    console.error('授权验证失败:', error);
+    console.error('❌ 授权验证异常:', error);
+    console.error('❌ 错误堆栈:', (error as Error).stack);
     return {
       valid: false,
       message: '❌ 网络错误: ' + (error as Error).message,
@@ -352,43 +361,17 @@ export async function checkAuthorization(): Promise<boolean> {
 
   // 检查是否已有授权码
   const savedCode = localStorage.getItem(STORAGE_KEY);
-  const lastVerifyTime = localStorage.getItem(STORAGE_VERIFY_TIME_KEY);
 
-  // 🔥 检查缓存是否有效（24小时内）
-  if (savedCode && lastVerifyTime) {
-    const timeSinceLastVerify = Date.now() - parseInt(lastVerifyTime);
-
-    if (timeSinceLastVerify < CACHE_DURATION) {
-      // 缓存仍然有效，直接使用
-      const hoursLeft = Math.floor((CACHE_DURATION - timeSinceLastVerify) / (60 * 60 * 1000));
-      console.log(`✅ 使用缓存的授权验证（剩余 ${hoursLeft} 小时有效期）`);
-
-      localStorage.setItem(STORAGE_VERIFIED_KEY, 'true');
-
-      // 短暂显示成功消息
-      setTimeout(() => {
-        (window as any).toastr?.success(`✅ 授权验证有效（缓存）！猫猫欢迎你！🐱`, '', {
-          timeOut: 2000,
-        });
-      }, 300);
-
-      return true;
-    } else {
-      console.log('⏰ 授权缓存已过期（超过24小时），需要重新验证');
-    }
-  }
-
-  // 如果有保存的授权码，先尝试验证（静默验证）
+  // 🔥 每次都重新验证，不使用时间缓存
   if (savedCode) {
-    console.log('📋 找到已保存的授权码，后台验证中...');
+    console.log('📋 找到已保存的授权码，重新验证中...');
 
     try {
       const result = await verifyAuthCode(savedCode);
 
       if (result.valid) {
-        console.log('✅ 授权验证成功！（已保存的授权码有效）');
+        console.log('✅ 授权验证成功！');
         localStorage.setItem(STORAGE_VERIFIED_KEY, 'true');
-        localStorage.setItem(STORAGE_VERIFY_TIME_KEY, Date.now().toString()); // 🔥 记录验证时间
 
         // 短暂显示成功消息
         setTimeout(() => {
@@ -399,17 +382,15 @@ export async function checkAuthorization(): Promise<boolean> {
 
         return true;
       } else {
-        console.warn('⚠️ 保存的授权码已失效，需要重新输入');
+        console.warn('⚠️ 授权码已失效，需要重新输入');
         localStorage.removeItem(STORAGE_KEY);
         localStorage.removeItem(STORAGE_VERIFIED_KEY);
-        localStorage.removeItem(STORAGE_VERIFY_TIME_KEY); // 🔥 清除验证时间
       }
     } catch (error) {
-      console.error('❌ 后台验证授权码时出错:', error);
+      console.error('❌ 验证授权码时出错:', error);
       // 验证出错，清除旧数据，继续弹窗流程
       localStorage.removeItem(STORAGE_KEY);
       localStorage.removeItem(STORAGE_VERIFIED_KEY);
-      localStorage.removeItem(STORAGE_VERIFY_TIME_KEY);
     }
   }
 
@@ -461,12 +442,11 @@ export async function checkAuthorization(): Promise<boolean> {
     const result = await verifyAuthCode(code);
 
     if (result.valid) {
-      // 验证成功，保存授权码和验证时间
+      // 验证成功，保存授权码
       localStorage.setItem(STORAGE_KEY, code);
       localStorage.setItem(STORAGE_VERIFIED_KEY, 'true');
-      localStorage.setItem(STORAGE_VERIFY_TIME_KEY, Date.now().toString()); // 🔥 记录验证时间
-      console.log('✅ 授权验证成功！（6小时内有效）');
-      (window as any).toastr?.success(result.message + '\n\n💾 授权已缓存 6 小时', '授权成功', {
+      console.log('✅ 授权验证成功！');
+      (window as any).toastr?.success(result.message, '授权成功', {
         timeOut: 3000,
       });
       return true;
@@ -513,3 +493,29 @@ export function clearAuthorization(): void {
 
 // 导出别名，方便使用
 export const clearAuth = clearAuthorization;
+
+/**
+ * 测试授权码验证（调试用）
+ */
+export async function testAuthCode(code: string): Promise<void> {
+  console.log('🧪 开始测试授权码验证...');
+  console.log('📝 测试授权码:', code);
+
+  const result = await verifyAuthCode(code);
+
+  console.log('📊 验证结果:', result);
+
+  if (result.valid) {
+    console.log('✅ 授权码有效！');
+    (window as any).toastr?.success('✅ 授权码有效！', '', { timeOut: 3000 });
+  } else {
+    console.error('❌ 授权码无效:', result.message);
+    (window as any).toastr?.error(`❌ 授权码无效: ${result.message}`, '', { timeOut: 5000 });
+  }
+}
+
+// 暴露到全局，方便调试
+if (typeof window !== 'undefined') {
+  (window as any).testAuthCode = testAuthCode;
+  console.log('🔧 调试函数已暴露: window.testAuthCode(code)');
+}

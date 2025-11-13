@@ -119,6 +119,44 @@
           </div>
         </div>
 
+        <!-- 主题选择器 - 新增 -->
+        <div
+          style="
+            margin-bottom: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.1) 0%, rgba(219, 39, 119, 0.1) 100%);
+            border-radius: 8px;
+            border: 1px solid rgba(236, 72, 153, 0.3);
+          "
+        >
+          <h5
+            style="color: #ec4899; margin-bottom: 10px; font-size: 13px; display: flex; align-items: center; gap: 6px"
+          >
+            <i class="fa-solid fa-palette"></i>
+            配色主题
+          </h5>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px">
+            <button
+              v-for="theme in themes"
+              :key="theme.name"
+              :style="{
+                padding: '8px',
+                background: selectedTheme === theme.name ? theme.primary : '#2a2a2a',
+                border: selectedTheme === theme.name ? `2px solid ${theme.primary}` : '1px solid #3a3a3a',
+                borderRadius: '6px',
+                color: selectedTheme === theme.name ? 'white' : '#c0c0c0',
+                fontSize: '11px',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                fontWeight: selectedTheme === theme.name ? '600' : '400',
+              }"
+              @click="applyTheme(theme)"
+            >
+              {{ theme.name }}
+            </button>
+          </div>
+        </div>
+
         <!-- 组件库 - 新增 -->
         <div
           style="
@@ -838,6 +876,93 @@ const showAIGenerator = ref(false);
 const aiPrompt = ref('');
 const isGenerating = ref(false);
 const isGeneratingCSS = ref(false);
+const selectedTheme = ref('默认蓝');
+
+// 主题系统
+interface Theme {
+  name: string;
+  primary: string;
+  secondary: string;
+  accent: string;
+  background: string;
+  text: string;
+  description: string;
+}
+
+const themes: Theme[] = [
+  {
+    name: '默认蓝',
+    primary: '#4a9eff',
+    secondary: '#5ab0ff',
+    accent: '#667eea',
+    background: '#ffffff',
+    text: '#333333',
+    description: '清新蓝色，适合大多数场景',
+  },
+  {
+    name: '粉色可爱',
+    primary: '#ff6b9d',
+    secondary: '#ffc1e3',
+    accent: '#ff8fab',
+    background: '#fff5f8',
+    text: '#4a4a4a',
+    description: '甜美粉色，适合可爱风格',
+  },
+  {
+    name: '赛博朋克',
+    primary: '#00ffff',
+    secondary: '#ff00ff',
+    accent: '#ffff00',
+    background: '#0a0a0a',
+    text: '#00ff00',
+    description: '霓虹配色，科幻感十足',
+  },
+  {
+    name: '紫色梦幻',
+    primary: '#8b5cf6',
+    secondary: '#a78bfa',
+    accent: '#c084fc',
+    background: '#faf5ff',
+    text: '#3730a3',
+    description: '优雅紫色，神秘梦幻',
+  },
+  {
+    name: '绿色自然',
+    primary: '#10b981',
+    secondary: '#34d399',
+    accent: '#6ee7b7',
+    background: '#f0fdf4',
+    text: '#065f46',
+    description: '清新绿色，自然舒适',
+  },
+  {
+    name: '橙色活力',
+    primary: '#f59e0b',
+    secondary: '#fbbf24',
+    accent: '#fcd34d',
+    background: '#fffbeb',
+    text: '#78350f',
+    description: '温暖橙色，充满活力',
+  },
+  {
+    name: '深色模式',
+    primary: '#60a5fa',
+    secondary: '#93c5fd',
+    accent: '#bfdbfe',
+    background: '#1f2937',
+    text: '#f3f4f6',
+    description: '护眼深色，适合夜间',
+  },
+  {
+    name: '红色热情',
+    primary: '#ef4444',
+    secondary: '#f87171',
+    accent: '#fca5a5',
+    background: '#fef2f2',
+    text: '#7f1d1d',
+    description: '热情红色，醒目强烈',
+  },
+];
 
 // 快速组件库
 interface QuickComponent {
@@ -2191,6 +2316,37 @@ const insertComponent = (component: QuickComponent) => {
   });
 
   (window as any).toastr?.success(`✅ 已插入"${component.name}"组件`);
+};
+
+// 应用主题
+const applyTheme = (theme: Theme) => {
+  selectedTheme.value = theme.name;
+
+  // 遍历所有页面，替换颜色
+  pages.value.forEach(page => {
+    let content = page.content;
+
+    // 替换常见的颜色值
+    const colorMap: Record<string, string> = {
+      '#4a9eff': theme.primary,
+      '#5ab0ff': theme.secondary,
+      '#667eea': theme.accent,
+      '#764ba2': theme.accent,
+      '#ffffff': theme.background,
+      white: theme.background,
+      '#333333': theme.text,
+      '#333': theme.text,
+    };
+
+    Object.entries(colorMap).forEach(([oldColor, newColor]) => {
+      const regex = new RegExp(oldColor, 'gi');
+      content = content.replace(regex, newColor);
+    });
+
+    page.content = content;
+  });
+
+  (window as any).toastr?.success(`✅ 已应用"${theme.name}"主题`);
 };
 
 // 导出世界书条目

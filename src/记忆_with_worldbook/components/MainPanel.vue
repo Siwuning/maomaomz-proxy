@@ -163,7 +163,7 @@ import ToolsTab from './ToolsTab.vue';
 // 标签页配置
 const tabs = [
   { key: 'settings', label: '设置', icon: 'fa-solid fa-cog' },
-  { key: 'preferences', label: '偏好', icon: 'fa-solid fa-sliders' },
+  // { key: 'preferences', label: '偏好', icon: 'fa-solid fa-sliders' }, // 临时禁用
   { key: 'summary', label: '历史总结', icon: 'fa-solid fa-list' },
   { key: 'table', label: '表格', icon: 'fa-solid fa-table' },
   { key: 'greetings', label: '开场白', icon: 'fa-solid fa-comments' },

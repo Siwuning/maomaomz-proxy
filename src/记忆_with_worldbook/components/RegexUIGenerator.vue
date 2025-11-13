@@ -828,6 +828,7 @@ interface Page {
   name: string;
   content: string;
   customCSS?: string;
+  script?: string; // JavaScript代码
 }
 
 // 布局配置
@@ -1132,96 +1133,85 @@ const generateWithAI = async () => {
   const taskStore = useTaskStore();
   const taskId = taskStore.createTask('ui_generate', `AI 生成翻页状态栏: ${userPrompt.substring(0, 50)}...`);
 
-  // 构建 AI 提示词
-  const systemPrompt = `你是一个富有创意的前端设计师，专门为翻页状态栏生成完全自由的创意设计。
+  // 构建 AI 提示词（参考普通状态栏生成器的格式）
+  const systemPrompt = `你是一个富有创意的前端设计师，专门为 SillyTavern 翻页状态栏生成各种风格的代码。
 
 🎨 【核心理念】完全自由！不受任何限制！
-- 整个容器内的所有内容都可以自由设计：标签页、内容区域、布局、形状、颜色、动画
 - 可以是任意形状：圆形、椭圆、六边形、不规则形状、卡片、面板
-- 可以是任意风格：学神手册、赛博朋克、可爱粉色、游戏UI、科幻面板
+- 可以是任意风格：卡片、可爱、科技、游戏、简约、复古
 - 可以是任意布局：上下、左右、环形、网格、自由排列
-- 标签页按钮可以是任意样式：圆形、方形、标签、图标、侧边栏
+- 翻页按钮可以是任意样式：圆形、方形、标签、图标、侧边栏
 
 🎯 任务：
-根据用户描述，生成翻页状态栏的 HTML 内容和变量定义。
+根据用户描述，生成可翻页的状态栏代码（三个独立文件）。
 
-📋 返回格式（纯 JSON，不要添加任何解释）：
-{
-  "pages": [
-    {
-      "name": "页面名称",
-      "content": "完整的HTML内容，包含所有内联样式，可以是任意创意设计",
-      "customCSS": ""
-    }
-  ],
-  "variables": [
-    {
-      "name": "变量名（不含花括号）",
-      "defaultValue": "默认值",
-      "description": "变量说明",
-      "type": "text|number|progress|icon|image",
-      "min": 0,
-      "max": 100,
-      "unit": "单位（可选）",
-      "color": "#4a9eff"
-    }
-  ]
-}
+FILE_START: index.html
+<details>
+<summary> 状态栏标题 </summary>
+<div class="status-container">
+  <!-- 翻页按钮区域 -->
+  <div class="page-tabs">
+    <button class="page-tab active" data-page="0">页面1</button>
+    <button class="page-tab" data-page="1">页面2</button>
+  </div>
 
-📝 变量类型说明：
-- **text**: 普通文本，如姓名、描述
-- **number**: 数字，如年龄、等级
-- **progress**: 进度条，如HP、经验值（需要min、max、color）
-- **icon**: 图标，如❤️、⭐、fa-heart
-- **image**: 图片URL
-
-✅ 核心规则 - 必须遵守：
-1. **所有样式必须使用内联 style 属性**，不要依赖外部CSS类
-2. **完全自由设计**：整个容器内的所有元素（标签页、内容、布局）都可以任意设计
-3. **customCSS 留空**：所有样式都在 HTML 的 style 属性中
-4. 生成2-4个相关页面，每个页面风格统一但内容不同
-5. **发挥创意**：根据用户描述创造独特的视觉效果
-
-🎨 创意方向参考：
-- 卡片风格：圆角卡片，头像+信息布局，标签页按钮
-- 可爱风格：柔和色彩，圆润形状，进度条和装饰元素
-- 科技风格：几何形状，霓虹配色，动画效果
-- 游戏风格：血条样式，图标按钮，装备槽布局
-- 简约风格：极简设计，黑白灰配色，清晰排版
-
-🎨 样式要求：
-- 使用内联样式实现所有视觉效果
-- 可以使用：渐变背景、圆角、阴影、transform、过渡效果
-- 进度条、卡片、图标等都用 HTML+内联样式实现
-- 颜色搭配要和谐、现代化
-- 布局可以用 flexbox、grid、absolute 等（都在 style 里）
-
-📝 变量使用：
-- 使用 {{变量名}} 格式，例如：{{char}}, {{hp}}, {{favorability}}, {{lust}}
-- **不要修改标准变量名**：{{char}} 就是 {{char}}
-- 在 variables 数组中列出所有变量及说明
-
-💡 示例（六边形容器的正确写法）：
-<div style="width: 300px; height: 300px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); display: flex; align-items: center; justify-content: center; color: white;">
-  <div style="text-align: center;">
-    <div style="font-size: 24px; font-weight: bold;">{{char}}</div>
-    <div style="margin-top: 10px;">HP: {{hp}}/{{max_hp}}</div>
+  <!-- 页面内容区域 -->
+  <div class="page-content">
+    <div class="page active" data-page-id="0">
+      <!-- 第一页内容，使用 $1, $2 等占位符 -->
+    </div>
+    <div class="page" data-page-id="1">
+      <!-- 第二页内容，使用 $3, $4 等占位符 -->
+    </div>
   </div>
 </div>
+</details>
+FILE_END
 
-🚫 错误示例（不要这样）：
-<div class="container">{{char}}</div>  ❌ 不要用class
-<div>{{char}}</div>  ❌ 缺少样式和创意
+FILE_START: style.css
+/* 你的创意样式 */
+.status-container { }
+.page-tabs { }
+.page-tab { }
+.page-content { }
+.page { display: none; }
+.page.active { display: block; }
+FILE_END
 
-✅ 其他规则：
-- 直接返回 JSON，不要添加 \`\`\`json 标记
-- 可以包含任何类型的内容（包括 NSFW）
-- 每个页面的 HTML 要完整、自包含
-- 发挥你的创意，让每个设计都独一无二
+FILE_START: script.js
+(function() {
+  // 翻页逻辑
+  document.querySelectorAll('.page-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      const pageIndex = this.getAttribute('data-page');
+
+      // 切换按钮状态
+      document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+
+      // 切换页面显示
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelector(\`.page[data-page-id="\${pageIndex}"]\`).classList.add('active');
+    });
+  });
+})();
+FILE_END
+
+✅ 核心规则：
+1. HTML 必须以 <details> 开头，</details> 结尾
+2. FILE_START 和 FILE_END 之间直接写代码，**禁止**添加代码块标记（\\\`\\\`\\\`）
+3. 使用 $1, $2, $3 等占位符表示字段值，不要用 {{变量名}}
+4. CSS 样式要富有创意，根据用户需求设计独特效果
+5. JS 使用立即执行函数，实现翻页交互
+6. 生成2-4个页面，每个页面显示不同的字段
+
+🎨 创意方向：
+- 卡片风格、可爱风格、科技风格、游戏风格、简约风格
+- 任意形状、任意配色、任意布局、任意动画
 
 用户需求：${userPrompt}
 
-现在直接输出 JSON：`;
+现在直接输出三个文件的内容：`;
 
   try {
     taskStore.updateTaskProgress(taskId, 10, '正在准备...');
@@ -1324,52 +1314,63 @@ const generateWithAI = async () => {
       .replace(/([{,]\s*)(\w+):/g, '$1"$2":') // 给没有引号的键加上引号
       .replace(/:\s*'([^']*)'/g, ': "$1"'); // 将单引号改为双引号
 
-    // 解析 JSON
-    let result;
-    try {
-      result = JSON.parse(content);
-    } catch (parseError) {
-      // 如果解析失败，显示详细错误信息
-      console.error('JSON解析失败，原始内容:', content);
-      throw new Error(`JSON解析失败: ${(parseError as Error).message}\n\n原始内容:\n${content.substring(0, 500)}...`);
+    // 解析三个文件格式（参考普通状态栏生成器）
+    const files: { path: string; content: string }[] = [];
+    const fileRegex = /FILE_START:\s*(.+?)\s*\n([\s\S]*?)FILE_END/g;
+    let match;
+
+    while ((match = fileRegex.exec(content)) !== null) {
+      files.push({
+        path: match[1].trim(),
+        content: match[2].trim(),
+      });
     }
 
-    if (result.pages && Array.isArray(result.pages)) {
-      pages.value = result.pages;
-      selectedPageIndex.value = 0;
+    if (files.length === 3) {
+      // 找到三个文件：index.html, style.css, script.js
+      const htmlFile = files.find(f => f.path === 'index.html');
+      const cssFile = files.find(f => f.path === 'style.css');
+      const jsFile = files.find(f => f.path === 'script.js');
 
-      // 自动提取并设置变量
-      if (result.variables && Array.isArray(result.variables)) {
-        variables.value = result.variables;
-        console.log('✅ 已自动提取变量:', result.variables);
+      if (htmlFile && cssFile && jsFile) {
+        // 创建一个页面，包含三个文件的内容
+        pages.value = [
+          {
+            name: '翻页状态栏',
+            content: htmlFile.content,
+            customCSS: cssFile.content,
+            script: jsFile.content,
+          },
+        ];
+        selectedPageIndex.value = 0;
+
+        // 从HTML中提取占位符（$1, $2, $3等）
+        const placeholders = new Set<string>();
+        const placeholderRegex = /\$(\d+)/g;
+        let placeholderMatch;
+        while ((placeholderMatch = placeholderRegex.exec(htmlFile.content)) !== null) {
+          placeholders.add(placeholderMatch[1]);
+        }
+
+        // 生成变量列表
+        variables.value = Array.from(placeholders)
+          .sort((a, b) => parseInt(a) - parseInt(b))
+          .map(num => ({
+            name: `field${num}`,
+            defaultValue: '',
+            description: `字段${num}`,
+          }));
+
+        aiPrompt.value = '';
+        showAIGenerator.value = false;
+
+        taskStore.completeTask(taskId, `成功生成翻页状态栏，包含 ${placeholders.size} 个字段`);
+        (window as any).toastr.success(`成功生成翻页状态栏，包含 ${placeholders.size} 个字段！`);
       } else {
-        // 如果 AI 没有返回变量，自动从内容中提取
-        const extractedVars = new Set<string>();
-        pages.value.forEach(page => {
-          const matches = page.content.match(/\{\{(\w+)\}\}/g);
-          if (matches) {
-            matches.forEach(match => {
-              const varName = match.replace(/\{\{|\}\}/g, '');
-              extractedVars.add(varName);
-            });
-          }
-        });
-
-        variables.value = Array.from(extractedVars).map(varName => ({
-          name: varName,
-          defaultValue: '',
-          description: `自动提取的变量: ${varName}`,
-        }));
-        console.log('✅ 自动提取变量:', variables.value);
+        throw new Error('缺少必要的文件（index.html, style.css, script.js）');
       }
-
-      aiPrompt.value = '';
-      showAIGenerator.value = false;
-
-      taskStore.completeTask(taskId, `成功生成 ${result.pages.length} 个页面，提取 ${variables.value.length} 个变量`);
-      (window as any).toastr.success(`成功生成 ${result.pages.length} 个页面，提取 ${variables.value.length} 个变量！`);
     } else {
-      throw new Error('返回格式不正确');
+      throw new Error(`文件数量不正确，期望3个文件，实际${files.length}个`);
     }
   } catch (error) {
     console.error('AI 生成失败:', error);
@@ -1521,140 +1522,37 @@ ${selectedPage.value.content}
   }
 };
 
-// 单文件导出（原有方式）
+// 单文件导出（三个文件拼接格式）
 const exportRegex = () => {
   if (pages.value.length === 0) {
     alert('请先添加至少一个页面');
     return;
   }
 
-  // 生成完整的HTML片段（包含翻页按钮、样式和脚本）
-  const customCSS = pages.value.map(p => p.customCSS || '').join('\n');
+  // 获取第一个页面的内容（AI生成的应该只有一个页面，包含三个文件）
+  const page = pages.value[0];
+
+  // 拼接三个文件的内容
+  const htmlContent = page.content || '';
+  const cssContent = page.customCSS || '';
+  const jsContent = page.script || '';
+
+  // 拼接成最终的replaceString（直接拼接，不用```html包裹）
+  const scriptTag = 'script';
+  const replaceString = `<style>\n${cssContent}\n</style>\n\n${htmlContent}\n\n<${scriptTag}>\n${jsContent}\n</${scriptTag}>`;
 
   // 生成唯一ID
   const uuid = `regex-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
-  // 生成翻页按钮HTML
-  const tabsHTML = pages.value
-    .map(
-      (page, index) => `
-    <button class="statusbar-tab ${index === 0 ? 'active' : ''}" data-page-index="${index}" style="padding: 8px 16px; cursor: pointer; background: ${index === 0 ? 'linear-gradient(135deg, #4a9eff 0%, #5ab0ff 100%)' : 'white'}; border: 2px solid ${index === 0 ? '#4a9eff' : '#e9ecef'}; border-radius: 8px; font-size: 14px; font-weight: 500; color: ${index === 0 ? 'white' : '#6c757d'}; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin: 4px;">
-      ${page.name}
-    </button>
-  `,
-    )
-    .join('');
-
-  // 生成页面内容HTML
-  const pagesHTML = pages.value
-    .map(
-      (page, index) => `
-    <div class="statusbar-page ${index === 0 ? 'active' : ''}" id="statusbar-page-${index}" style="display: ${index === 0 ? 'block' : 'none'}; animation: fadeIn 0.3s;">
-      ${page.content}
-    </div>
-  `,
-    )
-    .join('');
-
-  // 完整的HTML文档（参考大佬的格式，用 ```html 包裹）
-  const scriptTag = 'script';
-  const htmlFragment = `\`\`\`html
-<html>
-<head>
-  <style>
-  .statusbar-container {
-    max-width: 800px;
-    margin: 20px auto;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    overflow: hidden;
-    padding: 20px;
-  }
-  .statusbar-tabs {
-    display: flex;
-    gap: 8px;
-    background: #f8f9fa;
-    padding: 12px;
-    flex-wrap: wrap;
-    border-radius: 8px;
-    margin-bottom: 20px;
-  }
-  .statusbar-tab:hover {
-    background: #f8f9ff !important;
-    border-color: #4a9eff !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(74, 158, 255, 0.2) !important;
-  }
-  .statusbar-page-content {
-    min-height: 200px;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  ${customCSS}
-  </style>
-</head>
-<body>
-  <div class="statusbar-container">
-  <div class="statusbar-tabs">
-    ${tabsHTML}
-  </div>
-  <div class="statusbar-page-content">
-    ${pagesHTML}
-  </div>
-  </div>
-
-  <${scriptTag}>
-  function switchStatusbarPage(index) {
-    document.querySelectorAll('.statusbar-tab').forEach((tab, i) => {
-      if (i === index) {
-        tab.classList.add('active');
-        tab.style.background = 'linear-gradient(135deg, #4a9eff 0%, #5ab0ff 100%)';
-        tab.style.color = 'white';
-        tab.style.borderColor = '#4a9eff';
-      } else {
-        tab.classList.remove('active');
-        tab.style.background = 'white';
-        tab.style.color = '#6c757d';
-        tab.style.borderColor = '#e9ecef';
-      }
-    });
-    document.querySelectorAll('.statusbar-page').forEach((page, i) => {
-      if (i === index) {
-        page.classList.add('active');
-        page.style.display = 'block';
-      } else {
-        page.classList.remove('active');
-        page.style.display = 'none';
-      }
-    });
-  }
-
-  // 使用事件委托监听按钮点击
-  document.addEventListener('click', function(e) {
-    const button = e.target.closest('.statusbar-tab');
-    if (button) {
-      const index = parseInt(button.getAttribute('data-page-index'));
-      switchStatusbarPage(index);
-    }
-  });
-  </${scriptTag}>
-</body>
-</html>
-\`\`\``;
-
-  // 更新正则配置，添加 markdownOnly
+  // 构建正则配置
   const regexData = {
     id: uuid,
     scriptName: '翻页状态栏',
     findRegex: triggerRegex.value,
-    replaceString: htmlFragment,
+    replaceString: replaceString,
     trimStrings: [],
-    placement: [1, 2], // 1 = AI回复后, 2 = AI回复前
+    placement: [2], // 2 = AI回复前
     disabled: false,
-    markdownOnly: true, // 重要：启用markdown渲染
     runOnEdit: true,
   };
 

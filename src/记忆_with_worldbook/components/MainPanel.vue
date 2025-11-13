@@ -176,23 +176,12 @@ const tabs = [
 ];
 
 const activeTab = ref<
-  | 'settings'
-  | 'preferences'
-  | 'summary'
-  | 'table'
-  | 'greetings'
-  | 'status'
-  | 'regex'
-  | 'project'
-  | 'tools'
-  | 'mvu'
-  | 'help'
+  'settings' | 'summary' | 'table' | 'greetings' | 'status' | 'regex' | 'project' | 'tools' | 'mvu' | 'help'
 >('settings');
 
 // 组件映射
 const componentMap = {
   settings: SettingsTab,
-  preferences: PreferencesTab,
   summary: SummaryTab,
   table: TableTab,
   greetings: GreetingsTab,

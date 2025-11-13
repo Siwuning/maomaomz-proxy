@@ -388,6 +388,7 @@
               border: 1px solid #3a3a3a;
             "
           >
+            <!-- 变量名和删除按钮 -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px">
               <input
                 v-model="variable.name"
@@ -418,9 +419,34 @@
                 删除
               </button>
             </div>
+
+            <!-- 变量类型选择 -->
+            <div style="margin-bottom: 6px">
+              <label style="display: block; margin-bottom: 4px; color: #888; font-size: 10px">类型</label>
+              <select
+                v-model="variable.type"
+                style="
+                  width: 100%;
+                  padding: 4px 8px;
+                  background: #1e1e1e;
+                  border: 1px solid #3a3a3a;
+                  border-radius: 4px;
+                  color: #e0e0e0;
+                  font-size: 11px;
+                "
+              >
+                <option value="text">📝 文本</option>
+                <option value="number">🔢 数字</option>
+                <option value="progress">📊 进度条</option>
+                <option value="icon">🎨 图标</option>
+                <option value="image">🖼️ 图片</option>
+              </select>
+            </div>
+
+            <!-- 默认值 -->
             <input
               v-model="variable.defaultValue"
-              placeholder="默认值 (如: 100)"
+              :placeholder="getPlaceholderForType(variable.type || 'text')"
               style="
                 width: 100%;
                 padding: 4px 8px;
@@ -432,6 +458,72 @@
                 margin-bottom: 6px;
               "
             />
+
+            <!-- 进度条特有选项 -->
+            <div
+              v-if="variable.type === 'progress'"
+              style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-bottom: 6px"
+            >
+              <input
+                v-model.number="variable.min"
+                type="number"
+                placeholder="最小值"
+                style="
+                  padding: 4px 8px;
+                  background: #1e1e1e;
+                  border: 1px solid #3a3a3a;
+                  border-radius: 4px;
+                  color: #e0e0e0;
+                  font-size: 11px;
+                "
+              />
+              <input
+                v-model.number="variable.max"
+                type="number"
+                placeholder="最大值"
+                style="
+                  padding: 4px 8px;
+                  background: #1e1e1e;
+                  border: 1px solid #3a3a3a;
+                  border-radius: 4px;
+                  color: #e0e0e0;
+                  font-size: 11px;
+                "
+              />
+              <input
+                v-model="variable.color"
+                type="color"
+                title="进度条颜色"
+                style="
+                  width: 100%;
+                  height: 28px;
+                  padding: 2px;
+                  background: #1e1e1e;
+                  border: 1px solid #3a3a3a;
+                  border-radius: 4px;
+                  cursor: pointer;
+                "
+              />
+            </div>
+
+            <!-- 单位（用于数字和进度条） -->
+            <input
+              v-if="variable.type === 'number' || variable.type === 'progress'"
+              v-model="variable.unit"
+              placeholder="单位 (如: HP, %, 点)"
+              style="
+                width: 100%;
+                padding: 4px 8px;
+                background: #1e1e1e;
+                border: 1px solid #3a3a3a;
+                border-radius: 4px;
+                color: #e0e0e0;
+                font-size: 11px;
+                margin-bottom: 6px;
+              "
+            />
+
+            <!-- 描述 -->
             <input
               v-model="variable.description"
               placeholder="描述 (如: 角色生命值)"
@@ -639,6 +731,11 @@ interface Variable {
   name: string;
   defaultValue: string;
   description: string;
+  type?: 'text' | 'number' | 'progress' | 'icon' | 'image'; // 变量类型
+  min?: number; // 最小值（用于progress和number）
+  max?: number; // 最大值（用于progress和number）
+  unit?: string; // 单位（如：%, HP, MP）
+  color?: string; // 颜色（用于progress）
 }
 
 // localStorage 键名
@@ -1039,10 +1136,22 @@ const generateWithAI = async () => {
     {
       "name": "变量名（不含花括号）",
       "defaultValue": "默认值",
-      "description": "变量说明"
+      "description": "变量说明",
+      "type": "text|number|progress|icon|image",
+      "min": 0,
+      "max": 100,
+      "unit": "单位（可选）",
+      "color": "#4a9eff"
     }
   ]
 }
+
+📝 变量类型说明：
+- **text**: 普通文本，如姓名、描述
+- **number**: 数字，如年龄、等级
+- **progress**: 进度条，如HP、经验值（需要min、max、color）
+- **icon**: 图标，如❤️、⭐、fa-heart
+- **image**: 图片URL
 
 ✅ 核心规则 - 必须遵守：
 1. **所有样式必须使用内联 style 属性**，不要依赖外部CSS类
@@ -1897,12 +2006,35 @@ const addVariable = () => {
     name: '',
     defaultValue: '',
     description: '',
+    type: 'text',
+    min: 0,
+    max: 100,
+    unit: '',
+    color: '#4a9eff',
   });
 };
 
 // 删除变量
 const deleteVariable = (index: number) => {
   variables.value.splice(index, 1);
+};
+
+// 根据类型获取占位符文本
+const getPlaceholderForType = (type: string) => {
+  switch (type) {
+    case 'text':
+      return '默认值 (如: 张三)';
+    case 'number':
+      return '默认值 (如: 100)';
+    case 'progress':
+      return '默认值 (如: 75)';
+    case 'icon':
+      return '图标 (如: ❤️ 或 fa-heart)';
+    case 'image':
+      return '图片URL (如: https://...)';
+    default:
+      return '默认值';
+  }
 };
 
 // 导出世界书条目

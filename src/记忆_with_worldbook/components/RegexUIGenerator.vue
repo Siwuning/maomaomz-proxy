@@ -1261,8 +1261,8 @@ FILE_END
                 content: systemPrompt,
               },
             ],
-            max_tokens: settings.max_tokens || 4000, // 增加到 4000 以确保完整响应
-            temperature: 0.8,
+            max_tokens: settings.max_tokens, // 使用设置标签页配置的 max_tokens
+            temperature: settings.temperature, // 使用设置标签页配置的 temperature
           }),
         });
 

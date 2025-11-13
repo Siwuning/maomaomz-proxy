@@ -13,12 +13,12 @@ $(() => {
         .panel-title-mobile {
           display: none;
         }
-        
+
         /* 桌面端（横屏）：显示完整标题 */
         .panel-title {
           display: inline;
         }
-        
+
         /* 移动端全局样式 - 改用宽度判断，适配所有小屏设备 */
         @media (max-width: 768px) {
           /* 移动端：面板容器全屏显示 - 使用最高优先级覆盖内联样式 */
@@ -40,44 +40,44 @@ $(() => {
             margin: 0 !important;
             padding: 0 !important;
           }
-          
+
           /* 移动端：隐藏完整标题，显示简短标题 */
           .panel-title {
             display: none !important;
           }
-          
+
           .panel-title-mobile {
             display: inline !important;
             font-size: 14px !important;
           }
-          
+
           /* 移动端：隐藏最小化按钮 */
           .minimize-button {
             display: none !important;
           }
-          
+
           /* 移动端：调整头部样式 */
           .panel-header {
             padding: 12px 16px !important;
             border-radius: 0 !important;
           }
-          
+
           .panel-header .header-left {
             gap: 8px !important;
           }
-          
+
           .panel-header .header-left .header-icon {
             font-size: 24px !important;
           }
-          
+
           .panel-header .header-left .panel-title {
             font-size: 15px !important;
           }
-          
+
           .panel-header > div:last-child {
             gap: 8px !important;
           }
-          
+
           /* 移动端：头部按钮 */
           .panel-header .header-button {
             width: 40px !important;
@@ -88,7 +88,7 @@ $(() => {
             font-size: 16px !important;
             border-radius: 8px !important;
           }
-          
+
           /* 移动端：标签栏可横向滚动 */
           .panel-tabs {
             overflow-x: auto !important;
@@ -97,11 +97,11 @@ $(() => {
             -webkit-overflow-scrolling: touch !important;
             padding: 0 8px !important;
           }
-          
+
           .panel-tabs::-webkit-scrollbar {
             height: 3px !important;
           }
-          
+
           .panel-tabs .tab-item {
             flex: 0 0 auto !important;
             padding: 12px 16px !important;
@@ -110,21 +110,21 @@ $(() => {
             min-width: auto !important;
             border-radius: 0 !important; /* 移动端标签不需要圆角 */
           }
-          
+
           .panel-tabs .tab-item .tab-icon {
             font-size: 15px !important;
           }
-          
+
           .panel-tabs .tab-item .tab-label {
             white-space: nowrap !important;
             font-weight: 500 !important;
           }
-          
+
           /* 移动端：内容区域优化 */
           .memory-panel-container {
             font-size: 14px !important;
           }
-          
+
           /* 移动端：面板内容区域滚动优化 */
           .panel-content {
             overflow-y: auto !important;
@@ -133,13 +133,13 @@ $(() => {
             height: 100% !important;
             padding: 12px !important;
           }
-          
+
           /* 移动端：确保标签页内容不超出 */
           .memory-panel-container .tab-content {
             max-width: 100vw !important;
             overflow-x: hidden !important;
           }
-          
+
           /* 移动端：按钮优化 */
           .memory-panel-container button,
           .memory-panel-container .el-button {
@@ -149,7 +149,7 @@ $(() => {
             border-radius: 12px !important; /* 统一圆角 */
             font-weight: 500 !important;
           }
-          
+
           /* 移动端：小按钮优化 */
           .memory-panel-container .mini-button,
           .memory-panel-container .show-button {
@@ -158,7 +158,7 @@ $(() => {
             font-size: 13px !important;
             border-radius: 10px !important;
           }
-          
+
           /* 移动端：复选框优化 */
           .memory-panel-container input[type="checkbox"] {
             width: 20px !important;
@@ -167,32 +167,32 @@ $(() => {
             min-height: 20px !important;
             cursor: pointer !important;
           }
-          
+
           /* 移动端：按钮组堆叠（只针对按钮组，不影响主布局） */
           .memory-panel-container .button-group,
           .memory-panel-container .project-action-buttons {
             flex-direction: column !important;
             gap: 8px !important;
           }
-          
+
           .memory-panel-container .button-group > *,
           .memory-panel-container .button-group button,
           .memory-panel-container .project-action-buttons > button {
             width: 100% !important;
             margin: 0 !important;
           }
-          
+
           /* 移动端：对话框内的按钮堆叠 */
           .memory-panel-container .dialog-actions,
           .memory-panel-container [style*="justify-content: flex-end"] {
             flex-direction: column !important;
             gap: 10px !important;
           }
-          
+
           .memory-panel-container .dialog-actions > button {
             width: 100% !important;
           }
-          
+
           /* 移动端：输入框优化 */
           .memory-panel-container input,
           .memory-panel-container textarea,
@@ -201,17 +201,17 @@ $(() => {
             padding: 12px !important;
             min-height: 44px !important;
           }
-          
+
           .memory-panel-container textarea {
             min-height: 120px !important;
           }
-          
+
           /* 移动端：表单项间距 */
           .memory-panel-container .form-group,
           .memory-panel-container [style*="margin"] {
             margin-bottom: 16px !important;
           }
-          
+
           /* 移动端：卡片/面板内边距 */
           .memory-panel-container .card,
           .memory-panel-container .panel,
@@ -219,20 +219,20 @@ $(() => {
             padding: 12px !important;
             margin: 8px 0 !important;
           }
-          
+
           /* 移动端：字段组优化 */
           .memory-panel-container .field-group,
           .memory-panel-container [class*="field"] {
             padding: 8px !important;
             margin-bottom: 12px !important;
           }
-          
+
           /* 移动端：工具区域优化 */
           .memory-panel-container .tool-section,
           .memory-panel-container .section-content {
             padding: 12px 8px !important;
           }
-          
+
           /* 移动端：预览区域优化 */
           .memory-panel-container .preview-container,
           .memory-panel-container [class*="preview"] {
@@ -240,7 +240,7 @@ $(() => {
             max-width: 100% !important;
             overflow-x: auto !important;
           }
-          
+
           /* 移动端：标题字体 */
           .memory-panel-container h1,
           .memory-panel-container h2,
@@ -250,7 +250,7 @@ $(() => {
             font-size: 16px !important;
             margin-bottom: 12px !important;
           }
-          
+
           /* 移动端：对话框全屏 */
           .memory-panel-container .modal,
           .memory-panel-container .dialog {
@@ -263,45 +263,45 @@ $(() => {
             left: 0 !important;
             transform: none !important;
           }
-          
+
           /* 移动端：滚动条优化 */
           .memory-panel-container ::-webkit-scrollbar {
             width: 3px !important;
             height: 3px !important;
           }
-          
+
           /* 移动端：减小字段间的gap */
           .memory-panel-container [style*="gap: 1"] {
             gap: 8px !important;
           }
-          
+
           .memory-panel-container [style*="gap: 2"] {
             gap: 12px !important;
           }
-          
+
           /* 移动端：工具区域按钮组优化 */
           .memory-panel-container .tool-section .button-group {
             display: flex !important;
             flex-direction: column !important;
             width: 100% !important;
           }
-          
+
           /* 移动端：状态栏生成器字段优化（只针对字段，不影响主布局） */
           .memory-panel-container .field-item {
             flex-direction: column !important;
             align-items: stretch !important;
           }
-          
+
           .memory-panel-container .field-item > * {
             width: 100% !important;
             margin-bottom: 8px !important;
           }
-          
+
           /* 移动端：两栏布局改为单列（只针对设置项，不影响主布局） */
           .memory-panel-container [style*="display: grid"][style*="grid-template-columns: 1fr 1fr"] {
             grid-template-columns: 1fr !important;
           }
-          
+
           /* 移动端：三栏布局改为单列！！！最重要的修复！ */
           /* 用更通用的选择器强制覆盖所有grid布局 */
           .memory-panel-container div[style*="display: grid"],
@@ -312,7 +312,7 @@ $(() => {
             flex-direction: column !important;
             gap: 12px !important;
           }
-          
+
           /* 移动端：所有带固定宽度的元素强制改为100%宽度 */
           .memory-panel-container div[style*="width: 280px"],
           .memory-panel-container div[style*="width: 300px"],
@@ -326,79 +326,79 @@ $(() => {
             max-width: 100% !important;
             min-width: auto !important;
           }
-          
+
           /* 移动端：强制所有子div在容器内正确显示 */
           .memory-panel-container > div > div,
           .panel-content > div > div {
             max-width: 100% !important;
             overflow-x: hidden !important;
           }
-          
+
           /* 移动端：开场白管理器整体布局优化 */
           .memory-panel-container .greetings-tab > div[style*="display: flex"][style*="gap: 20px"] {
             flex-direction: column !important;
             gap: 15px !important;
           }
-          
+
           .memory-panel-container .greetings-tab > div > div[style*="flex: 1"] {
             width: 100% !important;
             flex: none !important;
             max-height: 50vh !important;
           }
-          
+
           /* 移动端：开场白管理器顶部操作按钮优化 */
           .memory-panel-container .header-actions {
             flex-wrap: wrap !important;
             justify-content: center !important;
           }
-          
+
           .memory-panel-container .header-actions .mini-button {
             flex: 1 1 auto !important;
             min-width: 120px !important;
           }
-          
+
           /* 移动端：开场白管理器底部操作按钮堆叠 */
           .memory-panel-container .greetings-tab > div > div > div[style*="position: sticky"][style*="bottom: 0"] {
             flex-direction: column !important;
             gap: 10px !important;
           }
-          
+
           .memory-panel-container .greetings-tab > div > div > div[style*="position: sticky"] button {
             width: 100% !important;
             justify-content: center !important;
           }
-          
+
           /* 移动端：开场白管理器配置界面优化 */
           .memory-panel-container .greeting-item > div:first-child {
             flex-direction: column !important;
             align-items: stretch !important;
             gap: 10px !important;
           }
-          
+
           .memory-panel-container .greeting-item input[placeholder*="图标"] {
             width: 100% !important;
             max-width: 80px !important;
             margin: 0 auto !important;
           }
-          
+
           .memory-panel-container .greeting-item input[placeholder*="开场白"],
           .memory-panel-container .greeting-item input[placeholder*="默认"] {
             width: 100% !important;
             flex: none !important;
           }
-          
+
           .memory-panel-container .greeting-item button {
             width: 100% !important;
             justify-content: center !important;
           }
-          
+
           /* 移动端：开场白选择器网格布局优化 */
           .memory-panel-container iframe,
           body iframe[srcdoc*="scene-grid"] {
             width: 100% !important;
             max-width: 100% !important;
           }
-          
+
           /* 移动端：iframe内的网格布局也要优化（开场白选择器） */
           @supports (-webkit-touch-callout: none) {
             /* iOS Safari特殊处理 */
@@ -407,7 +407,7 @@ $(() => {
               max-width: 100vw !important;
             }
           }
-          
+
           /* 移动端：删除/操作按钮优化 */
           .memory-panel-container .delete-button,
           .memory-panel-container [class*="delete"],
@@ -416,14 +416,14 @@ $(() => {
             min-height: 44px !important;
             padding: 8px !important;
           }
-          
+
           /* 移动端：表单label优化 */
           .memory-panel-container label {
             font-size: 13px !important;
             margin-bottom: 6px !important;
             display: block !important;
           }
-          
+
           /* 移动端：防止内容超出视口（只针对表单元素和文本） */
           .memory-panel-container input,
           .memory-panel-container textarea,
@@ -434,7 +434,7 @@ $(() => {
             max-width: 100% !important;
             word-wrap: break-word !important;
           }
-          
+
           /* 移动端：字段标题区域 */
           .memory-panel-container .section-header {
             padding: 16px !important;
@@ -443,19 +443,19 @@ $(() => {
             align-items: stretch !important;
             gap: 12px !important;
           }
-          
+
           .memory-panel-container .section-header h3 {
             font-size: 15px !important;
             margin-bottom: 0 !important;
           }
-          
+
           /* 移动端：减少不必要的空白 */
           .memory-panel-container .empty-space,
           .memory-panel-container [style*="padding: 20px"],
           .memory-panel-container [style*="padding: 25px"] {
             padding: 12px !important;
           }
-          
+
           /* 移动端：隐藏最小化图标 */
           #memoryPanelMinimizeIcon {
             display: none !important;
@@ -485,6 +485,18 @@ $(() => {
 
     console.log('🚀🚀🚀 开始创建面板容器 - 时间戳:', new Date().toISOString());
 
+    // 检查偏好设置
+    let shouldAutoShow = true;
+    try {
+      const prefsStr = localStorage.getItem('maomaomz_preferences');
+      if (prefsStr) {
+        const prefs = JSON.parse(prefsStr);
+        shouldAutoShow = prefs.autoShowPanel !== false; // 默认true
+      }
+    } catch (e) {
+      console.warn('读取偏好设置失败:', e);
+    }
+
     // 创建面板容器 - 居中显示，固定高度（完整版：更大的面板）
     const panelContainer = $(`
       <div id="memoryManagementPanel" style="
@@ -501,7 +513,7 @@ $(() => {
         border-radius: 8px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
         z-index: 999999;
-        display: flex;
+        display: ${shouldAutoShow ? 'flex' : 'none'};
         flex-direction: column;
         overflow: hidden;
       ">

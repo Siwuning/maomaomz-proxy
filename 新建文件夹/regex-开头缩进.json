@@ -1,0 +1,17 @@
+{
+    "id": "eaeddc4f-991a-478a-bd06-287de5785289",
+    "scriptName": "开头缩进",
+    "findRegex": "/([»])(?=\\»1)|»|[]+/g",
+    "replaceString": "&emsp;&emsp;",
+    "trimStrings": [],
+    "placement": [
+        2
+    ],
+    "disabled": false,
+    "markdownOnly": true,
+    "promptOnly": false,
+    "runOnEdit": true,
+    "substituteRegex": 1,
+    "minDepth": null,
+    "maxDepth": null
+}

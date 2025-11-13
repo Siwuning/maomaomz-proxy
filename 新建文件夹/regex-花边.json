@@ -1,0 +1,17 @@
+{
+    "id": "ca1fac83-acbd-4002-944b-b608dd928c75",
+    "scriptName": "花边",
+    "findRegex": "<border></border>",
+    "replaceString": "<div style=\"text-align: left;\">\n    <img src=\"https://files.catbox.moe/97cjwh.png\" alt=\"边框\" style=\"width: 10%; height: 10%;\">\n</div>",
+    "trimStrings": [],
+    "placement": [
+        2
+    ],
+    "disabled": false,
+    "markdownOnly": true,
+    "promptOnly": false,
+    "runOnEdit": true,
+    "substituteRegex": 2,
+    "minDepth": null,
+    "maxDepth": null
+}

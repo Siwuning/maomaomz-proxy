@@ -180,30 +180,50 @@
         </div>
 
         <!-- 主要操作按钮 -->
-        <div style="display: flex; gap: 8px; margin-bottom: 10px">
-          <button
-            style="
-              flex: 1;
-              padding: 8px;
-              background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-              border: none;
-              border-radius: 6px;
-              color: white;
-              font-size: 12px;
-              font-weight: 600;
-              cursor: pointer;
-            "
-            @click="exportRegex"
-          >
-            <i class="fa-solid fa-download" style="margin-right: 4px"></i>
-            导出
-          </button>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px">
+          <div style="display: flex; gap: 8px">
+            <button
+              style="
+                flex: 1;
+                padding: 8px;
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                border: none;
+                border-radius: 6px;
+                color: white;
+                font-size: 12px;
+                font-weight: 600;
+                cursor: pointer;
+              "
+              @click="exportRegex"
+            >
+              <i class="fa-solid fa-download" style="margin-right: 4px"></i>
+              单文件导出
+            </button>
+
+            <button
+              style="
+                flex: 1;
+                padding: 8px;
+                background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+                border: none;
+                border-radius: 6px;
+                color: white;
+                font-size: 12px;
+                font-weight: 600;
+                cursor: pointer;
+              "
+              @click="loadTemplate"
+            >
+              <i class="fa-solid fa-lightbulb" style="margin-right: 4px"></i>
+              示例
+            </button>
+          </div>
 
           <button
             style="
-              flex: 1;
+              width: 100%;
               padding: 8px;
-              background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+              background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
               border: none;
               border-radius: 6px;
               color: white;
@@ -211,10 +231,10 @@
               font-weight: 600;
               cursor: pointer;
             "
-            @click="loadTemplate"
+            @click="exportThreeStage"
           >
-            <i class="fa-solid fa-lightbulb" style="margin-right: 4px"></i>
-            示例
+            <i class="fa-solid fa-layer-group" style="margin-right: 4px"></i>
+            三段式导出（推荐）
           </button>
         </div>
 
@@ -1354,6 +1374,7 @@ ${selectedPage.value.content}
   }
 };
 
+// 单文件导出（原有方式）
 const exportRegex = () => {
   if (pages.value.length === 0) {
     alert('请先添加至少一个页面');
@@ -1385,6 +1406,294 @@ const exportRegex = () => {
   URL.revokeObjectURL(url);
 
   (window as any).toastr?.success('✅ 正则已导出');
+};
+
+// 三段式导出（新方式）
+const exportThreeStage = () => {
+  if (pages.value.length === 0) {
+    alert('请先添加至少一个页面');
+    return;
+  }
+
+  // 提取所有变量
+  const allVariables = new Set<string>();
+  pages.value.forEach(page => {
+    const matches = page.content.match(/\{\{(\w+)\}\}/g);
+    if (matches) {
+      matches.forEach(match => {
+        const varName = match.replace(/\{\{|\}\}/g, '');
+        allVariables.add(varName);
+      });
+    }
+  });
+
+  const variableList = Array.from(allVariables);
+
+  // 生成基础时间戳和ID
+  const timestamp = Date.now();
+  const baseId = Math.random().toString(36).substring(2, 9);
+
+  // ========== 1. 数据捕获正则 ==========
+  // 构建捕获正则：<STATUS>变量1:值1|变量2:值2|...|</STATUS>
+  const capturePattern = `${triggerRegex.value}[\\r\\n\\s]*${variableList.map(() => '([^|]+)').join('\\|')}[\\r\\n\\s]*`;
+
+  // 生成HTML结构（带占位符）
+  const htmlStructure = generateHTMLStructure(variableList);
+
+  const regex1 = {
+    id: `regex-data-${timestamp}-${baseId}`,
+    scriptName: '翻页状态栏-数据捕获',
+    findRegex: capturePattern,
+    replaceString: htmlStructure,
+    trimStrings: [],
+    placement: [2],
+    disabled: false,
+    runOnEdit: true,
+  };
+
+  // ========== 2. CSS注入正则 ==========
+  const cssContent = extractAllCSS();
+
+  const regex2 = {
+    id: `regex-css-${timestamp}-${baseId}`,
+    scriptName: '翻页状态栏-CSS注入',
+    findRegex: '<link rel="stylesheet" href="statusbar-placeholder.css">',
+    replaceString: `<style>\n${cssContent}\n</style>`,
+    trimStrings: [],
+    placement: [2],
+    disabled: false,
+    runOnEdit: true,
+  };
+
+  // ========== 3. JS注入正则 ==========
+  const jsContent = generateJavaScript();
+  const scriptTag = 'script';
+
+  const regex3 = {
+    id: `regex-js-${timestamp}-${baseId}`,
+    scriptName: '翻页状态栏-JS注入',
+    findRegex: `<${scriptTag} src="statusbar-placeholder.js"></${scriptTag}>`,
+    replaceString: `<${scriptTag}>\n${jsContent}\n</${scriptTag}>`,
+    trimStrings: [],
+    placement: [2],
+    disabled: false,
+    runOnEdit: true,
+  };
+
+  // 导出三个文件
+  downloadJSON(regex1, 'statusbar-1-data.json');
+  setTimeout(() => downloadJSON(regex2, 'statusbar-2-css.json'), 100);
+  setTimeout(() => downloadJSON(regex3, 'statusbar-3-js.json'), 200);
+
+  (window as any).toastr?.success('✅ 三段式正则已导出！\n\n请按顺序导入：\n1. 数据捕获\n2. CSS注入\n3. JS注入');
+};
+
+// 辅助函数：生成HTML结构
+const generateHTMLStructure = (variableList: string[]) => {
+  const customCSS = pages.value.map(p => p.customCSS || '').join('\n');
+
+  // 生成页面HTML
+  const pagesHTML = pages.value
+    .map((page, index) => {
+      // 替换变量为捕获组引用
+      let content = page.content;
+      variableList.forEach((varName, varIndex) => {
+        const regex = new RegExp(`\\{\\{${varName}\\}\\}`, 'g');
+        content = content.replace(regex, `$${varIndex + 1}`);
+      });
+
+      return `
+      <div class="page ${index === 0 ? 'active' : ''}" id="page-${index}">
+        ${content}
+      </div>
+    `;
+    })
+    .join('');
+
+  // 生成标签页按钮
+  const tabsHTML = pages.value
+    .map(
+      (page, index) => `
+      <button class="tab ${index === 0 ? 'active' : ''}" onclick="switchPage(${index})">
+        ${page.name}
+      </button>
+    `,
+    )
+    .join('');
+
+  const scriptTag = 'script';
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="statusbar-placeholder.css">
+</head>
+<body>
+  <div class="statusbar-container">
+    <div class="tabs">${tabsHTML}</div>
+    <div class="page-content">${pagesHTML}</div>
+  </div>
+  <${scriptTag} src="statusbar-placeholder.js"></${scriptTag}>
+</body>
+</html>`;
+};
+
+// 辅助函数：提取所有CSS
+const extractAllCSS = () => {
+  const customCSS = pages.value.map(p => p.customCSS || '').join('\n');
+
+  return `
+/* 基础样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.statusbar-container {
+  width: 90%;
+  max-width: 800px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  background: #f8f9fa;
+  padding: 12px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 10px 20px;
+  cursor: pointer;
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6c757d;
+  transition: all 0.3s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.tab:hover {
+  background: #f8f9ff;
+  border-color: #4a9eff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(74, 158, 255, 0.2);
+}
+
+.tab.active {
+  background: linear-gradient(135deg, #4a9eff 0%, #5ab0ff 100%);
+  color: white;
+  border-color: #4a9eff;
+  box-shadow: 0 4px 12px rgba(74, 158, 255, 0.4);
+}
+
+.page-content {
+  padding: 20px;
+  min-height: 200px;
+}
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .statusbar-container {
+    width: 100%;
+  }
+
+  .tabs {
+    flex-direction: column;
+  }
+
+  .tab {
+    width: 100%;
+  }
+}
+
+/* 自定义样式 */
+${customCSS}
+`;
+};
+
+// 辅助函数：生成JavaScript
+const generateJavaScript = () => {
+  return `
+let currentPage = 0;
+
+function switchPage(index) {
+  const pages = document.querySelectorAll('.page');
+  const tabs = document.querySelectorAll('.tab');
+
+  pages.forEach((page, i) => {
+    if (i === index) {
+      page.classList.add('active');
+    } else {
+      page.classList.remove('active');
+    }
+  });
+
+  tabs.forEach((tab, i) => {
+    if (i === index) {
+      tab.classList.add('active');
+    } else {
+      tab.classList.remove('active');
+    }
+  });
+
+  currentPage = index;
+}
+
+// 初始化
+document.addEventListener('DOMContentLoaded', () => {
+  switchPage(0);
+});
+`;
+};
+
+// 辅助函数：下载JSON文件
+const downloadJSON = (data: any, filename: string) => {
+  const jsonStr = JSON.stringify(data, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
 };
 
 const loadTemplate = () => {

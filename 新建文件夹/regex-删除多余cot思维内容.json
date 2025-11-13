@@ -1,0 +1,17 @@
+{
+    "id": "a0f97edd-9b40-4ea5-8f69-fee240007300",
+    "scriptName": "删除多余COT思维内容",
+    "findRegex": "/(?:<(CoT-Lite)>([\\s\\S]*?)<\\/\\1>|```(cot)([\\s\\S]*?)```|<\\s*(system info)\\s*>([\\s\\S]*?)<\\/\\5>|<\\s*(cot)\\s*>([\\s\\S]*?)<\\/\\7>|<\\s*(output format)\\s*>([\\s\\S]*?)<\\/\\9>)/ig",
+    "replaceString": "",
+    "trimStrings": [],
+    "placement": [
+        2
+    ],
+    "disabled": false,
+    "markdownOnly": true,
+    "promptOnly": false,
+    "runOnEdit": true,
+    "substituteRegex": 2,
+    "minDepth": null,
+    "maxDepth": null
+}

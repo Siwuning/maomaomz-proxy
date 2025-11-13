@@ -1,10 +1,32 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// ========== Upstash Redis 配置 ==========
+const UPSTASH_REDIS_REST_URL = 'https://pro-piglet-36199.upstash.io';
+const UPSTASH_REDIS_REST_TOKEN = 'AY1nAAIncDI0ODNmMmM0MzhiODA0YjUzYTc4OTk0NjFhMjRlNTY2MnAyMzYxOTk';
+
+/**
+ * Upstash Redis REST API 辅助函数
+ */
+async function redisGet(key: string) {
+  const response = await fetch(`${UPSTASH_REDIS_REST_URL}/GET/${key}`, {
+    headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` },
+  });
+  const data = await response.json();
+  return data.result;
+}
+
+async function redisIncr(key: string) {
+  const response = await fetch(`${UPSTASH_REDIS_REST_URL}/INCR/${key}`, {
+    headers: { Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}` },
+  });
+  const data = await response.json();
+  return data.result;
+}
 
 serve(async req => {
   // 处理 CORS 预检请求
@@ -13,9 +35,6 @@ serve(async req => {
   }
 
   try {
-    // 创建 Supabase 客户端（使用内置环境变量）
-    const supabase = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '');
-
     // 解析请求
     const { code, apiEndpoint, timestamp } = await req.json();
 
@@ -27,7 +46,7 @@ serve(async req => {
     }
 
     // 获取 IP 和地理位置
-    const ip = req.headers.get('x-forwarded-for') || 'unknown';
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || 'unknown';
     const country = req.headers.get('cf-ipcountry') || 'unknown';
 
     // 清理 API 端点
@@ -36,35 +55,32 @@ serve(async req => {
       cleanApiEndpoint = apiEndpoint.trim() || 'unknown';
     }
 
-    // 获取当前有效的授权码
-    const { data: configData, error: configError } = await supabase
-      .from('auth_config')
-      .select('value')
-      .eq('key', 'current_code')
-      .single();
+    // 🔥 从 Upstash Redis 获取当前有效的授权码
+    const currentCode = await redisGet('current_code');
 
-    if (configError || !configData) {
-      return new Response(JSON.stringify({ valid: false, message: '❌ 系统暂未设置授权码' }), {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+    if (!currentCode) {
+      return new Response(
+        JSON.stringify({
+          valid: false,
+          message: '❌ 系统暂未设置授权码\n\n请联系管理员',
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        },
+      );
     }
 
-    const currentCode = configData.value;
+    // 验证授权码（不区分大小写）
     const isValid = code.toUpperCase() === currentCode.toUpperCase();
 
-    // 只在失败时记录详细日志
     if (!isValid) {
-      await supabase.from('verification_logs').insert({
-        code,
-        is_valid: false,
-        api_endpoint: cleanApiEndpoint,
-        ip,
-        country,
-      });
-
-      // 更新失败统计
-      await supabase.rpc('increment_stat', { stat_key: 'failed' });
+      // 记录失败统计
+      try {
+        await redisIncr('stats:failed');
+      } catch (e) {
+        console.warn('记录失败统计出错:', e);
+      }
 
       return new Response(
         JSON.stringify({
@@ -75,17 +91,11 @@ serve(async req => {
       );
     }
 
-    // 验证成功：只记录必要数据
-    await supabase.rpc('increment_stat', { stat_key: 'success' });
-
-    // 记录 API 端点（用于抓商业化）
-    if (cleanApiEndpoint !== 'unknown' && !cleanApiEndpoint.startsWith('[object ')) {
-      await supabase
-        .from('api_endpoints')
-        .upsert(
-          { endpoint: cleanApiEndpoint, ip, country, last_seen: new Date().toISOString() },
-          { onConflict: 'endpoint', ignoreDuplicates: false },
-        );
+    // 验证成功：记录统计
+    try {
+      await redisIncr('stats:success');
+    } catch (e) {
+      console.warn('记录成功统计出错:', e);
     }
 
     return new Response(
@@ -98,9 +108,15 @@ serve(async req => {
     );
   } catch (error) {
     console.error('验证错误:', error);
-    return new Response(JSON.stringify({ valid: false, message: '❌ 服务器错误: ' + error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({
+        valid: false,
+        message: '❌ 服务器错误: ' + (error as Error).message,
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      },
+    );
   }
 });

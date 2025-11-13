@@ -4,11 +4,8 @@
  * ⚠️ 商业化死全家，贩子死全家 ⚠️
  */
 
-// Supabase Edge Functions 授权后端地址
-const AUTH_API_URL = 'https://gelaigbqpwkmbdovmwcc.supabase.co/functions/v1';
-// Supabase anon key（公开密钥，可以在前端使用）
-const SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdlbGFpZ2JxcHdrbWJkb3Ztd2NjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI4ODQ3OTIsImV4cCI6MjA3ODQ2MDc5Mn0.psf0ZCXCAKc7PDFZhlMB0Q0mX55w1N1X50MAY6PuUxw';
+// 🔥 Cloudflare Worker 授权后端地址
+const AUTH_API_URL = 'https://maomaomz-auth.baobaoyu999727272.workers.dev';
 
 // LocalStorage 键名
 const STORAGE_KEY = 'maomaomz_auth_code';
@@ -98,7 +95,6 @@ async function verifyAuthCode(code: string): Promise<{ valid: boolean; message: 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
       },
       body: JSON.stringify(requestBody),
     });

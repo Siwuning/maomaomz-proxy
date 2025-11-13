@@ -1,12 +1,11 @@
-import { watch, createApp } from 'vue';
-import { klona } from 'klona';
-import { useSettingsStore, useSummaryHistoryStore } from './settings';
-import { getScriptIdSafe, getChatIdSafe, setGlobalScriptId } from './utils';
-import { summarizeMessages } from './总结功能';
-import { checkAuthorization, isAuthorized, clearAuth } from './auth';
-import { autoCheckUpdates, manualCheckUpdates, CURRENT_VERSION } from './versionCheck';
-import { globalPinia } from './globalPinia';
+import { createApp, watch } from 'vue';
+import { checkAuthorization, clearAuth, isAuthorized } from './auth';
 import TaskManager from './components/TaskManager.vue';
+import { globalPinia } from './globalPinia';
+import { useSettingsStore, useSummaryHistoryStore } from './settings';
+import { getChatIdSafe, getScriptIdSafe, setGlobalScriptId } from './utils';
+import { autoCheckUpdates, CURRENT_VERSION, manualCheckUpdates } from './versionCheck';
+import { summarizeMessages } from './总结功能';
 // 直接导入UI模块，不再延迟加载
 import './浮动面板';
 import './添加导航按钮';
@@ -934,10 +933,23 @@ $(() => {
 
       const taskManagerContainer = document.createElement('div');
       taskManagerContainer.id = 'global-task-manager';
-      taskManagerContainer.style.cssText = 'position: fixed; z-index: 999999;';
+
+      // 检查偏好设置，决定是否显示任务管理器
+      let shouldShowTaskManager = true; // 默认显示
+      try {
+        const prefsStr = localStorage.getItem('maomaomz_preferences');
+        if (prefsStr) {
+          const prefs = JSON.parse(prefsStr);
+          shouldShowTaskManager = prefs.showTaskManager !== false; // 默认显示
+        }
+      } catch (e) {
+        console.warn('读取任务管理器偏好设置失败:', e);
+      }
+
+      taskManagerContainer.style.cssText = `position: fixed; z-index: 999999; display: ${shouldShowTaskManager ? 'block' : 'none'};`;
       document.body.appendChild(taskManagerContainer);
 
-      console.log('📦 任务管理器容器已创建:', taskManagerContainer);
+      console.log('📦 任务管理器容器已创建:', taskManagerContainer, '显示状态:', shouldShowTaskManager);
 
       const taskApp = createApp(TaskManager);
       taskApp.use(globalPinia); // 使用全局pinia实例

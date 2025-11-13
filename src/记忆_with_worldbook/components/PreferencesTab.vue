@@ -214,12 +214,16 @@ const applyPreferences = () => {
     // 延迟应用DOM设置，避免阻塞渲染
     setTimeout(() => {
       try {
-        const taskManager = document.querySelector('.task-manager-container') as HTMLElement;
+        // 查找任务管理器容器（ID 是 global-task-manager）
+        const taskManager = document.getElementById('global-task-manager') as HTMLElement;
         if (taskManager) {
           taskManager.style.display = preferences.showTaskManager ? 'block' : 'none';
+          console.log('✅ 任务管理器显示状态已更新:', preferences.showTaskManager ? '显示' : '隐藏');
+        } else {
+          console.warn('⚠️ 任务管理器容器未找到');
         }
       } catch (err) {
-        console.warn('任务管理器DOM未找到:', err);
+        console.warn('❌ 更新任务管理器显示状态失败:', err);
       }
     }, 100);
   } catch (error) {

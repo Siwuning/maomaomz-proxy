@@ -119,6 +119,46 @@
           </div>
         </div>
 
+        <!-- 组件库 - 新增 -->
+        <div
+          style="
+            margin-bottom: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
+            border-radius: 8px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+          "
+        >
+          <h5
+            style="color: #8b5cf6; margin-bottom: 10px; font-size: 13px; display: flex; align-items: center; gap: 6px"
+          >
+            <i class="fa-solid fa-cubes"></i>
+            快速组件
+          </h5>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px">
+            <button
+              v-for="component in quickComponents"
+              :key="component.name"
+              style="
+                padding: 8px;
+                background: #2a2a2a;
+                border: 1px solid #3a3a3a;
+                border-radius: 6px;
+                color: #c0c0c0;
+                font-size: 11px;
+                cursor: pointer;
+                transition: all 0.2s;
+              "
+              @click="insertComponent(component)"
+              @mouseenter="e => (e.currentTarget.style.borderColor = '#8b5cf6')"
+              @mouseleave="e => (e.currentTarget.style.borderColor = '#3a3a3a')"
+            >
+              <i :class="component.icon" style="margin-right: 4px"></i>
+              {{ component.name }}
+            </button>
+          </div>
+        </div>
+
         <!-- AI 生成器 - 始终显示 -->
         <div
           style="
@@ -798,6 +838,101 @@ const showAIGenerator = ref(false);
 const aiPrompt = ref('');
 const isGenerating = ref(false);
 const isGeneratingCSS = ref(false);
+
+// 快速组件库
+interface QuickComponent {
+  name: string;
+  icon: string;
+  template: string;
+  variables: Variable[];
+}
+
+const quickComponents: QuickComponent[] = [
+  {
+    name: '进度条',
+    icon: 'fa-solid fa-chart-bar',
+    template: `<div style="margin-bottom: 15px;">
+  <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+    <span style="font-weight: 600; color: #333;">{{label}}</span>
+    <span style="color: #666;">{{current}}/{{max}}</span>
+  </div>
+  <div style="width: 100%; height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden;">
+    <div style="height: 100%; background: linear-gradient(90deg, #4a9eff 0%, #5ab0ff 100%); width: calc({{current}} / {{max}} * 100%); transition: width 0.3s;"></div>
+  </div>
+</div>`,
+    variables: [
+      { name: 'label', defaultValue: 'HP', description: '标签名称', type: 'text' },
+      { name: 'current', defaultValue: '75', description: '当前值', type: 'number', min: 0, max: 100 },
+      { name: 'max', defaultValue: '100', description: '最大值', type: 'number', min: 0, max: 100 },
+    ],
+  },
+  {
+    name: '信息卡片',
+    icon: 'fa-solid fa-id-card',
+    template: `<div style="padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; color: white; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+  <div style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">{{title}}</div>
+  <div style="font-size: 14px; opacity: 0.9;">{{content}}</div>
+</div>`,
+    variables: [
+      { name: 'title', defaultValue: '角色名称', description: '卡片标题', type: 'text' },
+      { name: 'content', defaultValue: '这是卡片内容', description: '卡片内容', type: 'text' },
+    ],
+  },
+  {
+    name: '统计数字',
+    icon: 'fa-solid fa-hashtag',
+    template: `<div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 12px; margin-bottom: 15px;">
+  <div style="font-size: 36px; font-weight: 700; color: #4a9eff; margin-bottom: 5px;">{{value}}</div>
+  <div style="font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px;">{{label}}</div>
+</div>`,
+    variables: [
+      { name: 'value', defaultValue: '1234', description: '数值', type: 'number' },
+      { name: 'label', defaultValue: '总积分', description: '标签', type: 'text' },
+    ],
+  },
+  {
+    name: '标签组',
+    icon: 'fa-solid fa-tags',
+    template: `<div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px;">
+  <span style="padding: 6px 12px; background: #e3f2fd; color: #1976d2; border-radius: 20px; font-size: 12px; font-weight: 600;">{{tag1}}</span>
+  <span style="padding: 6px 12px; background: #f3e5f5; color: #7b1fa2; border-radius: 20px; font-size: 12px; font-weight: 600;">{{tag2}}</span>
+  <span style="padding: 6px 12px; background: #e8f5e9; color: #388e3c; border-radius: 20px; font-size: 12px; font-weight: 600;">{{tag3}}</span>
+</div>`,
+    variables: [
+      { name: 'tag1', defaultValue: '标签1', description: '第一个标签', type: 'text' },
+      { name: 'tag2', defaultValue: '标签2', description: '第二个标签', type: 'text' },
+      { name: 'tag3', defaultValue: '标签3', description: '第三个标签', type: 'text' },
+    ],
+  },
+  {
+    name: '头像卡',
+    icon: 'fa-solid fa-user-circle',
+    template: `<div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 15px;">
+  <img src="{{avatar}}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid #4a9eff;" />
+  <div style="flex: 1;">
+    <div style="font-size: 16px; font-weight: 700; color: #333; margin-bottom: 4px;">{{name}}</div>
+    <div style="font-size: 13px; color: #666;">{{description}}</div>
+  </div>
+</div>`,
+    variables: [
+      { name: 'avatar', defaultValue: 'https://via.placeholder.com/60', description: '头像URL', type: 'image' },
+      { name: 'name', defaultValue: '角色名称', description: '名称', type: 'text' },
+      { name: 'description', defaultValue: '角色描述', description: '描述', type: 'text' },
+    ],
+  },
+  {
+    name: '列表项',
+    icon: 'fa-solid fa-list',
+    template: `<div style="padding: 12px; background: white; border-left: 4px solid #4a9eff; margin-bottom: 10px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+  <div style="font-weight: 600; color: #333; margin-bottom: 4px;">{{title}}</div>
+  <div style="font-size: 13px; color: #666;">{{content}}</div>
+</div>`,
+    variables: [
+      { name: 'title', defaultValue: '列表标题', description: '标题', type: 'text' },
+      { name: 'content', defaultValue: '列表内容描述', description: '内容', type: 'text' },
+    ],
+  },
+];
 
 // 组件挂载时加载数据
 onMounted(() => {
@@ -2035,6 +2170,27 @@ const getPlaceholderForType = (type: string) => {
     default:
       return '默认值';
   }
+};
+
+// 插入快速组件
+const insertComponent = (component: QuickComponent) => {
+  if (!selectedPage.value) {
+    (window as any).toastr?.warning('请先选择一个页面');
+    return;
+  }
+
+  // 添加组件HTML到当前页面
+  selectedPage.value.content += '\n\n' + component.template;
+
+  // 合并变量（避免重复）
+  component.variables.forEach(newVar => {
+    const exists = variables.value.find(v => v.name === newVar.name);
+    if (!exists) {
+      variables.value.push({ ...newVar });
+    }
+  });
+
+  (window as any).toastr?.success(`✅ 已插入"${component.name}"组件`);
 };
 
 // 导出世界书条目

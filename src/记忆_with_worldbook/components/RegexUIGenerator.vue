@@ -114,10 +114,29 @@
             transition: all 0.3s ease;
           "
           :disabled="!generatedHTML"
-          @click="showWorldbookGuide"
+          @click="exportWorldbookEntry"
         >
           <i class="fa-solid fa-book" style="margin-right: 6px"></i>
-          世界书说明
+          导出世界书
+        </button>
+        <button
+          class="action-button"
+          style="
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+          "
+          :disabled="!generatedHTML"
+          @click="showWorldbookGuide"
+        >
+          <i class="fa-solid fa-question-circle" style="margin-right: 6px"></i>
+          使用说明
         </button>
         <button
           class="action-button"
@@ -387,12 +406,14 @@
               border-left: 4px solid #8b5cf6;
             "
           >
-            <p style="margin: 0; font-size: 14px">
-              <strong style="color: #8b5cf6">📌 使用方法：</strong><br />
-              1. 在聊天中输入
+            <p style="margin: 0; font-size: 14px; line-height: 1.8">
+              <strong style="color: #8b5cf6">📌 快速开始：</strong><br />
+              1. 点击顶部"导出世界书"按钮，下载世界书条目 JSON 文件<br />
+              2. 在 SillyTavern 中打开世界书，点击"导入"按钮导入该文件<br />
+              3. 编辑世界书条目，填写实际的字段值（替换 [字段名的值]）<br />
+              4. 在聊天中输入
               <code style="background: #2a2a2a; padding: 2px 6px; border-radius: 3px">{{ triggerRegex }}</code>
-              触发状态栏<br />
-              2. 在世界书中设置变量值，状态栏会自动替换显示
+              触发状态栏
             </p>
           </div>
 
@@ -663,6 +684,96 @@ const loadExample = () => {
   aiPrompt.value =
     '深色科技风格的角色状态栏，包含3个标签页：\n1. 基础信息（姓名、年龄、性别、职业）\n2. 状态（HP、MP、体力、精力，使用进度条）\n3. 关系（好感度、信任度、关系状态）\n\n使用蓝色渐变配色，圆角卡片设计，标签页按钮要有悬停效果';
   (window as any).toastr?.info('已加载示例，点击"AI 生成"开始');
+};
+
+const exportWorldbookEntry = () => {
+  if (!generatedHTML.value) {
+    (window as any).toastr?.warning('请先生成内容');
+    return;
+  }
+
+  if (detectedVariables.value.length === 0) {
+    (window as any).toastr?.warning('未检测到变量，无法生成世界书条目');
+    return;
+  }
+
+  // 生成字段说明
+  const fieldNames = ['姓名', '年龄', '性别', '职业', 'HP', 'MP', '体力', '精力', '好感度', '信任度', '魅力', '智力'];
+  const fields = detectedVariables.value
+    .map((num, index) => {
+      const fieldName = fieldNames[index] || `字段${num}`;
+      return `字段${num}: [${fieldName}的值]`;
+    })
+    .join('\n');
+
+  // 生成世界书条目内容
+  const entryContent = `# 角色状态栏数据
+
+${fields}
+
+---
+
+## 使用说明
+1. 将上面的字段值替换为实际内容
+2. 在聊天中输入 ${triggerRegex.value} 触发状态栏
+3. 状态栏会自动显示这些字段的值
+
+## 示例
+字段1: 张三
+字段2: 25
+字段3: 男
+字段4: 冒险者
+
+## 动态更新
+AI 可以在回复中更新这些值：
+字段1: 新的值`;
+
+  // 创建世界书条目 JSON
+  const worldbookEntry = {
+    uid: Date.now(),
+    key: [triggerRegex.value.replace(/[<>-]/g, '')],
+    keysecondary: [],
+    comment: '翻页状态栏数据',
+    content: entryContent,
+    constant: false,
+    selective: true,
+    selectiveLogic: 0,
+    addMemo: true,
+    order: 100,
+    position: 0,
+    disable: false,
+    excludeRecursion: false,
+    preventRecursion: false,
+    delayUntilRecursion: false,
+    probability: 100,
+    useProbability: true,
+    depth: 4,
+    group: '',
+    groupOverride: false,
+    groupWeight: 100,
+    scanDepth: null,
+    caseSensitive: null,
+    matchWholeWords: null,
+    useGroupScoring: null,
+    automationId: '',
+    role: 0,
+    vectorized: false,
+    sticky: 0,
+    cooldown: 0,
+    delay: 0,
+  };
+
+  // 导出为 JSON 文件
+  const jsonStr = JSON.stringify(worldbookEntry, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'statusbar-worldbook-entry.json';
+  a.click();
+  URL.revokeObjectURL(url);
+
+  (window as any).toastr?.success(`✅ 世界书条目已导出！包含 ${detectedVariables.value.length} 个字段`);
 };
 
 const showWorldbookGuide = () => {

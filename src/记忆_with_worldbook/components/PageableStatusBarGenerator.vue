@@ -263,53 +263,161 @@ const generateWithAI = async () => {
 
   isGenerating.value = true;
 
-  const systemPrompt = `🚫🚫🚫 严重警告 🚫🚫🚫
+  const systemPrompt = `你是富有创意的前端设计师，为 SillyTavern 生成精美翻页状态栏。
 
-如果你生成这样的代码，将被拒绝：
-❌ <span class="field-label">姓名</span><span class="field-value">$1</span>
-❌ <div class="field-row"><span>姓名</span><span>$1</span></div>
-❌ 任何使用 class 的字段
-❌ 任何简单的文本行
+# 翻页状态栏
+- 多个页面 + 标签页按钮切换
+- 布局：顶部/左侧/右侧标签页
+- 完全根据用户需求自由创作
 
-你必须生成这样的代码：
-✅ 每个字段必须是独立的 div 卡片
-✅ 所有样式必须 inline（不要用 class）
-✅ 必须有渐变/阴影/圆角
-
-正确示例（强制照做）：
-\`\`\`html
-<div style="background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.08)); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; padding: 18px 22px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1); transition: all 0.3s ease;">
-  <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 10px; font-weight: 600;">
-    <i class="fa-solid fa-user" style="margin-right: 6px;"></i>姓名
+# 输出格式（单个 HTML 文件）
+\\\`\\\`\\\`html
+<details>
+<summary>✨ 状态栏标题</summary>
+<div class="status-container">
+  <!-- 标签页按钮 -->
+  <div class="page-tabs">
+    <button class="page-tab active" onclick="switchPage(0)">
+      <i class="fa-solid fa-home"></i> 页面1
+    </button>
+    <button class="page-tab" onclick="switchPage(1)">
+      <i class="fa-solid fa-heart"></i> 页面2
+    </button>
   </div>
-  <div style="font-size: 17px; color: #fff; font-weight: 500;">
-    $1
+
+  <!-- 页面内容 -->
+  <div class="page-content">
+    <div class="page active" data-page="0">
+      <!-- 字段卡片 -->
+      <div class="field-card">
+        <div class="field-label">
+          <i class="fa-solid fa-user"></i> 姓名
+        </div>
+        <div class="field-value">$1</div>
+      </div>
+      <div class="field-card">
+        <div class="field-label">
+          <i class="fa-solid fa-cake-candles"></i> 年龄
+        </div>
+        <div class="field-value">$2</div>
+      </div>
+    </div>
+
+    <div class="page" data-page="1" style="display:none;">
+      <!-- 第2页的字段... -->
+    </div>
   </div>
 </div>
 
-<div style="background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.08)); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; padding: 18px 22px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.3s ease;">
-  <div style="font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 10px; font-weight: 600;">
-    <i class="fa-solid fa-cake-candles" style="margin-right: 6px;"></i>年龄
-  </div>
-  <div style="font-size: 17px; color: #fff; font-weight: 500;">
-    $2
-  </div>
-</div>
-\`\`\`
+<style>
+/* 容器样式 */
+.status-container {
+  background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
 
-# 任务
-生成翻页状态栏（2-4个页面）
+/* 标签页按钮 */
+.page-tab {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  padding: 12px 24px;
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.page-tab:hover {
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  transform: scale(1.05);
+  color: #fff;
+}
+
+.page-tab.active {
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  box-shadow: 0 0 20px rgba(59,130,246,0.6);
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ⚠️ 字段卡片（最重要！） */
+.field-card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.08));
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px;
+  padding: 18px 22px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+
+.field-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+}
+
+.field-label {
+  font-size: 13px;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.field-value {
+  font-size: 17px;
+  color: #fff;
+  font-weight: 500;
+}
+
+/* 页面切换动画 */
+.page {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.page.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
+
+<script>
+function switchPage(index) {
+  document.querySelectorAll('.page-tab').forEach((tab, i) => {
+    tab.classList.toggle('active', i === index);
+  });
+  document.querySelectorAll('.page').forEach((page, i) => {
+    if (i === index) {
+      page.style.display = 'block';
+      setTimeout(() => {
+        page.classList.add('active');
+      }, 10);
+    } else {
+      page.classList.remove('active');
+      setTimeout(() => {
+        page.style.display = 'none';
+      }, 300);
+    }
+  });
+}
+</script>
+</details>
+\\\`\\\`\\\`
 
 # 要求
-1. 使用 $1, $2, $3 占位符
-2. 容器用渐变背景 + 圆角 + 阴影
-3. 标签页按钮三态明显
-4. **每个字段必须完全按照上面的正确示例格式！**
-5. 所有 style 必须 inline
-6. 在 <details> 标签内
-7. 包含 <style> 和 <script>
+1. 使用 $1, $2, $3... 占位符
+2. 生成 2-4 个页面
+3. 每个字段必须用 .field-card 包裹
+4. 样式必须精美（渐变+阴影+圆角+动画）
+5. 标签页三态明显（默认/悬停/激活）
+6. 直接输出 HTML（不要 \\\`\\\`\\\`html 标记）
+7. 确保在 <details> 标签内
+8. 必须包含 <style> 和 <script> 标签
 
-🚫 如果字段不是卡片（有完整 inline style），你的输出无效！🚫`;
+⚠️ 核心：每个字段必须用 .field-card 卡片包裹！`;
 
   try {
     const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);

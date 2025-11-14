@@ -1,62 +1,211 @@
 <template>
-  <div class="pageable-statusbar-generator" style="padding: 25px; background: #1a1a1a">
-    <!-- 标题说明 -->
+  <div class="pageable-statusbar-generator">
+    <!-- 顶部操作栏 -->
     <div
+      class="section-header"
       style="
-        background: linear-gradient(135deg, rgba(74, 158, 255, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-        padding: 20px;
-        border-radius: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 28px;
+        background: linear-gradient(
+          135deg,
+          rgba(30, 30, 30, 0.95) 0%,
+          rgba(38, 38, 38, 0.9) 50%,
+          rgba(30, 30, 30, 0.95) 100%
+        );
+        backdrop-filter: blur(12px);
+        border-radius: 14px;
         margin-bottom: 20px;
-        border: 1px solid rgba(74, 158, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        box-shadow:
+          0 3px 12px rgba(0, 0, 0, 0.3),
+          inset 0 1px 0 rgba(255, 255, 255, 0.04),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.2);
       "
     >
-      <h3 style="color: #4a9eff; margin: 0 0 10px 0; font-size: 20px; font-weight: 600">📖 翻页状态栏生成器</h3>
-      <p style="color: #888; margin: 0; font-size: 14px; line-height: 1.6">
-        用 AI 生成可翻页、可交互的多页面状态栏。描述你想要的样式，AI 会为你创造！
-      </p>
+      <h3
+        style="
+          margin: 0;
+          color: #fff;
+          font-size: 16px !important;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          letter-spacing: 0.5px;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        "
+      >
+        <i class="fa-solid fa-book-open" style="color: #4a9eff; font-size: 18px"></i>
+        翻页状态栏生成器
+      </h3>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap">
+        <button
+          class="action-button"
+          style="
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+          "
+          @click="loadExample"
+        >
+          <i class="fa-solid fa-lightbulb" style="margin-right: 6px"></i>
+          加载示例
+        </button>
+        <button
+          class="action-button"
+          style="
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+          "
+          :disabled="isGenerating"
+          @click="generateWithAI"
+        >
+          <i
+            :class="isGenerating ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-wand-magic-sparkles'"
+            style="margin-right: 6px"
+          ></i>
+          {{ isGenerating ? '生成中...' : 'AI 生成' }}
+        </button>
+        <button
+          class="action-button"
+          style="
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+          "
+          :disabled="!generatedHTML"
+          @click="exportRegex"
+        >
+          <i class="fa-solid fa-download" style="margin-right: 6px"></i>
+          导出正则
+        </button>
+        <button
+          class="action-button"
+          style="
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+          "
+          :disabled="!generatedHTML"
+          @click="showWorldbookGuide"
+        >
+          <i class="fa-solid fa-book" style="margin-right: 6px"></i>
+          世界书说明
+        </button>
+        <button
+          class="action-button"
+          style="
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+          "
+          @click="clearAll"
+        >
+          <i class="fa-solid fa-trash" style="margin-right: 6px"></i>
+          清空
+        </button>
+      </div>
     </div>
 
     <!-- 主内容区 -->
-    <div style="display: grid; grid-template-columns: 400px 1fr; gap: 20px">
+    <div style="display: grid; grid-template-columns: 350px 1fr 500px; gap: 20px; min-height: 600px">
       <!-- 左侧：配置区 -->
-      <div style="display: flex; flex-direction: column; gap: 15px">
-        <!-- 触发正则 -->
-        <div style="background: #2a2a2a; padding: 15px; border-radius: 12px; border: 1px solid #3a3a3a">
-          <label style="display: block; margin-bottom: 8px; color: #c0c0c0; font-size: 13px; font-weight: 600">
-            触发正则
-          </label>
-          <input
-            v-model="triggerRegex"
-            type="text"
-            placeholder="<-STATUS->"
+      <div
+        style="
+          background: #2a2a2a;
+          border-radius: 16px;
+          padding: 20px;
+          border: 1px solid #3a3a3a;
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        "
+      >
+        <div>
+          <h4
             style="
-              width: 100%;
-              padding: 10px 12px;
-              background: #1e1e1e;
-              border: 1px solid #3a3a3a;
-              border-radius: 6px;
-              color: #e0e0e0;
-              font-size: 13px;
+              margin: 0 0 12px 0;
+              color: #fff;
+              font-size: 14px;
+              font-weight: 600;
+              display: flex;
+              align-items: center;
+              gap: 8px;
             "
-          />
+          >
+            <i class="fa-solid fa-cog" style="color: #4a9eff"></i>
+            基础配置
+          </h4>
+
+          <div style="margin-bottom: 15px">
+            <label style="display: block; margin-bottom: 8px; color: #c0c0c0; font-size: 12px; font-weight: 600"
+              >触发正则</label
+            >
+            <input
+              v-model="triggerRegex"
+              type="text"
+              placeholder="<-STATUS->"
+              style="
+                width: 100%;
+                padding: 10px 12px;
+                background: #1e1e1e;
+                border: 1px solid #3a3a3a;
+                border-radius: 6px;
+                color: #e0e0e0;
+                font-size: 13px;
+              "
+            />
+          </div>
         </div>
 
-        <!-- AI 生成区 -->
         <div
           style="
             background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.1) 100%);
-            padding: 20px;
+            padding: 15px;
             border-radius: 12px;
             border: 1px solid rgba(245, 158, 11, 0.3);
           "
         >
-          <h4 style="color: #f59e0b; margin: 0 0 12px 0; font-size: 15px; display: flex; align-items: center; gap: 8px">
+          <h4 style="color: #f59e0b; margin: 0 0 12px 0; font-size: 14px; display: flex; align-items: center; gap: 8px">
             <i class="fa-solid fa-sparkles"></i>
-            AI 智能生成
+            AI 需求描述
           </h4>
           <textarea
             v-model="aiPrompt"
-            placeholder="✨ 描述你想要的翻页状态栏样式：&#10;&#10;例如：&#10;- 深色科技风格，左边圆形头像，右边3个标签页&#10;- 粉色可爱风格，显示角色信息、状态、关系&#10;- 游戏风格，HP/MP进度条，技能图标&#10;&#10;💡 提示：&#10;- 可以指定颜色、形状、布局&#10;- 可以要求动画效果&#10;- 可以参考游戏UI风格"
+            placeholder="✨ 描述你想要的翻页状态栏：&#10;&#10;例如：&#10;- 深色科技风格，3个标签页&#10;- 粉色可爱风格，显示角色信息&#10;- 游戏风格，HP/MP进度条"
             :disabled="isGenerating"
             style="
               width: 100%;
@@ -66,95 +215,56 @@
               border: 2px solid #f59e0b;
               border-radius: 8px;
               color: #e0e0e0;
-              font-size: 13px;
+              font-size: 12px;
               line-height: 1.6;
               resize: vertical;
-              margin-bottom: 12px;
             "
           ></textarea>
-          <button
-            style="
-              width: 100%;
-              padding: 12px;
-              background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-              border: none;
-              border-radius: 8px;
-              color: white;
-              font-size: 14px;
-              font-weight: 600;
-              cursor: pointer;
-              transition: all 0.2s;
-            "
-            :style="{ opacity: isGenerating ? 0.6 : 1, cursor: isGenerating ? 'not-allowed' : 'pointer' }"
-            :disabled="isGenerating"
-            @click="generateWithAI"
-          >
-            <i
-              :class="isGenerating ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-wand-magic-sparkles'"
-              style="margin-right: 8px"
-            ></i>
-            {{ isGenerating ? '生成中...' : '✨ AI 一键生成' }}
-          </button>
         </div>
+      </div>
 
-        <!-- 操作按钮 -->
-        <div style="display: flex; flex-direction: column; gap: 10px">
-          <button
-            style="
-              padding: 12px;
-              background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-              border: none;
-              border-radius: 8px;
-              color: white;
-              font-size: 14px;
-              font-weight: 600;
-              cursor: pointer;
-              transition: all 0.2s;
-            "
-            :disabled="!generatedHTML"
-            :style="{ opacity: !generatedHTML ? 0.5 : 1 }"
-            @click="exportRegex"
-          >
-            <i class="fa-solid fa-download" style="margin-right: 8px"></i>
-            导出正则 JSON
-          </button>
+      <!-- 中间：代码编辑区 -->
+      <div
+        style="
+          background: #2a2a2a;
+          border-radius: 16px;
+          padding: 20px;
+          border: 1px solid #3a3a3a;
+          display: flex;
+          flex-direction: column;
+        "
+      >
+        <h4
+          style="
+            margin: 0 0 15px 0;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          "
+        >
+          <i class="fa-solid fa-code" style="color: #10b981"></i>
+          生成的代码
+        </h4>
 
-          <button
-            style="
-              padding: 12px;
-              background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-              border: none;
-              border-radius: 8px;
-              color: white;
-              font-size: 14px;
-              font-weight: 600;
-              cursor: pointer;
-              transition: all 0.2s;
-            "
-            @click="loadExample"
-          >
-            <i class="fa-solid fa-lightbulb" style="margin-right: 8px"></i>
-            加载示例
-          </button>
-
-          <button
-            style="
-              padding: 12px;
-              background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-              border: none;
-              border-radius: 8px;
-              color: white;
-              font-size: 14px;
-              font-weight: 600;
-              cursor: pointer;
-              transition: all 0.2s;
-            "
-            @click="clearAll"
-          >
-            <i class="fa-solid fa-trash" style="margin-right: 8px"></i>
-            清空所有
-          </button>
-        </div>
+        <textarea
+          v-model="generatedHTML"
+          placeholder="AI 生成的代码将显示在这里..."
+          style="
+            flex: 1;
+            padding: 15px;
+            background: #1e1e1e;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            resize: none;
+            min-height: 500px;
+          "
+        ></textarea>
       </div>
 
       <!-- 右侧：预览区 -->
@@ -166,7 +276,6 @@
           border: 2px solid #10b981;
           display: flex;
           flex-direction: column;
-          min-height: 700px;
           box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
         "
       >
@@ -183,26 +292,20 @@
           "
         >
           <i class="fa-solid fa-eye" style="color: #10b981; font-size: 18px"></i>
-          <span style="color: #fff; font-size: 16px; font-weight: 700">实时预览</span>
+          <span style="color: #fff; font-size: 14px; font-weight: 600">实时预览</span>
         </div>
 
         <div
           style="
             flex: 1;
-            background: linear-gradient(135deg, #1e1e1e 0%, #252525 100%);
+            background: #fff;
             border-radius: 12px;
-            padding: 30px;
+            padding: 20px;
             overflow: auto;
             border: 2px solid #3a3a3a;
-            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
           "
         >
-          <iframe
-            v-if="generatedHTML"
-            :srcdoc="previewHTML"
-            style="width: 100%; height: 100%; min-height: 600px; border: none; border-radius: 8px; background: white"
-            sandbox="allow-scripts allow-same-origin"
-          ></iframe>
+          <div v-if="generatedHTML" v-html="previewHTML"></div>
           <div
             v-else
             style="
@@ -210,14 +313,148 @@
               align-items: center;
               justify-content: center;
               height: 100%;
-              color: #666;
+              color: #999;
               text-align: center;
             "
           >
             <div>
               <i class="fa-solid fa-wand-magic-sparkles" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3"></i>
-              <p style="font-size: 16px">使用 AI 生成或加载示例查看预览</p>
+              <p style="font-size: 14px">使用 AI 生成或加载示例查看预览</p>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 世界书说明对话框 -->
+    <div
+      v-if="showWorldbookDialog"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      "
+      @click.self="showWorldbookDialog = false"
+    >
+      <div
+        style="
+          background: #1e1e1e;
+          border-radius: 16px;
+          padding: 30px;
+          max-width: 700px;
+          width: 90%;
+          max-height: 80vh;
+          overflow-y: auto;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        "
+      >
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px">
+          <h3 style="color: #8b5cf6; margin: 0; font-size: 20px">
+            <i class="fa-solid fa-book" style="margin-right: 8px"></i>
+            世界书使用说明
+          </h3>
+          <button
+            style="
+              background: none;
+              border: none;
+              color: #888;
+              font-size: 24px;
+              cursor: pointer;
+              padding: 0;
+              width: 32px;
+              height: 32px;
+            "
+            @click="showWorldbookDialog = false"
+          >
+            ×
+          </button>
+        </div>
+
+        <div style="color: #ccc; line-height: 1.8">
+          <div
+            style="
+              background: rgba(139, 92, 246, 0.1);
+              padding: 15px;
+              border-radius: 8px;
+              margin-bottom: 20px;
+              border-left: 4px solid #8b5cf6;
+            "
+          >
+            <p style="margin: 0; font-size: 14px">
+              <strong style="color: #8b5cf6">📌 使用方法：</strong><br />
+              1. 在聊天中输入
+              <code style="background: #2a2a2a; padding: 2px 6px; border-radius: 3px">{{ triggerRegex }}</code>
+              触发状态栏<br />
+              2. 在世界书中设置变量值，状态栏会自动替换显示
+            </p>
+          </div>
+
+          <h4 style="color: #fff; margin: 20px 0 10px 0; font-size: 16px">
+            <i class="fa-solid fa-list" style="color: #10b981; margin-right: 8px"></i>
+            检测到的变量：
+          </h4>
+
+          <div v-if="detectedVariables.length > 0" style="margin-bottom: 20px">
+            <div
+              v-for="(variable, index) in detectedVariables"
+              :key="index"
+              style="
+                background: #2a2a2a;
+                padding: 12px;
+                border-radius: 8px;
+                margin-bottom: 10px;
+                border: 1px solid #3a3a3a;
+              "
+            >
+              <code style="color: #4a9eff; font-size: 14px; font-weight: 600">${{ variable }}</code>
+              <p style="margin: 5px 0 0 0; color: #888; font-size: 12px">
+                在世界书中使用：<code style="background: #1e1e1e; padding: 2px 6px; border-radius: 3px"
+                  >字段{{ variable }}: 值</code
+                >
+              </p>
+            </div>
+          </div>
+
+          <h4 style="color: #fff; margin: 20px 0 10px 0; font-size: 16px">
+            <i class="fa-solid fa-code" style="color: #f59e0b; margin-right: 8px"></i>
+            世界书示例：
+          </h4>
+
+          <pre
+            style="
+              background: #2a2a2a;
+              padding: 15px;
+              border-radius: 8px;
+              overflow-x: auto;
+              color: #e0e0e0;
+              font-size: 12px;
+              border: 1px solid #3a3a3a;
+            "
+            >{{ worldbookExample }}</pre
+          >
+
+          <div
+            style="
+              background: rgba(16, 185, 129, 0.1);
+              padding: 15px;
+              border-radius: 8px;
+              margin-top: 20px;
+              border-left: 4px solid #10b981;
+            "
+          >
+            <p style="margin: 0; font-size: 13px">
+              <strong style="color: #10b981">💡 提示：</strong><br />
+              - 变量值会自动替换到状态栏中<br />
+              - 可以在角色卡或世界书中动态更新这些值<br />
+              - AI 回复时也可以更新变量值
+            </p>
           </div>
         </div>
       </div>
@@ -230,44 +467,47 @@ import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
 import { filterApiParams, normalizeApiEndpoint, useSettingsStore } from '../settings';
 
-// Settings store
 const settingsStore = useSettingsStore();
 const { settings } = storeToRefs(settingsStore);
 
-// 状态
 const triggerRegex = ref('<-STATUS->');
 const aiPrompt = ref('');
 const isGenerating = ref(false);
 const generatedHTML = ref('');
+const showWorldbookDialog = ref(false);
 
 // 预览 HTML
 const previewHTML = computed(() => {
   if (!generatedHTML.value) return '';
+  return generatedHTML.value;
+});
 
-  return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      backgroundla#f5f5f5;
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-    }
-  </style>
-</head>
-<body>
-  ${generatedHTML.value}
-</body>
-</html>
-  `;
+// 检测变量
+const detectedVariables = computed(() => {
+  if (!generatedHTML.value) return [];
+  const matches = generatedHTML.value.match(/\$(\d+)/g);
+  if (!matches) return [];
+  return [...new Set(matches.map(m => m.substring(1)))].sort((a, b) => parseInt(a) - parseInt(b));
+});
+
+// 世界书示例
+const worldbookExample = computed(() => {
+  if (detectedVariables.value.length === 0) return '';
+
+  const examples = detectedVariables.value
+    .map((num, index) => {
+      const fieldNames = ['姓名', '年龄', '性别', '职业', 'HP', 'MP', '体力', '精力', '好感度', '信任度'];
+      const fieldName = fieldNames[index] || `字段${num}`;
+      const exampleValue = index === 0 ? '张三' : index === 1 ? '25' : index === 2 ? '男' : '示例值';
+      return `字段${num}: ${exampleValue}  // ${fieldName}`;
+    })
+    .join('\n');
+
+  return `[角色状态]
+${examples}
+
+// 在世界书中创建一个条目，包含以上内容
+// 当触发 ${triggerRegex.value} 时，这些值会自动填充到状态栏`;
 });
 
 // AI 生成
@@ -297,13 +537,10 @@ const generateWithAI = async () => {
 <details>
 <summary>状态栏标题</summary>
 <div class="status-container">
-  <!-- 翻页按钮/标签页 -->
   <div class="page-tabs">
     <button class="page-tab active" onclick="switchPage(0)">页面1</button>
     <button class="page-tab" onclick="switchPage(1)">页面2</button>
   </div>
-
-  <!-- 页面内容 -->
   <div class="page-content">
     <div class="page active" data-page="0">
       <div>字段1: $1</div>
@@ -368,13 +605,11 @@ function switchPage(index) {
     const data = await response.json();
     let content = data.choices?.[0]?.message?.content || data.content || '';
 
-    // 清理代码块标记
     content = content
       .replace(/```html\n?/g, '')
       .replace(/```\n?/g, '')
       .trim();
 
-    // 提取 details 标签之间的内容
     const detailsRegex = new RegExp('<details[\\s\\S]*?</details>', 'i');
     const detailsMatch = content.match(detailsRegex);
 
@@ -382,7 +617,6 @@ function switchPage(index) {
       generatedHTML.value = detailsMatch[0];
       (window as any).toastr?.success('✨ AI 生成成功！');
     } else {
-      // 如果没有 details，尝试提取整个 HTML
       generatedHTML.value = content;
       (window as any).toastr?.warning('生成成功，但格式可能需要调整');
     }
@@ -394,7 +628,6 @@ function switchPage(index) {
   }
 };
 
-// 导出正则
 const exportRegex = () => {
   if (!generatedHTML.value) {
     (window as any).toastr?.warning('请先生成内容');
@@ -409,7 +642,7 @@ const exportRegex = () => {
     findRegex: triggerRegex.value,
     replaceString: generatedHTML.value,
     trimStrings: [],
-    placement: [2], // AI回复前
+    placement: [2],
     disabled: false,
     runOnEdit: true,
   };
@@ -426,14 +659,16 @@ const exportRegex = () => {
   (window as any).toastr?.success('✅ 正则已导出');
 };
 
-// 加载示例
 const loadExample = () => {
   aiPrompt.value =
     '深色科技风格的角色状态栏，包含3个标签页：\n1. 基础信息（姓名、年龄、性别、职业）\n2. 状态（HP、MP、体力、精力，使用进度条）\n3. 关系（好感度、信任度、关系状态）\n\n使用蓝色渐变配色，圆角卡片设计，标签页按钮要有悬停效果';
-  (window as any).toastr?.info('已加载示例，点击"AI 一键生成"开始');
+  (window as any).toastr?.info('已加载示例，点击"AI 生成"开始');
 };
 
-// 清空所有
+const showWorldbookGuide = () => {
+  showWorldbookDialog.value = true;
+};
+
 const clearAll = () => {
   if (confirm('确定要清空所有内容吗？')) {
     triggerRegex.value = '<-STATUS->';
@@ -445,16 +680,16 @@ const clearAll = () => {
 </script>
 
 <style scoped>
-button:hover {
+.action-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-button:active {
+.action-button:active {
   transform: translateY(0);
 }
 
-button:disabled {
+.action-button:disabled {
   cursor: not-allowed !important;
   opacity: 0.5 !important;
 }

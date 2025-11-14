@@ -505,7 +505,9 @@ const previewHTML = computed(() => {
   if (!generatedHTML.value) return '';
 
   // 返回完整的 HTML 文档，确保 JavaScript 可以执行
-  return `
+  const scriptTag = 'script';
+  return (
+    `
 <!DOCTYPE html>
 <html>
 <head>
@@ -526,9 +528,51 @@ const previewHTML = computed(() => {
 </head>
 <body>
   ${generatedHTML.value}
+
+  <${scriptTag}>
+  // 默认的翻页函数（如果 AI 生成的代码中没有定义）
+  if (typeof switchPage === 'undefined') {
+    window.switchPage = function(index) {
+      console.log('Using default switchPage, index:', index);
+
+      const tabs = document.querySelectorAll('.page-tab, button[onclick*="switchPage"]');
+      tabs.forEach((tab, i) => {
+        if (i === index) {
+          tab.classList.add('active');
+        } else {
+          tab.classList.remove('active');
+        }
+      });
+
+      const pages = document.querySelectorAll('.page, [data-page]');
+      pages.forEach((page, i) => {
+        const pageIndex = page.getAttribute('data-page');
+        if (pageIndex !== null) {
+          if (parseInt(pageIndex) === index) {
+            page.classList.add('active');
+            page.style.display = 'block';
+          } else {
+            page.classList.remove('active');
+            page.style.display = 'none';
+          }
+        } else {
+          if (i === index) {
+            page.classList.add('active');
+            page.style.display = 'block';
+          } else {
+            page.classList.remove('active');
+            page.style.display = 'none';
+          }
+        }
+      });
+    };
+  }
+  </` +
+    `${scriptTag}>
 </body>
 </html>
-  `;
+  `
+  );
 });
 
 // 检测变量

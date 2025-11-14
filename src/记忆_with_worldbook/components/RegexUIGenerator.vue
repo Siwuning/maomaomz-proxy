@@ -667,36 +667,31 @@ const generateWithAI = async () => {
   const taskId = taskStore.createTask('ui_generate', `AI 生成翻页状态栏: ${aiPrompt.value.substring(0, 30)}...`);
 
   const scriptTag = 'script';
-  const systemPrompt = `你是一个专业的前端设计师，专门为 SillyTavern 生成翻页状态栏。
+  const systemPrompt = `你是一位顶尖的 UI/UX 设计师，专门为 SillyTavern 创建精美的翻页状态栏。
 
-【输出格式】：
-必须输出一个完整的 HTML 代码块，包含：
-1. <style> 标签内的所有 CSS 样式
-2. HTML 结构（使用 <details> 和 <summary>）
-3. <${scriptTag}> 标签内的翻页 JavaScript 代码
+## 核心要求
+直接输出完整的 HTML 代码，包含 <style>、HTML 结构和 <${scriptTag}> 标签。不要任何解释文字，不要代码块标记。
 
-【HTML 结构要求】：
-<details>
-<summary>状态栏标题</summary>
+## 必须的 HTML 结构
+\`\`\`
+<details open>
+<summary>✨ 状态栏标题</summary>
 <div class="status-container">
   <div class="page-tabs">
-    <button class="page-tab active" onclick="switchPage(0)">页面1</button>
-    <button class="page-tab" onclick="switchPage(1)">页面2</button>
+    <button class="page-tab active" onclick="switchPage(0)">标签1</button>
+    <button class="page-tab" onclick="switchPage(1)">标签2</button>
   </div>
   <div class="page-content">
     <div class="page active" data-page="0">
-      <div>字段1: $1</div>
-      <div>字段2: $2</div>
+      <!-- 字段内容 -->
     </div>
     <div class="page" data-page="1">
-      <div>字段3: $3</div>
-      <div>字段4: $4</div>
+      <!-- 字段内容 -->
     </div>
   </div>
 </div>
 </details>
 
-【JavaScript 要求】：
 <${scriptTag}>
 function switchPage(index) {
   document.querySelectorAll('.page-tab').forEach((tab, i) => {
@@ -707,14 +702,36 @@ function switchPage(index) {
   });
 }
 </${scriptTag}>
+\`\`\`
 
-【关键要求】：
-1. 使用 $1, $2, $3 等占位符表示字段值
-2. 生成 2-4 个页面，每个页面显示不同字段
-3. CSS 样式要富有创意，符合用户需求
-4. 翻页按钮要美观、易用
-5. 直接输出完整的 HTML 代码，不要添加任何解释文字
-6. 不要使用 \`\`\`html 代码块标记`;
+## 设计原则（重要！）
+1. **现代美学**：使用渐变、阴影、圆角、毛玻璃效果
+2. **配色和谐**：主色 + 辅助色 + 中性色，避免纯黑纯白
+3. **视觉层次**：卡片式布局，清晰的间距和对齐
+4. **交互反馈**：悬停效果、过渡动画、激活状态
+5. **图标点缀**：使用 emoji 或 Unicode 符号增加趣味性
+
+## CSS 样式要求
+- summary: 大标题，渐变背景，圆角，阴影，居中对齐
+- .status-container: 卡片容器，背景色，内边距，圆角
+- .page-tabs: 标签栏，flex 布局，间距均匀
+- .page-tab: 按钮样式，圆角，过渡效果，悬停变色
+- .page-tab.active: 激活状态，明显的视觉区分
+- .page-content: 内容区域，适当内边距
+- .page: 隐藏非激活页面 (display: none)
+- .page.active: 显示激活页面 (display: block)
+- 字段显示：使用 flex 或 grid 布局，标签和值分开，对齐美观
+
+## 字段占位符
+使用 $1, $2, $3... 表示动态字段值，生成 8-12 个字段，分布在 2-3 个标签页中。
+
+## 示例配色方案
+- 科技风：深蓝 (#1e293b) + 青色 (#06b6d4) + 紫色 (#8b5cf6)
+- 可爱风：粉色 (#ec4899) + 紫色 (#a855f7) + 橙色 (#f97316)
+- 自然风：绿色 (#10b981) + 青色 (#14b8a6) + 黄色 (#fbbf24)
+- 暗黑风：深灰 (#18181b) + 红色 (#ef4444) + 金色 (#fbbf24)
+
+根据用户需求选择合适的配色和风格，创造视觉冲击力强的设计！`;
 
   try {
     taskStore.updateTaskProgress(taskId, 10, '正在准备...');

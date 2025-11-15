@@ -2446,7 +2446,7 @@
                 <input
                   v-model="pageableTriggerRegex"
                   type="text"
-                  placeholder="<-STATUS->"
+                  placeholder="<-PAGEABLE_STATUS->"
                   style="
                     width: 100%;
                     padding: 10px 12px;
@@ -2719,7 +2719,7 @@ const editingEntryUid = ref<number | null>(null);
 const isDataLoaded = ref(false);
 
 // 翻页状态栏生成器相关
-const pageableTriggerRegex = ref('<-STATUS->');
+const pageableTriggerRegex = ref('<-PAGEABLE_STATUS->');
 const pageableAIPrompt = ref('');
 const isPageableGenerating = ref(false);
 const pageableGeneratedHTML = ref('');
@@ -4615,7 +4615,7 @@ const loadPageableExample = () => {
 
 const clearPageableAll = () => {
   if (confirm('确定要清空所有内容吗？')) {
-    pageableTriggerRegex.value = '<-STATUS->';
+    pageableTriggerRegex.value = '<-PAGEABLE_STATUS->';
     pageableAIPrompt.value = '';
     pageableGeneratedHTML.value = '';
     window.toastr.success('已清空');

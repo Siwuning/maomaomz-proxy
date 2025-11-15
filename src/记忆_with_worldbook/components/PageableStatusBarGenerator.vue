@@ -10,7 +10,7 @@
         border: 1px solid rgba(74, 158, 255, 0.2);
       "
     >
-      <h3 style="color: #4a9eff; margin: 0 0 10px 0; font-size: 20px; font-weight: 600">📖 翻页状态栏生成器</h3>
+      <h3 style="color: #4a9eff; margin: 0 0 10px 0; font-size: 20px; font-weight: 600">翻页状态栏生成器</h3>
       <p style="color: #888; margin: 0; font-size: 14px; line-height: 1.6">
         用 AI 生成可翻页、可交互的多页面状态栏。描述你想要的样式，AI 会为你创造！
       </p>
@@ -56,7 +56,7 @@
           </h4>
           <textarea
             v-model="aiPrompt"
-            placeholder="✨ 描述你想要的翻页状态栏（描述越详细越精美）：&#10;&#10;🎨 风格示例：&#10;• 深色科技风：深灰渐变 #1e293b → #334155，蓝色强调 #3b82f6，发光效果，玻璃态&#10;• 粉色可爱风：粉色渐变 #ec4899 → #f472b6，圆润设计，卡片式布局，柔和动画&#10;• 赛博朋克风：紫色 #8b5cf6 + 霓虹边框，HP/MP 进度条，脉动动画&#10;• 商务简约风：灰蓝渐变 #475569 → #64748b，极简设计，专业配色&#10;&#10;💡 描述要点：&#10;1. 【风格】科技/可爱/游戏/商务/简约等&#10;2. 【配色】具体颜色值（如 #3b82f6）&#10;3. 【布局】标签页位置（顶部/左侧/右侧）&#10;4. 【页面内容】每页显示哪些字段&#10;5. 【特殊效果】渐变/阴影/发光/玻璃态/进度条等&#10;&#10;⚠️ 提示：描述越详细，AI 生成的界面越精美！"
+            placeholder="描述你想要的翻页状态栏（描述越详细越精美）&#10;&#10;风格示例：&#10;• 深色科技风：深灰渐变 #1e293b → #334155，蓝色强调 #3b82f6，发光效果，玻璃态&#10;• 粉色可爱风：粉色渐变 #ec4899 → #f472b6，圆润设计，卡片式布局，柔和动画&#10;• 赛博朋克风：紫色 #8b5cf6 + 霓虹边框，HP/MP 进度条，脉动动画&#10;• 商务简约风：灰蓝渐变 #475569 → #64748b，极简设计，专业配色&#10;&#10;描述要点：&#10;1. 风格 - 科技/可爱/游戏/商务/简约等&#10;2. 配色 - 具体颜色值（如 #3b82f6）&#10;3. 布局 - 标签页位置（顶部/左侧/右侧）&#10;4. 页面内容 - 每页显示哪些字段&#10;5. 特殊效果 - 渐变/阴影/发光/玻璃态/进度条等&#10;&#10;提示：描述越详细，AI 生成的界面越精美"
             :disabled="isGenerating"
             style="
               width: 100%;
@@ -92,7 +92,7 @@
               :class="isGenerating ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-wand-magic-sparkles'"
               style="margin-right: 8px"
             ></i>
-            {{ isGenerating ? '生成中...' : '✨ AI 一键生成' }}
+            {{ isGenerating ? '生成中...' : 'AI 一键生成' }}
           </button>
         </div>
 
@@ -139,41 +139,41 @@
       <!-- 右侧：预览区 -->
       <div
         style="
-          background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+          background: linear-gradient(135deg, #2d2d2d 0%, #242424 100%);
           border-radius: 16px;
-          padding: 20px;
-          border: 2px solid #10b981;
+          padding: 24px;
+          border: 1px solid #3a3a3a;
           display: flex;
           flex-direction: column;
           min-height: 700px;
-          box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
         "
       >
         <div
           style="
-            margin: 0 0 16px 0;
+            margin: 0 0 20px 0;
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%);
-            border-radius: 10px;
-            border: 1px solid rgba(16, 185, 129, 0.3);
+            gap: 12px;
+            padding: 14px 18px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(5, 150, 105, 0.08) 100%);
+            border-radius: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.25);
           "
         >
-          <i class="fa-solid fa-eye" style="color: #10b981; font-size: 18px"></i>
-          <span style="color: #fff; font-size: 16px; font-weight: 700">实时预览</span>
+          <i class="fa-solid fa-eye" style="color: #10b981; font-size: 16px"></i>
+          <span style="color: #e0e0e0; font-size: 15px; font-weight: 600; letter-spacing: 0.3px">实时预览</span>
         </div>
 
         <div
           style="
             flex: 1;
-            background: linear-gradient(135deg, #1e1e1e 0%, #252525 100%);
+            background: #1a1a1a;
             border-radius: 12px;
-            padding: 30px;
+            padding: 24px;
             overflow: auto;
-            border: 2px solid #3a3a3a;
-            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+            border: 1px solid #333;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
           "
         >
           <iframe
@@ -263,161 +263,257 @@ const generateWithAI = async () => {
 
   isGenerating.value = true;
 
-  const systemPrompt = `你是富有创意的前端设计师，为 SillyTavern 生成精美翻页状态栏。
+  const systemPrompt = `你是专业的前端工程师。根据用户需求,生成精美的翻页状态栏 HTML 代码。
 
-# 翻页状态栏
-- 多个页面 + 标签页按钮切换
-- 布局：顶部/左侧/右侧标签页
-- 完全根据用户需求自由创作
+强制要求：禁止使用任何 emoji 符号!包括但不限于: 😀 🎯 💡 ❤️ 等所有 Unicode emoji 字符。所有文字必须使用纯文本,简洁专业。
 
-# 输出格式（单个 HTML 文件）
-\\\`\\\`\\\`html
-<details>
-<summary>✨ 状态栏标题</summary>
+输出要求：直接输出完整的 HTML 代码,不要任何解释文字,不要 Markdown 代码块标记(\\\`\\\`\\\`),直接输出纯 HTML。
+
+---
+
+完整代码示例(必须严格参照):
+
+示例 1:现代简约风格
+
+<details open>
+<summary>角色状态面板</summary>
 <div class="status-container">
-  <!-- 标签页按钮 -->
+<style>
+.status-container {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  max-width: 500px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 250, 252, 0.98) 100%);
+  backdrop-filter: blur(10px);
+  border-radius: 0 0 20px 20px;
+  padding: 28px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+summary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 22px 32px;
+  border-radius: 20px 20px 0 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.5px;
+  user-select: none;
+}
+summary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.35);
+}
+.page-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 14px;
+}
+.page-tab {
+  flex: 1;
+  padding: 12px 18px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+.page-tab:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: #475569;
+}
+.page-tab.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: transparent;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+}
+.page-content {
+  min-height: 280px;
+  position: relative;
+}
+.page {
+  display: none;
+  animation: pageSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.page.active {
+  display: block;
+}
+@keyframes pageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.field-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  margin-bottom: 10px;
+  background: #ffffff;
+  border-radius: 12px;
+  border-left: 4px solid #667eea;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+}
+.field-row:hover {
+  transform: translateX(6px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.12);
+  border-left-color: #764ba2;
+}
+.field-label {
+  font-weight: 600;
+  color: #475569;
+  font-size: 14px;
+}
+.field-value {
+  color: #1e293b;
+  font-size: 14px;
+  font-weight: 600;
+}
+</style>
   <div class="page-tabs">
-    <button class="page-tab active" onclick="switchPage(0)">
-      <i class="fa-solid fa-home"></i> 页面1
-    </button>
-    <button class="page-tab" onclick="switchPage(1)">
-      <i class="fa-solid fa-heart"></i> 页面2
-    </button>
+    <button class="page-tab active" onclick="switchPage(0)">基础信息</button>
+    <button class="page-tab" onclick="switchPage(1)">状态属性</button>
+    <button class="page-tab" onclick="switchPage(2)">关系面板</button>
   </div>
-
-  <!-- 页面内容 -->
   <div class="page-content">
     <div class="page active" data-page="0">
-      <!-- 字段卡片 -->
-      <div class="field-card">
-        <div class="field-label">
-          <i class="fa-solid fa-user"></i> 姓名
-        </div>
-        <div class="field-value">$1</div>
+      <div class="field-row">
+        <span class="field-label">姓名</span>
+        <span class="field-value">$1</span>
       </div>
-      <div class="field-card">
-        <div class="field-label">
-          <i class="fa-solid fa-cake-candles"></i> 年龄
-        </div>
-        <div class="field-value">$2</div>
+      <div class="field-row">
+        <span class="field-label">年龄</span>
+        <span class="field-value">$2</span>
+      </div>
+      <div class="field-row">
+        <span class="field-label">性别</span>
+        <span class="field-value">$3</span>
+      </div>
+      <div class="field-row">
+        <span class="field-label">职业</span>
+        <span class="field-value">$4</span>
       </div>
     </div>
-
-    <div class="page" data-page="1" style="display:none;">
-      <!-- 第2页的字段... -->
+    <div class="page" data-page="1">
+      <div class="field-row">
+        <span class="field-label">生命值</span>
+        <span class="field-value">$5</span>
+      </div>
+      <div class="field-row">
+        <span class="field-label">魔法值</span>
+        <span class="field-value">$6</span>
+      </div>
+      <div class="field-row">
+        <span class="field-label">体力值</span>
+        <span class="field-value">$7</span>
+      </div>
+      <div class="field-row">
+        <span class="field-label">精力值</span>
+        <span class="field-value">$8</span>
+      </div>
+    </div>
+    <div class="page" data-page="2">
+      <div class="field-row">
+        <span class="field-label">好感度</span>
+        <span class="field-value">$9</span>
+      </div>
+      <div class="field-row">
+        <span class="field-label">信任度</span>
+        <span class="field-value">$10</span>
+      </div>
+      <div class="field-row">
+        <span class="field-label">关系状态</span>
+        <span class="field-value">$11</span>
+      </div>
     </div>
   </div>
 </div>
-
-<style>
-/* 容器样式 */
-.status-container {
-  background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
-  border-radius: 20px;
-  padding: 28px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-}
-
-/* 标签页按钮 */
-.page-tab {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 12px;
-  padding: 12px 24px;
-  color: rgba(255,255,255,0.7);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.page-tab:hover {
-  background: linear-gradient(135deg, #3b82f6, #60a5fa);
-  transform: scale(1.05);
-  color: #fff;
-}
-
-.page-tab.active {
-  background: linear-gradient(135deg, #3b82f6, #60a5fa);
-  box-shadow: 0 0 20px rgba(59,130,246,0.6);
-  font-weight: 700;
-  color: #fff;
-}
-
-/* ⚠️ 字段卡片（最重要！） */
-.field-card {
-  background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.08));
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 14px;
-  padding: 18px 22px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  transition: all 0.3s ease;
-}
-
-.field-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
-}
-
-.field-label {
-  font-size: 13px;
-  color: rgba(255,255,255,0.6);
-  margin-bottom: 10px;
-  font-weight: 600;
-}
-
-.field-value {
-  font-size: 17px;
-  color: #fff;
-  font-weight: 500;
-}
-
-/* 页面切换动画 */
-.page {
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.page.active {
-  opacity: 1;
-  transform: translateY(0);
-}
-</style>
-
+</details>
 <script>
 function switchPage(index) {
   document.querySelectorAll('.page-tab').forEach((tab, i) => {
     tab.classList.toggle('active', i === index);
   });
-  document.querySelectorAll('.page').forEach((page, i) => {
-    if (i === index) {
-      page.style.display = 'block';
-      setTimeout(() => {
-        page.classList.add('active');
-      }, 10);
-    } else {
-      page.classList.remove('active');
-      setTimeout(() => {
-        page.style.display = 'none';
-      }, 300);
-    }
+  document.querySelectorAll('.page').forEach((page) => {
+    const pageIndex = parseInt(page.getAttribute('data-page'));
+    page.classList.toggle('active', pageIndex === index);
   });
 }
 </script>
-</details>
-\\\`\\\`\\\`
 
-# 要求
-1. 使用 $1, $2, $3... 占位符
-2. 生成 2-4 个页面
-3. 每个字段必须用 .field-card 包裹
-4. 样式必须精美（渐变+阴影+圆角+动画）
-5. 标签页三态明显（默认/悬停/激活）
-6. 直接输出 HTML（不要 \\\`\\\`\\\`html 标记）
-7. 确保在 <details> 标签内
-8. 必须包含 <style> 和 <script> 标签
+---
 
-⚠️ 核心：每个字段必须用 .field-card 卡片包裹！`;
+生成规则:
+
+参照上述示例,按以下要求生成代码:
+
+1. 必须包含的结构:
+   - <details open> + <summary> 标题
+   - 容器 div(自定义 class 名)
+   - <style> 标签(内联样式)
+   - .page-tabs(标签栏,3-4 个标签)
+   - .page-content(内容区)
+   - 每个 .page 使用 data-page="0/1/2" 标识
+   - <script> 标签实现 switchPage 函数
+
+2. 字段占位符:
+   - 使用 $1, $2, $3... $15 表示动态字段
+   - 生成 10-15 个字段,合理分布在 3 个页面
+   - 字段名简洁专业,不使用 emoji
+
+3. 设计质量:
+   - 多层渐变背景(linear-gradient 至少 2 层)
+   - 精致阴影效果(box-shadow 多层叠加)
+   - 流畅过渡动画(transition 0.3s)
+   - 悬停交互反馈(hover 效果)
+   - 页面切换动画(@keyframes)
+   - 统一圆角(border-radius 12px-20px)
+
+4. 配色协调:
+   - 根据用户需求选择主题色
+   - 背景使用半透明渐变
+   - 文字对比度足够
+   - 激活状态明显高亮
+
+5. 代码质量:
+   - CSS 类名语义化
+   - 样式集中在 <style> 内
+   - JavaScript 简洁高效
+   - 完整可运行,无需外部依赖
+
+---
+
+再次强调:
+严格禁止使用 emoji! 包括:
+- 标签按钮文字: 使用"基础信息"而非"基础信息"
+- 字段标签: 使用"姓名"而非"姓名"
+- summary 标题: 使用纯文字,不要任何表情符号
+
+违反此规则将视为失败!
+
+---
+
+现在,根据用户的需求,直接生成一个完整的 HTML 代码。不要任何解释`;
 
   try {
     const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
@@ -428,17 +524,18 @@ function switchPage(index) {
         { role: 'system', content: systemPrompt },
         {
           role: 'user',
-          content: `🎨 用户需求：
+          content: `用户需求：
 ${aiPrompt.value.trim()}
 
-📋 任务：
-根据以上需求，创造一个**令人惊艳、极致精美**的翻页状态栏！
+任务：
+根据以上需求，创造一个令人惊艳、极致精美的翻页状态栏。
 
-⚠️ 核心要求：
+核心要求：
 1. 完全按照用户需求自由设计，不要套模板
 2. 字段项必须是精美卡片，禁止简单文本行
 3. 必须使用渐变、阴影、圆角、动画等现代元素
 4. 标签页三态（默认/悬停/激活）必须明显区分
+5. 不要在生成的界面中使用任何 emoji 表情符号
 
 现在直接输出完整的 HTML 代码（不要添加解释）：`,
         },
@@ -475,7 +572,7 @@ ${aiPrompt.value.trim()}
     const detailsMatch = content.match(/<details[\s\S]*?<\/details>/i);
     if (detailsMatch) {
       generatedHTML.value = detailsMatch[0];
-      (window as any).toastr?.success('✨ AI 生成成功！');
+      (window as any).toastr?.success('AI 生成成功');
     } else {
       // 如果没有 <details>，尝试提取整个 HTML
       generatedHTML.value = content;
@@ -526,7 +623,7 @@ const exportRegex = () => {
   a.click();
   URL.revokeObjectURL(url);
 
-  (window as any).toastr?.success('✅ 正则已导出');
+  (window as any).toastr?.success('正则已导出');
 };
 
 // 清空所有

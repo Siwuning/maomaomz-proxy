@@ -28,7 +28,7 @@
           <input
             v-model="triggerRegex"
             type="text"
-            placeholder="<-STATUS->"
+            placeholder="<-PAGEABLE_STATUS->"
             style="
               width: 100%;
               padding: 10px 12px;
@@ -214,7 +214,7 @@ const settingsStore = useSettingsStore();
 const { settings } = storeToRefs(settingsStore);
 
 // 状态
-const triggerRegex = ref('<-STATUS->');
+const triggerRegex = ref('<-PAGEABLE_STATUS->');
 const aiPrompt = ref('');
 const isGenerating = ref(false);
 const generatedHTML = ref('');
@@ -424,7 +424,7 @@ const exportRegex = () => {
 // 清空所有
 const clearAll = () => {
   if (confirm('确定要清空所有内容吗？')) {
-    triggerRegex.value = '<-STATUS->';
+    triggerRegex.value = '<-PAGEABLE_STATUS->';
     aiPrompt.value = '';
     generatedHTML.value = '';
     (window as any).toastr?.success('已清空');

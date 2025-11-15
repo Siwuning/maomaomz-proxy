@@ -1874,7 +1874,7 @@ function exportAsWorldbook() {
   const worldbookEntries = [
     {
       uid: generateUID(),
-      key: [],
+      key: ['InitVar'],
       keysecondary: [],
       comment: '[InitVar]',
       content: generatedStructure.value,
@@ -1906,7 +1906,7 @@ function exportAsWorldbook() {
     },
     {
       uid: generateUID(),
-      key: [],
+      key: [varNameParsed],
       keysecondary: [],
       comment: '变量',
       content: generatedPrompt.value,

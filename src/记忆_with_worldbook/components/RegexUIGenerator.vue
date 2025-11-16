@@ -819,30 +819,29 @@ const worldbookContent = computed(() => {
 
   const uniqueFields = [...new Set(matches.map(m => m.slice(2, -2)))];
 
-  // 生成状态栏规则 - 使用 {{字段名}} 格式
+  // 生成状态栏规则 - 添加触发标记
+  const triggerMark = triggerRegex.value; // 使用触发正则作为标记
+
   const statusRule = `<status_rule>
-每一次回复必须在开头包含以下格式的状态栏，实时更新{{char}}的状态：
+#每一次回复都必须在末尾加上完整的状态栏，实时更新{{char}}的状态。
 
 ##状态栏格式：
 <status>
+${triggerMark}
 ${uniqueFields.map(field => `{{${field}}}`).join('\n')}
 </status>
 
 ##字段说明
-${uniqueFields.map(field => `- ${field}：描述${field}当前的值`).join('\n')}
+${uniqueFields.map(field => `  - ${field}：描述${field}当前的值`).join('\n')}
 
-##重要提示
-- 翻页状态栏中的 {{字段名}} 会被自动替换为对应的值
-- 你只需要在 <status> 标签中按照上述格式提供字段值即可
-</status_rule>`;
-
-  // 生成示例状态
-  const exampleStatus = `
+##输出示例
+此处仅为格式示例，具体内容需根据剧情填写
 <status>
+${triggerMark}
 ${uniqueFields
   .map(field => {
     let example = '[具体值]';
-    if (field.includes('姓名') || field.includes('名字')) example = '张三';
+    if (field.includes('姓名') || field.includes('名字')) example = '{{char}}';
     else if (field.includes('年龄')) example = '25';
     else if (field.includes('HP') || field.includes('生命')) example = '100/100';
     else if (field.includes('MP') || field.includes('魔法')) example = '80/100';
@@ -850,9 +849,26 @@ ${uniqueFields
     return `{{${field}}}${example}`;
   })
   .join('\n')}
-</status>`;
+</status>
 
-  return `${statusRule}\n\n##示例${exampleStatus}`;
+##格式要求（必读）：
+1. **必须包含 <status> 标签和触发标记**：
+   - ✅ 开头：<status>
+   - ✅ 第一行：${triggerMark}
+   - ✅ 结尾：</status>
+
+2. **严格按照上述示例格式输出**：
+   - 每个字段必须独占一行
+   - 格式：{{字段名}}字段值（无空格）
+   - 不要改变行数、不要合并行、不要调换顺序
+
+3. **其他要求**：
+   - 状态栏紧贴正文最后一句
+   - {{字段名}} 仅为占位符，输出时替换为实际内容
+   - 这是 {{char}} 的状态，不是 {{user}} 的状态
+</status_rule>`;
+
+  return statusRule;
 });
 
 // AI 生成

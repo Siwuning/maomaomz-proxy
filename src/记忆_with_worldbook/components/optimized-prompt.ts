@@ -148,51 +148,51 @@ summary:hover {
     <div class="page active" data-page="0">
       <div class="field-row">
         <span class="field-label">姓名</span>
-        <span class="field-value">$1</span>
+        <span class="field-value">{{姓名}}</span>
       </div>
       <div class="field-row">
         <span class="field-label">年龄</span>
-        <span class="field-value">$2</span>
+        <span class="field-value">{{年龄}}</span>
       </div>
       <div class="field-row">
         <span class="field-label">性别</span>
-        <span class="field-value">$3</span>
+        <span class="field-value">{{性别}}</span>
       </div>
       <div class="field-row">
         <span class="field-label">职业</span>
-        <span class="field-value">$4</span>
+        <span class="field-value">{{职业}}</span>
       </div>
     </div>
     <div class="page" data-page="1">
       <div class="field-row">
         <span class="field-label">生命值</span>
-        <span class="field-value">$5</span>
+        <span class="field-value">{{生命值}}</span>
       </div>
       <div class="field-row">
         <span class="field-label">魔法值</span>
-        <span class="field-value">$6</span>
+        <span class="field-value">{{魔法值}}</span>
       </div>
       <div class="field-row">
         <span class="field-label">体力值</span>
-        <span class="field-value">$7</span>
+        <span class="field-value">{{体力值}}</span>
       </div>
       <div class="field-row">
         <span class="field-label">精力值</span>
-        <span class="field-value">$8</span>
+        <span class="field-value">{{精力值}}</span>
       </div>
     </div>
     <div class="page" data-page="2">
       <div class="field-row">
         <span class="field-label">好感度</span>
-        <span class="field-value">$9</span>
+        <span class="field-value">{{好感度}}</span>
       </div>
       <div class="field-row">
         <span class="field-label">信任度</span>
-        <span class="field-value">$10</span>
+        <span class="field-value">{{信任度}}</span>
       </div>
       <div class="field-row">
         <span class="field-label">关系状态</span>
-        <span class="field-value">$11</span>
+        <span class="field-value">{{关系状态}}</span>
       </div>
     </div>
   </div>
@@ -335,47 +335,47 @@ summary:hover {
     <div class="page active" data-page="0">
       <div class="field-row">
         <span class="field-label">姓名</span>
-        <span class="field-value">$1</span>
+        <span class="field-value">{{姓名}}</span>
       </div>
       <div class="field-row">
         <span class="field-label">编号</span>
-        <span class="field-value">$2</span>
+        <span class="field-value">{{编号}}</span>
       </div>
       <div class="field-row">
         <span class="field-label">类型</span>
-        <span class="field-value">$3</span>
+        <span class="field-value">{{类型}}</span>
       </div>
       <div class="field-row">
         <span class="field-label">等级</span>
-        <span class="field-value">$4</span>
+        <span class="field-value">{{等级}}</span>
       </div>
     </div>
     <div class="page" data-page="1">
       <div class="field-row">
         <span class="field-label">生命值</span>
-        <span class="field-value">$5</span>
+        <span class="field-value">{{生命值}}</span>
       </div>
       <div class="field-row">
         <span class="field-label">能量值</span>
-        <span class="field-value">$6</span>
+        <span class="field-value">{{能量值}}</span>
       </div>
       <div class="field-row">
         <span class="field-label">攻击力</span>
-        <span class="field-value">$7</span>
+        <span class="field-value">{{攻击力}}</span>
       </div>
       <div class="field-row">
         <span class="field-label">速度</span>
-        <span class="field-value">$8</span>
+        <span class="field-value">{{速度}}</span>
       </div>
     </div>
     <div class="page" data-page="2">
       <div class="field-row">
         <span class="field-label">信任度</span>
-        <span class="field-value">$9</span>
+        <span class="field-value">{{信任度}}</span>
       </div>
       <div class="field-row">
         <span class="field-label">当前状态</span>
-        <span class="field-value">$10</span>
+        <span class="field-value">{{当前状态}}</span>
       </div>
     </div>
   </div>
@@ -409,23 +409,26 @@ function switchPage(index) {
    - **<${scriptTag}> 标签实现 switchPage 函数（这是必须的！否则翻页功能无法工作）**
 
 2. **字段占位符**:
-   - 使用 $1, $2, $3... $15 表示动态字段
-   - 生成 10-15 个字段,合理分布在 3 个页面
-   - 字段名简洁专业,不使用 emoji
+   - **根据用户描述的字段需求，智能生成对应数量的占位符**
+   - 使用 {{字段名}} 格式，例如：{{姓名}}、{{年龄}}、{{HP}}
+   - 合理分布在 3 个页面
+   - 字段名简洁专业，不使用 emoji
+   - **如果用户没有指定字段，则生成通用字段：基础信息、状态属性、关系信息等**
 
 3. **设计质量**:
-   - 多层渐变背景(linear-gradient 至少 2 层)
-   - 精致阴影效果(box-shadow 多层叠加)
-   - 流畅过渡动画(transition 0.3s)
+   - 根据用户需求选择样式风格（可以使用渐变，也可以纯色）
+   - **避免过度使用渐变色，优先考虑简洁清爽的设计**
+   - 适度的阴影效果
+   - 流畅过渡动画(transition)
    - 悬停交互反馈(hover 效果)
    - 页面切换动画(@keyframes)
-   - 统一圆角(border-radius 12px-20px)
+   - 统一圆角(border-radius)
 
 4. **配色协调**:
    - 根据用户需求选择主题色
-   - 背景使用半透明渐变
    - 文字对比度足够
    - 激活状态明显高亮
+   - **整体风格清爽、现代、不花哨**
 
 5. **代码质量**:
    - CSS 类名语义化

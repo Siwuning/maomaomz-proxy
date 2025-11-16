@@ -60,12 +60,7 @@
             <i class="fa-solid fa-code" style="color: #10b981"></i>
             触发正则
           </h4>
-          <input
-            v-model="triggerRegex"
-            type="text"
-            placeholder="/【界面】/g"
-            class="regex-input"
-          />
+          <input v-model="triggerRegex" type="text" placeholder="/【界面】/g" class="regex-input" />
         </div>
 
         <div v-if="isModifyMode" class="modify-tips">

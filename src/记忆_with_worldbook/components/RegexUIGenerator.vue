@@ -968,7 +968,10 @@ const exportRegex = () => {
   // 构建 replaceString - 将 {{字段名}} 替换为 $1, $2...
   let replaceString = generatedHTML.value;
   uniqueFields.forEach((field, index) => {
-    replaceString = replaceString.replace(new RegExp(`\\{\\{${field.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\}\\}`, 'g'), `$${index + 1}`);
+    replaceString = replaceString.replace(
+      new RegExp(`\\{\\{${field.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\}\\}`, 'g'),
+      `$${index + 1}`,
+    );
   });
 
   const uuid = `regex-pageable-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;

@@ -2367,6 +2367,61 @@
         </div>
       </div>
     </div>
+
+    <!-- 前端界面生成器 -->
+    <div class="tool-section">
+      <div
+        class="section-header"
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 15px 20px;
+          background: linear-gradient(
+            135deg,
+            rgba(30, 30, 30, 0.95) 0%,
+            rgba(38, 38, 38, 0.9) 50%,
+            rgba(30, 30, 30, 0.95) 100%
+          );
+          backdrop-filter: blur(12px);
+          border-radius: 12px;
+          margin-bottom: 15px;
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          box-shadow:
+            0 3px 12px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.04),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+          cursor: pointer;
+          transition: all 0.3s ease;
+        "
+        @click="toggleToolExpanded('uiGenerator')"
+        @mouseenter="(e: any) => (e.currentTarget.style.transform = 'translateY(-1px)')"
+        @mouseleave="(e: any) => (e.currentTarget.style.transform = 'translateY(0)')"
+      >
+        <h4
+          style="
+            margin: 0;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          "
+        >
+          <i class="fa-solid fa-palette" style="color: #4a9eff; font-size: 18px"></i>
+          前端界面生成器
+        </h4>
+        <i
+          :class="isToolExpanded('uiGenerator') ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'"
+          style="color: #ccc; transition: transform 0.3s ease; font-size: 14px"
+        ></i>
+      </div>
+
+      <div v-if="isToolExpanded('uiGenerator')" class="tool-content">
+        <UIGenerator />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -2376,6 +2431,7 @@ import { storeToRefs } from 'pinia';
 import { onBeforeUnmount, onMounted, ref, Ref, watch } from 'vue';
 import { detectApiProvider, filterApiParams, normalizeApiEndpoint, useSettingsStore } from '../settings';
 import { copyToClipboard, getScriptIdSafe } from '../utils';
+import UIGenerator from './UIGenerator.vue';
 
 const settingsStore = useSettingsStore();
 const { settings } = storeToRefs(settingsStore);

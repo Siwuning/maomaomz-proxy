@@ -495,26 +495,14 @@ const exportRegex = () => {
     return;
   }
 
-  // 解析用户输入的正则表达式格式
-  let findRegex = triggerRegex.value;
-
-  // 如果是 /pattern/flags 格式，提取 pattern
-  const regexMatch = triggerRegex.value.match(/^\/(.+?)\/([gimuy]*)$/);
-  if (regexMatch) {
-    // 用户输入的是正则格式，直接使用 pattern 部分
-    findRegex = regexMatch[1];
-  } else {
-    // 用户输入的是普通字符串，需要转义
-    findRegex = triggerRegex.value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  }
-
   const uuid = `regex-ui-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
+  // 直接使用用户输入的完整正则表达式（包括 / 和 flags）
   const regexData = {
     id: uuid,
     scriptName: '前端界面',
-    findRegex: findRegex,
-    replaceString: generatedCode.value,
+    findRegex: triggerRegex.value, // 保持完整格式，如 /【界面】/g
+    replaceString: '```\n' + generatedCode.value + '\n```', // 添加反引号包裹
     trimStrings: [],
     placement: [2],
     disabled: false,

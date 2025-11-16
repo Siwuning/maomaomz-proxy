@@ -859,12 +859,19 @@ ${uniqueFields
 
 2. **严格按照上述示例格式输出**：
    - 每个字段必须独占一行
-   - 格式：{{字段名}}字段值（无空格）
+   - ❌ 错误：姓名：张三
+   - ✅ 正确：{{姓名}}张三
+   - 格式必须是：{{字段名}}字段值（{{字段名}}不能省略！）
    - 不要改变行数、不要合并行、不要调换顺序
 
-3. **其他要求**：
+3. **字段值格式**：
+   - ❌ 错误：姓名：张三（有冒号和字段名）
+   - ✅ 正确：{{姓名}}张三（只有占位符和值）
+   - 必须保留 {{字段名}} 占位符
+
+4. **其他要求**：
    - 状态栏紧贴正文最后一句
-   - {{字段名}} 仅为占位符，输出时替换为实际内容
+   - {{字段名}} 是必须的，不能省略
    - 这是 {{char}} 的状态，不是 {{user}} 的状态
 </status_rule>`;
 
@@ -1032,43 +1039,85 @@ const exportWorldbookEntry = () => {
     return;
   }
 
-  // 生成字段说明
+  // 生成字段定义（类似普通状态栏）
   const fieldNames = ['姓名', '年龄', '性别', '职业', 'HP', 'MP', '体力', '精力', '好感度', '信任度', '魅力', '智力'];
-  const fields = detectedVariables.value
+  const fieldDefinitions = detectedVariables.value
     .map((num, index) => {
       const fieldName = fieldNames[index] || `字段${num}`;
-      return `字段${num}: [${fieldName}的值]`;
+      return `  - ${fieldName}：描述{{char}}的${fieldName}状态`;
     })
     .join('\n');
 
-  // 生成世界书条目内容
-  const entryContent = `# 角色状态栏数据
+  // 生成格式示例和输出示例（翻页状态栏格式）
+  const triggerMark = triggerRegex.value;
+  const uniqueFields = detectedVariables.value.map((num, index) => {
+    return fieldNames[index] || `字段${num}`;
+  });
 
-${fields}
+  const formatExample = `${triggerMark}
+${uniqueFields.map(field => `{{${field}}}`).join('\n')}`;
 
----
+  const exampleOutput = `${triggerMark}
+${uniqueFields
+  .map(field => {
+    let example = '[具体值]';
+    if (field.includes('姓名') || field.includes('名字')) example = '{{char}}';
+    else if (field.includes('年龄')) example = '25';
+    else if (field.includes('HP') || field.includes('生命')) example = '100/100';
+    else if (field.includes('MP') || field.includes('魔法')) example = '80/100';
+    else if (field.includes('好感')) example = '88/100';
+    return `{{${field}}}${example}`;
+  })
+  .join('\n')}`;
 
-## 使用说明
-1. 将上面的字段值替换为实际内容
-2. 在聊天中输入 ${triggerRegex.value} 触发状态栏
-3. 状态栏会自动显示这些字段的值
+  // 生成世界书条目内容（参考普通状态栏的格式）
+  const entryContent = `<status_rule>
+#每一次回复都必须在末尾加上完整的状态栏，实时更新{{char}}的状态。
 
-## 示例
-字段1: 张三
-字段2: 25
-字段3: 男
-字段4: 冒险者
+##状态栏格式：
+<status>
+${formatExample}
+</status>
 
-## 动态更新
-AI 可以在回复中更新这些值：
-字段1: 新的值`;
+##字段说明
+${fieldDefinitions}
+
+##输出示例
+此处仅为格式示例，具体内容需根据剧情填写
+<status>
+${exampleOutput}
+</status>
+
+##格式要求（必读）：
+1. **必须包含 <status> 标签和触发标记**：
+   - ✅ 开头：<status>
+   - ✅ 第一行：${triggerMark}
+   - ✅ 结尾：</status>
+
+2. **严格按照上述示例格式输出**：
+   - 每个字段必须独占一行
+   - ❌ 错误：姓名：张三
+   - ✅ 正确：{{姓名}}张三
+   - 格式必须是：{{字段名}}字段值（{{字段名}}不能省略！）
+   - 不要改变行数、不要合并行、不要调换顺序
+
+3. **字段值格式**：
+   - ❌ 错误：姓名：张三（有冒号和字段名）
+   - ✅ 正确：{{姓名}}张三（只有占位符和值）
+   - 必须保留 {{字段名}} 占位符
+
+4. **其他要求**：
+   - 状态栏紧贴正文最后一句
+   - {{字段名}} 是必须的，不能省略
+   - 这是 {{char}} 的状态，不是 {{user}} 的状态
+</status_rule>`;
 
   // 创建世界书条目 JSON
   const worldbookEntry = {
     uid: Date.now(),
-    key: [triggerRegex.value.replace(/[<>-]/g, '')],
+    key: [triggerRegex.value],  // 保留完整的触发标记
     keysecondary: [],
-    comment: '翻页状态栏数据',
+    comment: '翻页状态栏',
     content: entryContent,
     constant: false,
     selective: true,
@@ -1104,7 +1153,7 @@ AI 可以在回复中更新这些值：
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'statusbar-worldbook-entry.json';
+  a.download = 'pageable-statusbar-worldbook-entry.json';
   a.click();
   URL.revokeObjectURL(url);
 

@@ -65,12 +65,15 @@ summary:hover {
   color: #6b7280;
   cursor: pointer;
   transition: all 0.2s ease;
+  text-align: center;
 }
 .page-tab:hover {
   color: #374151;
   background: rgba(255, 255, 255, 0.5);
 }
-.page-tab.active {
+#page0:checked ~ .page-tabs label[for="page0"],
+#page1:checked ~ .page-tabs label[for="page1"],
+#page2:checked ~ .page-tabs label[for="page2"] {
   background: #3b82f6;
   color: white;
 }
@@ -82,9 +85,6 @@ summary:hover {
   display: none;
   animation: pageFadeIn 0.3s ease;
 }
-.page.active {
-  display: block;
-}
 @keyframes pageFadeIn {
   from {
     opacity: 0;
@@ -95,6 +95,9 @@ summary:hover {
     transform: translateY(0);
   }
 }
+#page0:checked ~ .page-content .page-0 { display: block; }
+#page1:checked ~ .page-content .page-1 { display: block; }
+#page2:checked ~ .page-content .page-2 { display: block; }
 .field-row {
   display: flex;
   align-items: center;
@@ -120,32 +123,17 @@ summary:hover {
   font-size: 14px;
   font-weight: 600;
 }
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  transition: all 0.3s ease;
-}
-.field-row:hover {
-  transform: translateX(6px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.12);
-  border-left-color: #764ba2;
-}
-.field-label {
-  font-weight: 600;
-  color: #475569;
-  font-size: 14px;
-}
-.field-value {
-  color: #1e293b;
-  font-size: 14px;
-  font-weight: 600;
-}
 </style>
+  <input type="radio" name="status-page" id="page0" checked style="display:none">
+  <input type="radio" name="status-page" id="page1" style="display:none">
+  <input type="radio" name="status-page" id="page2" style="display:none">
   <div class="page-tabs">
-    <button class="page-tab active" onclick="let container=this.closest('details')||this.closest('div');let tabs=container.querySelectorAll('.page-tab');tabs.forEach((t,i)=>t.classList.toggle('active',i===0));let pages=container.querySelectorAll('.page');pages.forEach(p=>p.classList.toggle('active',p.getAttribute('data-page')==='0'))">基础信息</button>
-    <button class="page-tab" onclick="let container=this.closest('details')||this.closest('div');let tabs=container.querySelectorAll('.page-tab');tabs.forEach((t,i)=>t.classList.toggle('active',i===1));let pages=container.querySelectorAll('.page');pages.forEach(p=>p.classList.toggle('active',p.getAttribute('data-page')==='1'))">状态属性</button>
-    <button class="page-tab" onclick="let container=this.closest('details')||this.closest('div');let tabs=container.querySelectorAll('.page-tab');tabs.forEach((t,i)=>t.classList.toggle('active',i===2));let pages=container.querySelectorAll('.page');pages.forEach(p=>p.classList.toggle('active',p.getAttribute('data-page')==='2'))">关系面板</button>
+    <label for="page0" class="page-tab">基础信息</label>
+    <label for="page1" class="page-tab">状态属性</label>
+    <label for="page2" class="page-tab">关系面板</label>
   </div>
   <div class="page-content">
-    <div class="page active" data-page="0">
+    <div class="page page-0">
       <div class="field-row">
         <span class="field-label">姓名</span>
         <span class="field-value">{{姓名}}</span>
@@ -163,7 +151,7 @@ summary:hover {
         <span class="field-value">{{职业}}</span>
       </div>
     </div>
-    <div class="page" data-page="1">
+    <div class="page page-1">
       <div class="field-row">
         <span class="field-label">生命值</span>
         <span class="field-value">{{生命值}}</span>
@@ -181,7 +169,7 @@ summary:hover {
         <span class="field-value">{{精力值}}</span>
       </div>
     </div>
-    <div class="page" data-page="2">
+    <div class="page page-2">
       <div class="field-row">
         <span class="field-label">好感度</span>
         <span class="field-value">{{好感度}}</span>
@@ -253,14 +241,17 @@ summary:hover {
   color: #9ca3af;
   cursor: pointer;
   transition: all 0.3s ease;
+  text-align: center;
 }
 .page-tab:hover {
   color: #e5e7eb;
   background: rgba(55, 65, 81, 0.8);
   border-color: rgba(255, 255, 255, 0.15);
 }
-.page-tab.active {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+#dark-page0:checked ~ .page-tabs label[for="dark-page0"],
+#dark-page1:checked ~ .page-tabs label[for="dark-page1"],
+#dark-page2:checked ~ .page-tabs label[for="dark-page2"] {
+  background: #3b82f6;
   color: white;
   border-color: transparent;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
@@ -272,9 +263,6 @@ summary:hover {
   display: none;
   animation: darkFadeIn 0.4s ease;
 }
-.page.active {
-  display: block;
-}
 @keyframes darkFadeIn {
   from {
     opacity: 0;
@@ -285,6 +273,9 @@ summary:hover {
     transform: translateY(0);
   }
 }
+#dark-page0:checked ~ .page-content .page-0 { display: block; }
+#dark-page1:checked ~ .page-content .page-1 { display: block; }
+#dark-page2:checked ~ .page-content .page-2 { display: block; }
 .field-row {
   display: flex;
   align-items: center;
@@ -315,13 +306,16 @@ summary:hover {
   font-weight: 600;
 }
 </style>
+  <input type="radio" name="dark-status-page" id="dark-page0" checked style="display:none">
+  <input type="radio" name="dark-status-page" id="dark-page1" style="display:none">
+  <input type="radio" name="dark-status-page" id="dark-page2" style="display:none">
   <div class="page-tabs">
-    <button class="page-tab active" onclick="let container=this.closest('details')||this.closest('div');let tabs=container.querySelectorAll('.page-tab');tabs.forEach((t,i)=>t.classList.toggle('active',i===0));let pages=container.querySelectorAll('.page');pages.forEach(p=>p.classList.toggle('active',p.getAttribute('data-page')==='0'))">基础数据</button>
-    <button class="page-tab" onclick="let container=this.closest('details')||this.closest('div');let tabs=container.querySelectorAll('.page-tab');tabs.forEach((t,i)=>t.classList.toggle('active',i===1));let pages=container.querySelectorAll('.page');pages.forEach(p=>p.classList.toggle('active',p.getAttribute('data-page')==='1'))">属性状态</button>
-    <button class="page-tab" onclick="let container=this.closest('details')||this.closest('div');let tabs=container.querySelectorAll('.page-tab');tabs.forEach((t,i)=>t.classList.toggle('active',i===2));let pages=container.querySelectorAll('.page');pages.forEach(p=>p.classList.toggle('active',p.getAttribute('data-page')==='2'))">关系信息</button>
+    <label for="dark-page0" class="page-tab">基础数据</label>
+    <label for="dark-page1" class="page-tab">属性状态</label>
+    <label for="dark-page2" class="page-tab">关系信息</label>
   </div>
   <div class="page-content">
-    <div class="page active" data-page="0">
+    <div class="page page-0">
       <div class="field-row">
         <span class="field-label">姓名</span>
         <span class="field-value">{{姓名}}</span>
@@ -339,7 +333,7 @@ summary:hover {
         <span class="field-value">{{等级}}</span>
       </div>
     </div>
-    <div class="page" data-page="1">
+    <div class="page page-1">
       <div class="field-row">
         <span class="field-label">生命值</span>
         <span class="field-value">{{生命值}}</span>
@@ -357,7 +351,7 @@ summary:hover {
         <span class="field-value">{{速度}}</span>
       </div>
     </div>
-    <div class="page" data-page="2">
+    <div class="page page-2">
       <div class="field-row">
         <span class="field-label">信任度</span>
         <span class="field-value">{{信任度}}</span>
@@ -381,10 +375,11 @@ summary:hover {
    - <details open> + <summary> 标题
    - 容器 div(自定义 class 名)
    - <style> 标签(内联样式)
-   - .page-tabs(标签栏,3-4 个标签)
+   - **隐藏的 radio 输入（用于纯 CSS 切换）**
+   - .page-tabs(使用 label 标签，关联 radio)
    - .page-content(内容区)
-   - 每个 .page 使用 data-page="0/1/2" 标识
-   - **按钮必须使用内联 onclick，不要使用独立的 <${scriptTag}> 标签！**
+   - 每个 .page 使用类名 page-0, page-1, page-2
+   - **使用 CSS :checked 伪类控制显示，不要使用 JavaScript！**
 
 2. **字段占位符**:
    - **根据用户描述的字段需求，智能生成对应数量的占位符**
@@ -411,8 +406,8 @@ summary:hover {
 5. **代码质量**:
    - CSS 类名语义化
    - 样式集中在 <style> 内
-   - **必须使用内联 onclick 事件，参考示例代码**
-   - 使用 this.closest() 定位容器，确保在任何环境都能工作
+   - **完全使用纯 CSS 实现翻页，不依赖 JavaScript**
+   - 使用 radio + label + :checked 伪类
    - 完整可运行,无需外部依赖
 
 ---
@@ -428,18 +423,38 @@ summary:hover {
 ---
 
 ## ⚠️ 关键提醒：翻页功能实现方式
-**SillyTavern 会过滤 <${scriptTag}> 标签，必须使用内联 JavaScript！**
+**SillyTavern 可能禁用 JavaScript，必须使用纯 CSS 实现翻页！**
 
-### 正确的按钮写法（必须严格遵循）：
-<button class="page-tab active" onclick="let container=this.closest('details')||this.closest('div');let tabs=container.querySelectorAll('.page-tab');tabs.forEach((t,i)=>t.classList.toggle('active',i===0));let pages=container.querySelectorAll('.page');pages.forEach(p=>p.classList.toggle('active',p.getAttribute('data-page')==='0'))">第1页</button>
+### 正确的实现方式（使用 radio + CSS）：
 
-### 关键点：
-1. 使用 this.closest() 找到最近的 details 或 div 容器
-2. 在容器内用 querySelectorAll 查找元素
-3. 使用 getAttribute('data-page') 而非 dataset.page
-4. 每个按钮都是独立的，不依赖外部函数
+**HTML 结构：**
+<input type="radio" name="page-switch" id="page0" checked style="display:none">
+<input type="radio" name="page-switch" id="page1" style="display:none">
+<input type="radio" name="page-switch" id="page2" style="display:none">
 
-**不要使用 <${scriptTag}> 标签定义 switchPage 函数！**
+<div class="page-tabs">
+  <label for="page0" class="page-tab">基础信息</label>
+  <label for="page1" class="page-tab">状态属性</label>
+  <label for="page2" class="page-tab">关系面板</label>
+</div>
+
+<div class="page-content">
+  <div class="page page-0">内容1</div>
+  <div class="page page-1">内容2</div>
+  <div class="page page-2">内容3</div>
+</div>
+
+**CSS 样式：**
+.page { display: none; }
+#page0:checked ~ .page-content .page-0 { display: block; }
+#page1:checked ~ .page-content .page-1 { display: block; }
+#page2:checked ~ .page-content .page-2 { display: block; }
+
+#page0:checked ~ .page-tabs label[for="page0"] { /* 激活样式 */ }
+#page1:checked ~ .page-tabs label[for="page1"] { /* 激活样式 */ }
+#page2:checked ~ .page-tabs label[for="page2"] { /* 激活样式 */ }
+
+**不要使用任何 JavaScript！完全使用 CSS 实现！**
 
 ---
 

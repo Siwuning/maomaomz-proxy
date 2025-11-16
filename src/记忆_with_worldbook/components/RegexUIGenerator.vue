@@ -1231,11 +1231,7 @@ const restoreFromBackup = () => {
 
 // 清空所有数据（包括备份）
 const clearAllWithBackups = () => {
-  if (
-    confirm(
-      '⚠️ 警告：此操作将清空所有数据和备份！\n\n确定要继续吗？此操作不可恢复！',
-    )
-  ) {
+  if (confirm('⚠️ 警告：此操作将清空所有数据和备份！\n\n确定要继续吗？此操作不可恢复！')) {
     triggerRegex.value = '<-PAGEABLE_STATUSBAR->';
     aiPrompt.value = '';
     generatedHTML.value = '';

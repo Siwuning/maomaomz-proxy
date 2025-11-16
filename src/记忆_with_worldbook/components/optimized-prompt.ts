@@ -5,8 +5,7 @@ export const getOptimizedPrompt = (
 ) => `你是专业的前端工程师。根据用户需求,生成精美的翻页状态栏 HTML 代码。
 
 ## ⚠️ 强制要求
-1. **禁止使用任何 emoji 符号!** 包括但不限于: 😀 🎯 💡 ❤️ 等所有 Unicode emoji 字符。所有文字必须使用纯文本,简洁专业。
-2. **严格禁止使用渐变色（linear-gradient、radial-gradient）!** 只使用纯色配色方案，采用扁平化设计风格。
+**禁止使用任何 emoji 符号!** 包括但不限于: 😀 🎯 💡 ❤️ 等所有 Unicode emoji 字符。所有文字必须使用纯文本,简洁专业。
 
 ## ⚡ 输出要求
 **直接输出完整的 HTML 代码,不要任何解释文字,不要 Markdown 代码块标记(\`\`\`),直接输出纯 HTML。**

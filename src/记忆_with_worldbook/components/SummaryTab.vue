@@ -753,7 +753,7 @@ const bindToWorldbook = async (content: string, summaryIndex: number) => {
       uid: Date.now(),
     };
 
-    await (window as any).TavernHelper.createWorldbookEntries(selectedWorldbook, [newEntry]);
+    await (window as any).TavernHelper.createWorldbookEntries(selectedWorldbook, [newEntry], { render: 'immediate' });
     window.toastr.success(`总结已绑定到世界书: ${selectedWorldbook}`);
   } catch (error) {
     console.error('绑定到世界书失败:', error);

@@ -159,6 +159,7 @@ import SettingsTab from './SettingsTab.vue';
 import StatusBarGenerator from './StatusBarGenerator.vue';
 import SummaryTab from './SummaryTab.vue';
 import TableTab from './TableTab.vue';
+import TokenStatsTab from './TokenStatsTab.vue';
 import ToolsTab from './ToolsTab.vue';
 
 // 标签页配置
@@ -172,6 +173,7 @@ const tabs = [
   { key: 'status', label: '状态栏生成', icon: 'fa-solid fa-chart-bar' },
   { key: 'project', label: '前端项目', icon: 'fa-solid fa-laptop-code' },
   { key: 'tools', label: '工具模板', icon: 'fa-solid fa-tools' },
+  { key: 'token', label: 'Token 统计', icon: 'fa-solid fa-chart-pie' },
   { key: 'mvu', label: 'MVU Beta', icon: 'fa-solid fa-flask' },
   { key: 'help', label: '帮助', icon: 'fa-solid fa-question-circle' },
 ];
@@ -186,6 +188,7 @@ const activeTab = ref<
   | 'regex'
   | 'project'
   | 'tools'
+  | 'token'
   | 'mvu'
   | 'help'
 >('settings');
@@ -201,6 +204,7 @@ const componentMap = {
   regex: RegexUIGenerator,
   project: ProjectManager,
   tools: ToolsTab,
+  token: TokenStatsTab,
   mvu: MvuBetaTab,
   help: HelpTab,
 };

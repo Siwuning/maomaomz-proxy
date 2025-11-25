@@ -78,35 +78,59 @@ async function fetchLatestVersion(): Promise<{ version: string; url: string; not
 }
 
 /**
- * 备用方案：使用 jsDelivr CDN 获取 package.json
+ * 备用方案：使用多个 CDN 源获取 package.json
  */
 async function fetchVersionFromCDN(): Promise<{ version: string; url: string; notes: string } | null> {
-  try {
-    console.log('🔍 正在从 jsDelivr CDN 获取版本信息...');
+  // 多个备用 CDN 源
+  const cdnSources = [
+    {
+      name: 'jsDelivr',
+      url: `https://cdn.jsdelivr.net/gh/${GITHUB_REPO}@main/package.json?t=${Date.now()}`,
+    },
+    {
+      name: 'raw.githubusercontent',
+      url: `https://raw.githubusercontent.com/${GITHUB_REPO}/main/package.json?t=${Date.now()}`,
+    },
+    {
+      name: 'ghproxy',
+      url: `https://ghproxy.com/https://raw.githubusercontent.com/${GITHUB_REPO}/main/package.json`,
+    },
+    {
+      name: 'fastgit',
+      url: `https://raw.fastgit.org/${GITHUB_REPO}/main/package.json`,
+    },
+  ];
 
-    // 使用 jsDelivr CDN，国内访问更稳定
-    const response = await fetch(`https://cdn.jsdelivr.net/gh/${GITHUB_REPO}@main/package.json`, {
-      cache: 'no-store',
-      signal: AbortSignal.timeout(10000),
-    });
+  for (const source of cdnSources) {
+    try {
+      console.log(`🔍 正在从 ${source.name} 获取版本信息...`);
 
-    if (!response.ok) {
-      console.warn(`⚠️ jsDelivr CDN 请求失败 (${response.status})`);
-      return null;
+      const response = await fetch(source.url, {
+        cache: 'no-store',
+        signal: AbortSignal.timeout(8000),
+      });
+
+      if (!response.ok) {
+        console.warn(`⚠️ ${source.name} 请求失败 (${response.status})`);
+        continue;
+      }
+
+      const data = await response.json();
+      console.log(`✅ 从 ${source.name} 成功获取版本:`, data.version);
+
+      return {
+        version: data.version,
+        url: `https://github.com/${GITHUB_REPO}/releases/latest`,
+        notes: `最新版本: ${data.version}\n\n请前往 GitHub 查看详细更新日志`,
+      };
+    } catch (error: any) {
+      console.warn(`⚠️ ${source.name} 请求失败:`, error.message || error);
+      continue;
     }
-
-    const data = await response.json();
-    console.log('✅ 从 CDN 成功获取版本:', data.version);
-
-    return {
-      version: data.version,
-      url: `https://github.com/${GITHUB_REPO}/releases/latest`,
-      notes: `最新版本: ${data.version}\n\n请前往 GitHub 查看详细更新日志`,
-    };
-  } catch (error: any) {
-    console.error('❌ jsDelivr CDN 请求失败:', error.message || error);
-    return null;
   }
+
+  console.error('❌ 所有 CDN 源都无法访问');
+  return null;
 }
 
 /**
@@ -230,7 +254,7 @@ export function showUpdateDialog(updateInfo: {
               <div style="color: #4a9eff; font-size: 20px; font-weight: 600;">v${updateInfo.latestVersion}</div>
             </div>
           </div>
-          
+
           <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 16px;">
             <div style="color: #ccc; font-size: 13px; margin-bottom: 8px; font-weight: 600;">📝 更新内容：</div>
             <div style="color: #aaa; font-size: 12px; line-height: 1.6; max-height: 150px; overflow-y: auto; white-space: pre-wrap;">
@@ -291,7 +315,7 @@ ${updateInfo.notes}
         </div>
       </div>
     </div>
-    
+
     <style>
       @keyframes fadeIn {
         from { opacity: 0; }

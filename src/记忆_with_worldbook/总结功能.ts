@@ -2,6 +2,47 @@ import { detectApiProvider, normalizeApiEndpoint, useSettingsStore } from './set
 import { detectEndpointType } from './utils/api-config';
 
 /**
+ * 通过酒馆后端获取模型列表（绕过 CORS）
+ * 使用 /api/backends/chat-completions/status 端点
+ */
+async function fetchModelsViaTavern(apiUrl: string): Promise<string[]> {
+  const tavernOrigin = window.location.origin;
+
+  console.log('🔄 通过酒馆后端获取模型列表:', apiUrl);
+
+  try {
+    // 使用酒馆的 status 端点获取模型列表
+    const response = await fetch(`${tavernOrigin}/api/backends/chat-completions/status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(typeof SillyTavern !== 'undefined' && SillyTavern.getRequestHeaders ? SillyTavern.getRequestHeaders() : {}),
+      },
+      body: JSON.stringify({
+        chat_completion_source: 'makersuite', // 使用 Google AI Studio 源，支持反代
+        reverse_proxy: apiUrl.replace(/\/v1\/?$/, ''), // 移除 /v1 后缀
+        proxy_password: '', // 反代不需要密码
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('✅ 酒馆返回模型数据:', data);
+
+      if (data.data && Array.isArray(data.data)) {
+        return data.data.map((m: any) => m.id || m.name || m).filter(Boolean);
+      }
+    } else {
+      console.log('⚠️ 酒馆 status 端点返回错误:', response.status);
+    }
+  } catch (error) {
+    console.log('⚠️ 通过酒馆获取模型失败:', error);
+  }
+
+  return [];
+}
+
+/**
  * 智能请求函数，自动处理 CORS 问题
  * 本地反代直接使用酒馆后端代理，避免 CORS 预检问题
  */
@@ -117,6 +158,20 @@ export async function fetchAvailableModels(): Promise<string[]> {
   // 使用 normalizeApiEndpoint 获取 models 端点
   const baseUrl = settings.api_endpoint.trim();
   console.log('📍 原始端点:', baseUrl);
+
+  // 检查是否是本地端点，如果是则优先使用酒馆后端获取模型列表
+  const endpointType = detectEndpointType(baseUrl);
+  const isLocalEndpoint = endpointType === 'local' || endpointType === 'reverse-proxy';
+
+  if (isLocalEndpoint) {
+    console.log('🏠 检测到本地端点，尝试通过酒馆后端获取模型列表...');
+    const models = await fetchModelsViaTavern(baseUrl);
+    if (models.length > 0) {
+      console.log(`🎉 通过酒馆后端成功获取 ${models.length} 个模型:`, models);
+      return models;
+    }
+    console.log('⚠️ 酒馆后端未返回模型，尝试其他方式...');
+  }
 
   // 尝试规范化为 /models 端点
   let modelsUrl: string;

@@ -433,16 +433,16 @@ ${aiPrompt.value.trim()}
       .trim();
 
     // 尝试分离世界书提示词和HTML代码
-    const parts = content.split(/={3,}|---{3,}|###.*世界书.*###|###.*HTML.*###/i);
+    const parts: string[] = content.split(/={3,}|---{3,}|###.*世界书.*###|###.*HTML.*###/i);
 
     if (parts.length >= 2) {
       // 找到世界书提示词部分
       const worldbookPart = parts.find(
-        (part: string) => part.includes('#指令：') || part.includes('核心警告') || part.includes('<-PAGEABLE_STATUS->'),
+        part => part.includes('#指令：') || part.includes('核心警告') || part.includes('<-PAGEABLE_STATUS->'),
       );
 
       // 找到HTML部分
-      const htmlPart = parts.find((part: string) => part.includes('<details') || part.includes('<div'));
+      const htmlPart = parts.find(part => part.includes('<details') || part.includes('<div'));
 
       if (worldbookPart) {
         // 清理世界书提示词

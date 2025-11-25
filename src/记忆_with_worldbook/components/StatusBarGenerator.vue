@@ -2712,7 +2712,6 @@ ${currentFiles}
     const errorMsg = error?.message || String(error) || '未知错误';
     taskStore.failTask(taskId, errorMsg);
     window.toastr.error('AI 生成失败: ' + errorMsg);
-  } finally {
   }
 }
 

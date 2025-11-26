@@ -7,7 +7,7 @@
           Token 统计
         </h2>
         <p style="margin: 4px 0 0; font-size: 12px; color: #aaa">
-          粗略了解当前角色卡和世界书大概消耗了多少上下文 Tokens。
+          粗略了解当前角色卡、世界书和聊天内容大概消耗了多少上下文 Tokens。
         </p>
       </div>
       <div style="display: flex; align-items: center; gap: 8px">
@@ -80,7 +80,9 @@
           <div style="font-size: 22px; font-weight: 700; color: #f97316">
             {{ formatNumber(stats.totalTokens) }}
           </div>
-          <div style="font-size: 11px; color: #777; margin-top: 4px">角色卡 + 世界书（仅统计启用条目）</div>
+          <div style="font-size: 11px; color: #777; margin-top: 4px">
+            角色卡 + 世界书 + 聊天内容（世界书仅统计启用条目）
+          </div>
         </div>
 
         <div
@@ -123,6 +125,27 @@
             </span>
           </div>
           <div style="font-size: 11px; color: #777; margin-top: 4px">启用的常驻/关键词/向量条目</div>
+        </div>
+
+        <div
+          class="stat-card"
+          style="
+            flex: 1;
+            min-width: 180px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            background: #252525;
+            border: 1px solid #333;
+          "
+        >
+          <div style="font-size: 12px; color: #aaa; margin-bottom: 4px">聊天内容</div>
+          <div style="font-size: 20px; font-weight: 700; color: #a855f7">
+            {{ formatNumber(stats.chatTokens) }}
+            <span style="font-size: 11px; color: #888; margin-left: 4px">
+              ({{ percent(stats.chatTokens, stats.totalTokens) }}%)
+            </span>
+          </div>
+          <div style="font-size: 11px; color: #777; margin-top: 4px">最近若干条对话消息（粗略估算）</div>
         </div>
       </div>
 
@@ -309,6 +332,7 @@ interface TokenStats {
   totalVectorizedTokens: number;
   lorebookTokens: number;
   totalTokens: number;
+  chatTokens: number;
   bySource: Record<SourceKey, SourceStats>;
   byLorebook: Record<string, LorebookStats>;
 }
@@ -402,6 +426,7 @@ async function calculateTokenStats(): Promise<void> {
     totalSelectiveTokens: 0,
     totalVectorizedTokens: 0,
     lorebookTokens: 0,
+    chatTokens: 0,
     totalTokens: 0,
     bySource: {
       primary: emptySource(),
@@ -414,28 +439,65 @@ async function calculateTokenStats(): Promise<void> {
 
   try {
     // 1. 角色卡
-    if (st && typeof st.characterId !== 'undefined' && st.characters && st.characters[st.characterId]) {
-      const ch = st.characters[st.characterId];
-      local.characterName = ch.name || '(未命名角色)';
-      const fields = [ch.description, ch.personality, ch.scenario, ch.first_mes].filter(Boolean).join('\n');
-      local.characterCardTokens = getTokenCount(fields);
-    } else if (st && st.groupId && Array.isArray(st.groups)) {
-      const group = st.groups.find((g: any) => g.id === st.groupId);
-      if (group) {
-        local.characterName = group.name || `群组 ${st.groupId}`;
+    let characterTokensComputed = false;
+
+    // 1.1 优先使用 TavernHelper.getCharData('current')
+    if (tav && typeof tav.getCharData === 'function') {
+      try {
+        const charData = tav.getCharData('current');
+        if (charData) {
+          console.log('[TokenStats] 使用 TavernHelper.getCharData("current") 获取到角色:', charData.name);
+          local.characterName = charData.name || '(未命名角色)';
+          const fields = [charData.description, charData.personality, charData.scenario, charData.first_mes]
+            .filter(Boolean)
+            .join('\n');
+          local.characterCardTokens = getTokenCount(fields);
+          characterTokensComputed = local.characterCardTokens > 0;
+        } else {
+          console.log('[TokenStats] TavernHelper.getCharData("current") 返回空');
+        }
+      } catch (e) {
+        console.warn('TavernHelper.getCharData("current") 调用失败:', e);
+      }
+    }
+
+    // 1.2 降级：直接使用 SillyTavern.characters / groups
+    if (
+      !characterTokensComputed &&
+      st &&
+      typeof (st as any).characterId !== 'undefined' &&
+      Array.isArray(st.characters)
+    ) {
+      const idx = (st as any).characterId as any;
+      const ch = (st.characters as any[])[idx];
+      if (ch) {
+        console.log('[TokenStats] 使用 SillyTavern.characters 和 characterId 获取角色:', ch.name, 'id=', idx);
+        local.characterName = ch.name || '(未命名角色)';
+        const fields = [ch.description, ch.personality, ch.scenario, ch.first_mes].filter(Boolean).join('\n');
+        local.characterCardTokens = getTokenCount(fields);
+        characterTokensComputed = local.characterCardTokens > 0;
+      }
+    }
+
+    if (!characterTokensComputed && st && (st as any).groupId && Array.isArray((st as any).groups)) {
+      const groupId = (st as any).groupId;
+      const groups = (st as any).groups as any[];
+      const group = groups.find((g: any) => String(g.id) === String(groupId));
+      if (group && Array.isArray(group.members) && Array.isArray(st.characters)) {
+        console.log('[TokenStats] 使用 SillyTavern.groups 获取群组:', group.name, 'id=', groupId);
+        local.characterName = group.name || `群组 ${groupId}`;
         let total = 0;
-        if (Array.isArray(group.members) && Array.isArray(st.characters)) {
-          for (const avatar of group.members) {
-            const member = st.characters.find((c: any) => c.avatar === avatar);
-            if (member) {
-              const fields = [member.description, member.personality, member.scenario, member.first_mes]
-                .filter(Boolean)
-                .join('\n');
-              total += getTokenCount(fields);
-            }
+        for (const avatar of group.members) {
+          const member = (st.characters as any[]).find((c: any) => c.avatar === avatar);
+          if (member) {
+            const fields = [member.description, member.personality, member.scenario, member.first_mes]
+              .filter(Boolean)
+              .join('\n');
+            total += getTokenCount(fields);
           }
         }
         local.characterCardTokens = total;
+        characterTokensComputed = local.characterCardTokens > 0;
       }
     }
 
@@ -551,7 +613,44 @@ async function calculateTokenStats(): Promise<void> {
     }
 
     local.lorebookTokens = local.totalConstantTokens + local.totalSelectiveTokens + local.totalVectorizedTokens;
-    local.totalTokens = local.characterCardTokens + local.lorebookTokens;
+
+    // 4. 聊天内容（最近若干条消息，粗略估算）
+    try {
+      let messages: any[] = [];
+
+      if (st && Array.isArray(st.chat)) {
+        console.log('[TokenStats] 使用 SillyTavern.chat 统计聊天内容，条数:', st.chat.length);
+        messages = st.chat;
+      } else if (
+        typeof (w as any).TavernHelper !== 'undefined' &&
+        typeof (w as any).TavernHelper.getChatMessages === 'function'
+      ) {
+        try {
+          messages = (w as any).TavernHelper.getChatMessages('0-{{lastMessageId}}') || [];
+          console.log('[TokenStats] 使用 TavernHelper.getChatMessages 统计聊天内容，条数:', messages.length);
+        } catch (e) {
+          console.warn('TavernHelper.getChatMessages 调用失败:', e);
+        }
+      }
+
+      if (Array.isArray(messages) && messages.length > 0) {
+        const maxMessages = 50;
+        const start = Math.max(0, messages.length - maxMessages);
+        const recent = messages.slice(start);
+        const text = recent
+          .map((m: any) => (typeof m.mes === 'string' ? m.mes : ((m.message as string) ?? '')))
+          .filter(Boolean)
+          .join('\n');
+        local.chatTokens = getTokenCount(text);
+      } else {
+        local.chatTokens = 0;
+      }
+    } catch (e) {
+      console.warn('计算聊天内容 Token 失败:', e);
+      local.chatTokens = 0;
+    }
+
+    local.totalTokens = local.characterCardTokens + local.lorebookTokens + local.chatTokens;
 
     stats.value = local;
     lastUpdated.value = Date.now();

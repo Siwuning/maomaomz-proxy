@@ -957,7 +957,7 @@ const detectedVariables = computed(() => {
   if (!generatedHTML.value) return [];
   const matches = generatedHTML.value.match(/\$(\d+)/g);
   if (!matches) return [];
-  return [...new Set(matches.map(m => m.substring(1)))].sort((a, b) => parseInt(a) - parseInt(b));
+  return ([...new Set(matches.map(m => m.substring(1)))] as string[]).sort((a, b) => parseInt(a) - parseInt(b));
 });
 
 // 世界书示例
@@ -990,62 +990,76 @@ const worldbookContent = computed(() => {
     return '未检测到字段占位符\n\n请在 AI 需求中描述需要的字段，AI 会自动生成对应的 {{字段名}} 占位符';
   }
 
-  const uniqueFields = [...new Set(matches.map(m => m.slice(2, -2)))];
+  const uniqueFields = [...new Set(matches.map(m => m.slice(2, -2)))] as string[];
 
   // 生成状态栏规则 - 添加触发标记
   const triggerMark = triggerRegex.value; // 使用触发正则作为标记
 
+  // 根据字段名生成智能示例值
+  const getExampleValue = (field: string): string => {
+    const f = field.toLowerCase();
+    if (f.includes('姓名') || f.includes('名字')) return '{{char}}';
+    if (f.includes('年龄')) return '25';
+    if (f.includes('性别')) return '男';
+    if (f.includes('职业')) return '学生';
+    if (f.includes('时间')) return '2025年7月2日 下午 14:35';
+    if (f.includes('地点')) return '教室';
+    if (f.includes('天气')) return '晴朗 28°C';
+    if (f.includes('着装')) return '深灰色西装，领带整齐';
+    if (f.includes('姿势')) return '站立';
+    if (f.includes('hp') || f.includes('生命')) return '100/100';
+    if (f.includes('mp') || f.includes('魔法')) return '80/100';
+    if (f.includes('体力')) return '90/100';
+    if (f.includes('精力')) return '75/100';
+    if (f.includes('好感')) return '65';
+    if (f.includes('信任')) return '50';
+    if (f.includes('关系')) return '朋友';
+    if (f.includes('心情') || f.includes('情绪')) return '平静';
+    if (f.includes('存款') || f.includes('金钱')) return '$1,000 USD';
+    if (f.includes('手机') || f.includes('电量')) return '85% (正常)';
+    if (f.includes('内心') || f.includes('os')) return '今天天气不错...';
+    return '[具体值]';
+  };
+
   const statusRule = `<status_rule>
-#每一次回复都必须在末尾加上完整的状态栏，实时更新{{char}}的状态。
+#指令：回复末尾需附带状态栏。
 
-##状态栏格式：
+#⚠️ 核心警告（违反将导致格式错误）：
+- ❌ **严禁输出任何 HTML 代码！**（禁止 <div>、<style>、<details>、class="" 等）
+- ❌ **严禁输出 CSS 样式！**
+- ❌ **严禁输出完整的状态栏界面！**
+- ✅ **只输出纯文本格式的字段数据！**
+
+#格式要求：
+1. 必须以 <status> 开头，</status> 结尾
+2. 第一行必须是 ${triggerMark}
+3. 每一行内容格式必须为：{{字段名}}具体内容
+4. 每个字段必须独占一行，禁止合并
+
+#✅ 正确输出示例：
 <status>
 ${triggerMark}
-${uniqueFields.map(field => `{{${field}}}`).join('\n')}
+${uniqueFields.map(field => `{{${field}}}${getExampleValue(field)}`).join('\n')}
 </status>
 
-##字段说明
-${uniqueFields.map(field => `  - ${field}：描述${field}当前的值`).join('\n')}
-
-##输出示例
-此处仅为格式示例，具体内容需根据剧情填写
+#❌ 错误输出示例（绝对禁止）：
 <status>
-${triggerMark}
-${uniqueFields
-  .map(field => {
-    let example = '[具体值]';
-    if (field.includes('姓名') || field.includes('名字')) example = '{{char}}';
-    else if (field.includes('年龄')) example = '25';
-    else if (field.includes('HP') || field.includes('生命')) example = '100/100';
-    else if (field.includes('MP') || field.includes('魔法')) example = '80/100';
-    else if (field.includes('好感')) example = '88/100';
-    return `{{${field}}}${example}`;
-  })
-  .join('\n')}
+<details open>
+<summary>状态面板</summary>
+<div class="status-container">
+<style>...</style>
+...任何 HTML 代码...
 </status>
 
-##格式要求（必读）：
-1. **必须包含 <status> 标签和触发标记**：
-   - ✅ 开头：<status>
-   - ✅ 第一行：${triggerMark}
-   - ✅ 结尾：</status>
+#字段说明：
+${uniqueFields.map(field => `- ${field}：根据当前剧情填写${field}的实际值`).join('\n')}
 
-2. **严格按照上述示例格式输出**：
-   - 每个字段必须独占一行
-   - ❌ 错误：姓名：张三
-   - ✅ 正确：{{姓名}}张三
-   - 格式必须是：{{字段名}}字段值（{{字段名}}不能省略！）
-   - 不要改变行数、不要合并行、不要调换顺序
-
-3. **字段值格式**：
-   - ❌ 错误：姓名：张三（有冒号和字段名）
-   - ✅ 正确：{{姓名}}张三（只有占位符和值）
-   - 必须保留 {{字段名}} 占位符
-
-4. **其他要求**：
-   - 状态栏紧贴正文最后一句
-   - {{字段名}} 是必须的，不能省略
-   - 这是 {{char}} 的状态，不是 {{user}} 的状态
+#其他要求：
+- 状态栏紧贴正文最后一句
+- {{字段名}} 是必须的占位符，不能省略
+- 这是 {{char}} 的状态，不是 {{user}} 的状态
+- ❌ 错误格式：姓名：张三（有冒号）
+- ✅ 正确格式：{{姓名}}张三（无冒号）
 </status_rule>`;
 
   return statusRule;
@@ -1239,7 +1253,7 @@ const exportRegex = () => {
     return;
   }
 
-  const uniqueFields = [...new Set(matches.map(m => m.slice(2, -2)))];
+  const uniqueFields = [...new Set(matches.map(m => m.slice(2, -2)))] as string[];
 
   // 构建 findRegex - 添加捕获组
   // 格式：<-PAGEABLE_STATUSBAR->\n{{姓名}}([^\n]+)\n{{年龄}}([^\n]+)\n...

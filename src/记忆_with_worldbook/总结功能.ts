@@ -394,13 +394,22 @@ export async function summarizeMessages(start_id: number, end_id: number): Promi
       const startIdx = Math.max(0, start_id);
       const endIdx = Math.min(chat.length - 1, end_id);
 
+      let skippedHidden = 0;
       for (let i = startIdx; i <= endIdx; i++) {
         if (chat[i] && chat[i].mes) {
+          // 跳过隐藏的消息
+          if (chat[i].is_hidden) {
+            skippedHidden++;
+            continue;
+          }
           messages.push({
             role: chat[i].is_user ? 'user' : 'assistant',
             message: chat[i].mes || '',
           });
         }
+      }
+      if (skippedHidden > 0) {
+        console.log(`⏭️ 跳过了 ${skippedHidden} 条隐藏的消息`);
       }
       console.log(`✅ 通过 SillyTavern.chat 获取到 ${messages.length} 条消息`);
       messagesRetrieved = true;
@@ -413,13 +422,22 @@ export async function summarizeMessages(start_id: number, end_id: number): Promi
       const startIdx = Math.max(0, start_id);
       const endIdx = Math.min(chat.length - 1, end_id);
 
+      let skippedHidden = 0;
       for (let i = startIdx; i <= endIdx; i++) {
         if (chat[i] && chat[i].mes) {
+          // 跳过隐藏的消息
+          if (chat[i].is_hidden) {
+            skippedHidden++;
+            continue;
+          }
           messages.push({
             role: chat[i].is_user ? 'user' : 'assistant',
             message: chat[i].mes || '',
           });
         }
+      }
+      if (skippedHidden > 0) {
+        console.log(`⏭️ 跳过了 ${skippedHidden} 条隐藏的消息`);
       }
       console.log(`✅ 通过全局 chat 获取到 ${messages.length} 条消息`);
       messagesRetrieved = true;

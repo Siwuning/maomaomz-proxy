@@ -78,7 +78,7 @@
           <div style="font-size: 22px; font-weight: 700; color: #f97316">
             {{ formatNumber(stats.totalTokens) }}
           </div>
-          <div style="font-size: 11px; color: #777; margin-top: 4px">该角色卡与绑定的世界书条目的总 Tokens</div>
+          <div style="font-size: 11px; color: #777; margin-top: 4px">角色卡 + 世界书 + 聊天内容 的大致 Token 总量</div>
         </div>
 
         <div
@@ -99,7 +99,7 @@
               ({{ percent(stats.characterCardTokens, stats.totalTokens) }}%)
             </span>
           </div>
-          <div style="font-size: 11px; color: #777; margin-top: 4px">描述 / 性格 / 场景 / 首条消息</div>
+          <div style="font-size: 11px; color: #777; margin-top: 4px">角色卡全部字段（描述 / 性格 / 场景 / 示例等）</div>
         </div>
 
         <div
@@ -121,6 +121,27 @@
             </span>
           </div>
           <div style="font-size: 11px; color: #777; margin-top: 4px">所有启用的世界书条目的 Token 总数</div>
+        </div>
+
+        <div
+          class="stat-card"
+          style="
+            flex: 1;
+            min-width: 180px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            background: #252525;
+            border: 1px solid #333;
+          "
+        >
+          <div style="font-size: 12px; color: #aaa; margin-bottom: 4px">聊天内容</div>
+          <div style="font-size: 20px; font-weight: 700; color: #a855f7">
+            {{ formatNumber(stats.chatTokens) }}
+            <span style="font-size: 11px; color: #888; margin-left: 4px">
+              ({{ percent(stats.chatTokens, stats.totalTokens) }}%)
+            </span>
+          </div>
+          <div style="font-size: 11px; color: #777; margin-top: 4px">当前会话全部对话消息的 Tokens（粗略估算）</div>
         </div>
       </div>
 
@@ -306,6 +327,7 @@ interface TokenStats {
   totalSelectiveTokens: number;
   totalVectorizedTokens: number;
   lorebookTokens: number;
+  chatTokens: number;
   totalTokens: number;
   bySource: Record<SourceKey, SourceStats>;
   byLorebook: Record<string, LorebookStats>;
@@ -400,6 +422,7 @@ async function calculateTokenStats(): Promise<void> {
     totalSelectiveTokens: 0,
     totalVectorizedTokens: 0,
     lorebookTokens: 0,
+    chatTokens: 0,
     totalTokens: 0,
     bySource: {
       primary: emptySource(),
@@ -626,8 +649,11 @@ async function calculateTokenStats(): Promise<void> {
         // 跳过禁用的条目
         if (!entry || !entry.enabled) continue;
 
-        // 计算 Token 数量
-        const entryTokens = getTokenCount(entry.content);
+        // 计算 Token 数量：优先使用预计算的 tk 字段，与参考脚本保持一致
+        const entryTokens =
+          typeof (entry as any).tk === 'number' && !Number.isNaN((entry as any).tk)
+            ? (entry as any).tk
+            : getTokenCount(entry.content);
 
         // 判断条目类型：使用 entry.type 字符串字段
         let kind: 'c' | 's' | 'v';
@@ -666,8 +692,39 @@ async function calculateTokenStats(): Promise<void> {
 
     local.lorebookTokens = local.totalConstantTokens + local.totalSelectiveTokens + local.totalVectorizedTokens;
 
-    // 总 Token = 角色卡 + 世界书
-    local.totalTokens = local.characterCardTokens + local.lorebookTokens;
+    // 4. 聊天内容（不创建聊天世界书，直接统计对话消息）
+    try {
+      let messages: any[] = [];
+
+      if (st && Array.isArray(st.chat)) {
+        // SillyTavern.chat 已经包含当前会话的全部消息
+        messages = st.chat;
+      } else if (w.TavernHelper && typeof w.TavernHelper.getChatMessages === 'function') {
+        try {
+          messages = w.TavernHelper.getChatMessages('0-{{lastMessageId}}') || [];
+        } catch (e) {
+          console.warn('TavernHelper.getChatMessages 调用失败:', e);
+        }
+      }
+
+      if (Array.isArray(messages) && messages.length > 0) {
+        const text = messages
+          .map((m: any) =>
+            typeof m.mes === 'string' ? m.mes : typeof m.message === 'string' ? (m.message as string) : '',
+          )
+          .filter(Boolean)
+          .join('\n');
+        local.chatTokens = getTokenCount(text);
+      } else {
+        local.chatTokens = 0;
+      }
+    } catch (e) {
+      console.warn('计算聊天内容 Token 失败:', e);
+      local.chatTokens = 0;
+    }
+
+    // 总 Token = 角色卡 + 世界书 + 聊天内容
+    local.totalTokens = local.characterCardTokens + local.lorebookTokens + local.chatTokens;
 
     stats.value = local;
     lastUpdated.value = Date.now();

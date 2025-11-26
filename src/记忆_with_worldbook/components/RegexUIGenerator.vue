@@ -1255,10 +1255,16 @@ const exportRegex = () => {
 
   const uniqueFields = [...new Set(matches.map(m => m.slice(2, -2)))] as string[];
 
-  // 构建 findRegex - 添加捕获组
-  // 格式：<-PAGEABLE_STATUSBAR->\n{{姓名}}([^\n]+)\n{{年龄}}([^\n]+)\n...
-  const captureGroups = uniqueFields.map(field => `\\{\\{${field}\\}\\}([^\\n]+)`).join('\\n');
-  const findRegex = `${triggerRegex.value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[\\r\\n]+${captureGroups}[\\r\\n]*`;
+  // 构建 findRegex - 使用更灵活的正则格式（参考精英版）
+  // 格式：<-PAGEABLE_STATUSBAR->[\s\S]*?{{字段名}}\s*([^\n\r]+)[\s\S]*?...[\s\S]*?</status>
+  // 关键改进：
+  // 1. 使用 [\s\S]*? 代替 \n，支持任意字符（包括换行）
+  // 2. 使用 \s* 允许字段名和值之间有空白
+  // 3. 使用 [^\n\r]+ 排除回车和换行
+  // 4. 以 </status> 结尾确保完整匹配
+  const triggerEscaped = triggerRegex.value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const captureGroups = uniqueFields.map(field => `\\{\\{${field}\\}\\}\\s*([^\\n\\r]+)`).join('[\\s\\S]*?');
+  const findRegex = `${triggerEscaped}[\\s\\S]*?${captureGroups}[\\s\\S]*?</status>`;
 
   // 构建 replaceString - 将 {{字段名}} 替换为 $1, $2...
   let replaceString = generatedHTML.value;
@@ -1279,7 +1285,12 @@ const exportRegex = () => {
     trimStrings: [],
     placement: [2],
     disabled: false,
-    runOnEdit: true,
+    markdownOnly: true, // 只在 Markdown 模式下应用
+    promptOnly: false,
+    runOnEdit: false, // 关闭编辑时运行，避免重复替换
+    substituteRegex: 0,
+    minDepth: null,
+    maxDepth: null,
   };
 
   const jsonStr = JSON.stringify(regexData, null, 2);

@@ -614,11 +614,11 @@ async function calculateTokenStats(): Promise<void> {
       }
     }
 
-    // 1.5 预设提示词统计（使用 getPreset('in_use') 获取当前预设的所有提示词）
+    // 1.5 预设提示词统计（使用 TavernHelper.getPreset('in_use') 获取当前预设的所有提示词）
     try {
-      // 使用酒馆官方的 getPreset 函数获取当前预设
-      if (typeof getPreset === 'function') {
-        const preset = getPreset('in_use');
+      // 使用酒馆官方的 getPreset 函数获取当前预设（通过 TavernHelper）
+      if (tav && typeof tav.getPreset === 'function') {
+        const preset = tav.getPreset('in_use');
         if (preset && Array.isArray(preset.prompts)) {
           // 遍历所有提示词，只统计启用的并且有内容的
           for (const prompt of preset.prompts) {
@@ -635,7 +635,7 @@ async function calculateTokenStats(): Promise<void> {
           );
         }
       } else {
-        console.warn('[TokenStats] getPreset 函数不可用，尝试使用备用方式');
+        console.warn('[TokenStats] tav.getPreset 函数不可用，尝试使用备用方式');
         // 备用方式：从 chatCompletionSettings 获取
         if (st?.chatCompletionSettings) {
           const oai = st.chatCompletionSettings;

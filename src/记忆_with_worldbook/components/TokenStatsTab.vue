@@ -418,6 +418,27 @@ function sourceTotal(s: SourceStats): number {
   return s.c + s.s + s.v;
 }
 
+// 使用 SillyTavern 官方的 token 计算方法
+async function getTokenCountAsync(text: string | null | undefined): Promise<number> {
+  if (!text) return 0;
+  try {
+    const w = window as any;
+    // 优先使用官方异步方法
+    if (w.SillyTavern && typeof w.SillyTavern.getTokenCountAsync === 'function') {
+      return await w.SillyTavern.getTokenCountAsync(text);
+    }
+    // 降级到同步方法
+    if (w.SillyTavern && typeof w.SillyTavern.getTokenCount === 'function') {
+      return w.SillyTavern.getTokenCount(text);
+    }
+  } catch (e) {
+    console.warn('getTokenCount 调用失败，使用近似值:', e);
+  }
+  // 粗略估算：英文 4 字符一个 token，中文大约 1-2 字符
+  return Math.ceil(text.length / 4);
+}
+
+// 同步版本（兼容旧代码）
 function getTokenCount(text: string | null | undefined): number {
   if (!text) return 0;
   try {
@@ -428,7 +449,6 @@ function getTokenCount(text: string | null | undefined): number {
   } catch (e) {
     console.warn('getTokenCount 调用失败，使用近似值:', e);
   }
-  // 粗略估算：英文 4 字符一个 token，中文大约 1-2 字符
   return Math.ceil(text.length / 4);
 }
 

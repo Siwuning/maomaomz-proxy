@@ -1024,17 +1024,35 @@ onMounted(() => {
 
   // 监听实际发送的提示词事件
   const w = window as any;
-  if (w.TavernHelper && typeof w.TavernHelper.eventOn === 'function') {
-    w.TavernHelper.eventOn('CHAT_COMPLETION_PROMPT_READY', handlePromptReady);
-    console.log('[TokenStats] 已注册 CHAT_COMPLETION_PROMPT_READY 事件监听');
+  const st = w.SillyTavern;
+
+  // 尝试多种方式注册事件监听
+  if (st?.eventSource?.on && st?.eventTypes) {
+    // 方式1: SillyTavern.eventSource.on
+    st.eventSource.on(st.eventTypes.CHAT_COMPLETION_PROMPT_READY, handlePromptReady);
+    console.log('[TokenStats] 使用 SillyTavern.eventSource.on 注册事件');
+  } else if (typeof w.eventOn === 'function' && w.tavern_events) {
+    // 方式2: 全局 eventOn
+    w.eventOn(w.tavern_events.CHAT_COMPLETION_PROMPT_READY, handlePromptReady);
+    console.log('[TokenStats] 使用全局 eventOn 注册事件');
+  } else if (w.TavernHelper?.eventOn && w.tavern_events) {
+    // 方式3: TavernHelper.eventOn
+    w.TavernHelper.eventOn(w.tavern_events.CHAT_COMPLETION_PROMPT_READY, handlePromptReady);
+    console.log('[TokenStats] 使用 TavernHelper.eventOn 注册事件');
+  } else {
+    console.warn('[TokenStats] 无法注册事件监听，所有方式都不可用');
   }
 });
 
 onUnmounted(() => {
   // 清理事件监听
   const w = window as any;
-  if (w.TavernHelper && typeof w.TavernHelper.eventOff === 'function') {
-    w.TavernHelper.eventOff('CHAT_COMPLETION_PROMPT_READY', handlePromptReady);
+  const st = w.SillyTavern;
+
+  if (st?.eventSource?.removeListener && st?.eventTypes) {
+    st.eventSource.removeListener(st.eventTypes.CHAT_COMPLETION_PROMPT_READY, handlePromptReady);
+  } else if (typeof w.eventRemoveListener === 'function' && w.tavern_events) {
+    w.eventRemoveListener(w.tavern_events.CHAT_COMPLETION_PROMPT_READY, handlePromptReady);
   }
 });
 </script>

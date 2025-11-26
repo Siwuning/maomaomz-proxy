@@ -878,13 +878,17 @@ async function calculateTokenStats(): Promise<void> {
       }
 
       if (Array.isArray(messages) && messages.length > 0) {
+        // 过滤掉隐藏的消息（API不会发送隐藏的消息）
+        const visibleMessages = messages.filter((m: any) => !m.is_hidden);
+        console.log('[TokenStats] 总消息数:', messages.length, '可见消息数:', visibleMessages.length);
+
         // 直接统计消息内容，不加额外格式化
-        const text = messages
+        const text = visibleMessages
           .map((m: any) => (typeof m.mes === 'string' ? m.mes : typeof m.message === 'string' ? m.message : ''))
           .filter(Boolean)
           .join('\n');
         local.chatTokens = getTokenCount(text);
-        console.log('[TokenStats] 聊天内容 Tokens:', local.chatTokens, '(共', messages.length, '条消息)');
+        console.log('[TokenStats] 聊天内容 Tokens:', local.chatTokens, '(共', visibleMessages.length, '条可见消息)');
       } else {
         local.chatTokens = 0;
       }

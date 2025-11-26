@@ -434,11 +434,13 @@ function getTokenCount(text: string | null | undefined): number {
 
 function collectPresetPromptTexts(st: any, tav: any): string[] {
   const texts: string[] = [];
+  const seen = new Set<string>(); // 避免重复统计
 
   const pushText = (value: unknown) => {
     if (typeof value !== 'string') return;
     const trimmed = value.trim();
-    if (trimmed) {
+    if (trimmed && !seen.has(trimmed)) {
+      seen.add(trimmed);
       texts.push(value);
     }
   };
@@ -474,6 +476,10 @@ function collectPresetPromptTexts(st: any, tav: any): string[] {
       'group_nudge_prompt',
       'impersonation_prompt',
       'system_prompt',
+      'wi_format',
+      'scenario_format',
+      'personality_format',
+      'char_description_format',
     ];
     for (const field of promptFields) {
       if (oai[field]) pushText(oai[field]);
@@ -482,6 +488,32 @@ function collectPresetPromptTexts(st: any, tav: any): string[] {
     if (Array.isArray(oai.prompts)) {
       for (const item of oai.prompts) {
         if (item?.content) pushText(item.content);
+      }
+    }
+  }
+
+  // 3) 作者注释 (Author's Note) - 非常重要！
+  const context = (st as any)?.context;
+  if (context) {
+    // 作者注释可能在多个位置
+    if (context.note_prompt) pushText(context.note_prompt);
+  }
+
+  // 从 power_user 获取作者注释
+  const powerUser = st?.powerUserSettings;
+  if (powerUser) {
+    if (powerUser.main_prompt) pushText(powerUser.main_prompt);
+    if (powerUser.nsfw_prompt) pushText(powerUser.nsfw_prompt);
+    if (powerUser.jailbreak_prompt) pushText(powerUser.jailbreak_prompt);
+  }
+
+  // 4) 深度提示词和扩展注入
+  if (st?.extensionPrompts && typeof st.extensionPrompts === 'object') {
+    for (const [key, ext] of Object.entries(st.extensionPrompts)) {
+      if (ext && typeof ext === 'object') {
+        const extObj = ext as any;
+        if (extObj.value) pushText(extObj.value);
+        if (extObj.content) pushText(extObj.content);
       }
     }
   }
@@ -805,7 +837,7 @@ async function calculateTokenStats(): Promise<void> {
 
     local.lorebookTokens = local.totalConstantTokens + local.totalSelectiveTokens + local.totalVectorizedTokens;
 
-    // 4. 聊天内容（不创建聊天世界书，直接统计对话消息）
+    // 4. 聊天内容（包含消息名称和格式化开销）
     try {
       let messages: any[] = [];
 
@@ -821,13 +853,26 @@ async function calculateTokenStats(): Promise<void> {
       }
 
       if (Array.isArray(messages) && messages.length > 0) {
-        const text = messages
-          .map((m: any) =>
-            typeof m.mes === 'string' ? m.mes : typeof m.message === 'string' ? (m.message as string) : '',
-          )
-          .filter(Boolean)
-          .join('\n');
-        local.chatTokens = getTokenCount(text);
+        // 获取角色名和用户名用于计算格式化开销
+        const charName = local.characterName || st?.name2 || 'Character';
+        const userName = st?.name1 || 'User';
+
+        // 统计每条消息，包含角色名前缀
+        let totalChatTokens = 0;
+        for (const m of messages) {
+          const content = typeof m.mes === 'string' ? m.mes : typeof m.message === 'string' ? m.message : '';
+          if (!content) continue;
+
+          // 判断是用户消息还是角色消息
+          const isUser = m.is_user === true || (m.is_system === false && m.name === userName);
+          const name = isUser ? userName : m.name || charName;
+
+          // 格式化后的消息：角色名 + 内容
+          const formattedMsg = `${name}: ${content}`;
+          totalChatTokens += getTokenCount(formattedMsg);
+        }
+        local.chatTokens = totalChatTokens;
+        console.log('[TokenStats] 聊天内容 Tokens:', local.chatTokens, '(共', messages.length, '条消息)');
       } else {
         local.chatTokens = 0;
       }

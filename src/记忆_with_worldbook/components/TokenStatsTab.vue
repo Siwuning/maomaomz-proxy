@@ -359,7 +359,7 @@ const sourceLabels: Record<SourceKey, string> = {
 const lorebookList = computed(() => {
   if (!stats.value) return [] as Array<LorebookStats & { name: string }>;
   return Object.entries(stats.value.byLorebook)
-    .map(([name, s]) => ({ name, ...s }))
+    .map(([name, s]: [string, LorebookStats]) => ({ name, ...s }))
     .sort((a, b) => b.t - a.t);
 });
 

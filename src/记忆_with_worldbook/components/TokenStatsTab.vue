@@ -74,20 +74,14 @@
             border: 1px solid #333;
           "
         >
-          <div style="font-size: 12px; color: #aaa; margin-bottom: 4px">
-            总 Tokens
-            <span v-if="actualPromptTokens !== null" style="color: #4ade80; margin-left: 8px">
-              (实际: {{ formatNumber(actualPromptTokens) }})
-            </span>
-          </div>
+          <div style="font-size: 12px; color: #aaa; margin-bottom: 4px">总 Tokens（估算）</div>
           <div style="font-size: 22px; font-weight: 700; color: #f97316">
             {{ formatNumber(stats.totalTokens) }}
           </div>
           <div style="font-size: 11px; color: #777; margin-top: 4px">
-            <template v-if="actualPromptTokens !== null">
-              上次发送 {{ actualPromptMessages }} 条消息，共 {{ formatNumber(actualPromptTokens) }} tokens
-            </template>
-            <template v-else> 角色卡 + 世界书 + 聊天 + 预设 的大致 Token 总量（发送一次消息后显示实际值） </template>
+            角色卡 + 世界书 + 聊天 + 预设 的估算值
+            <br />
+            <span style="color: #888">💡 精确值请使用酒馆的「提示词查看器」</span>
           </div>
         </div>
 
@@ -337,7 +331,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 type SourceKey = 'primary' | 'additional' | 'global' | 'chat';
 
@@ -377,11 +371,6 @@ const loading = ref(false);
 const error = ref<string | null>(null);
 const stats = ref<TokenStats | null>(null);
 const lastUpdated = ref<number | null>(null);
-
-// 实际发送的提示词统计（通过监听生成事件获取）
-const actualPromptTokens = ref<number | null>(null);
-const actualPromptMessages = ref<number>(0);
-const actualPromptUpdated = ref<number | null>(null);
 
 const envReady = computed(() => {
   const w = window as any;
@@ -995,84 +984,11 @@ function handleRefresh() {
   void calculateTokenStats();
 }
 
-// 监听实际发送的提示词
-function handlePromptReady(eventData: { chat: Array<{ role: string; content: string }>; dryRun: boolean }) {
-  console.log('[TokenStats] 🎯 收到 CHAT_COMPLETION_PROMPT_READY 事件:', eventData);
-  const messages = eventData.chat || [];
-  let totalTokens = 0;
-
-  const w = window as any;
-  for (const msg of messages) {
-    const content = typeof msg.content === 'string' ? msg.content : '';
-    if (content) {
-      // 使用同步方法快速计算
-      if (w.SillyTavern && typeof w.SillyTavern.getTokenCount === 'function') {
-        totalTokens += w.SillyTavern.getTokenCount(content);
-      } else {
-        totalTokens += Math.ceil(content.length / 4);
-      }
-    }
-  }
-
-  actualPromptTokens.value = totalTokens;
-  actualPromptMessages.value = messages.length;
-  actualPromptUpdated.value = Date.now();
-  console.log('[TokenStats] 🎯 实际发送提示词:', totalTokens, 'tokens,', messages.length, '条消息');
-}
-
-// 立即尝试注册事件（不等待 onMounted）
-(function registerEventNow() {
-  const w = window as any;
-  const st = w.SillyTavern;
-  console.log('[TokenStats] 🔍 尝试注册事件监听...');
-  console.log('[TokenStats] SillyTavern:', !!st, 'eventSource:', !!st?.eventSource, 'eventTypes:', !!st?.eventTypes);
-  console.log('[TokenStats] eventOn:', typeof w.eventOn, 'tavern_events:', !!w.tavern_events);
-
-  if (st?.eventSource?.on && st?.eventTypes?.CHAT_COMPLETION_PROMPT_READY) {
-    st.eventSource.on(st.eventTypes.CHAT_COMPLETION_PROMPT_READY, handlePromptReady);
-    console.log('[TokenStats] ✅ 使用 SillyTavern.eventSource.on 注册成功');
-  } else if (typeof w.eventOn === 'function' && w.tavern_events?.CHAT_COMPLETION_PROMPT_READY) {
-    w.eventOn(w.tavern_events.CHAT_COMPLETION_PROMPT_READY, handlePromptReady);
-    console.log('[TokenStats] ✅ 使用全局 eventOn 注册成功');
-  } else {
-    console.warn('[TokenStats] ⚠️ 无法注册事件监听');
-  }
-})();
+// 注：事件监听在此环境不可用，只能使用估算值
+// 精确的 token 数需要使用酒馆的「提示词查看器」
 
 onMounted(() => {
   // 默认不自动计算，避免每次打开面板都扫一次。用户手动点击按钮即可。
-
-  // 监听实际发送的提示词事件
-  const w = window as any;
-  const st = w.SillyTavern;
-
-  // 尝试多种方式注册事件监听
-  if (st?.eventSource?.on && st?.eventTypes) {
-    // 方式1: SillyTavern.eventSource.on
-    st.eventSource.on(st.eventTypes.CHAT_COMPLETION_PROMPT_READY, handlePromptReady);
-    console.log('[TokenStats] 使用 SillyTavern.eventSource.on 注册事件');
-  } else if (typeof w.eventOn === 'function' && w.tavern_events) {
-    // 方式2: 全局 eventOn
-    w.eventOn(w.tavern_events.CHAT_COMPLETION_PROMPT_READY, handlePromptReady);
-    console.log('[TokenStats] 使用全局 eventOn 注册事件');
-  } else if (w.TavernHelper?.eventOn && w.tavern_events) {
-    // 方式3: TavernHelper.eventOn
-    w.TavernHelper.eventOn(w.tavern_events.CHAT_COMPLETION_PROMPT_READY, handlePromptReady);
-    console.log('[TokenStats] 使用 TavernHelper.eventOn 注册事件');
-  } else {
-    console.warn('[TokenStats] 无法注册事件监听，所有方式都不可用');
-  }
-});
-
-onUnmounted(() => {
-  // 清理事件监听
-  const w = window as any;
-  const st = w.SillyTavern;
-
-  if (st?.eventSource?.removeListener && st?.eventTypes) {
-    st.eventSource.removeListener(st.eventTypes.CHAT_COMPLETION_PROMPT_READY, handlePromptReady);
-  } else if (typeof w.eventRemoveListener === 'function' && w.tavern_events) {
-    w.eventRemoveListener(w.tavern_events.CHAT_COMPLETION_PROMPT_READY, handlePromptReady);
-  }
+  // 注：事件监听在此环境不可用，只能使用估算值
 });
 </script>

@@ -7,46 +7,58 @@ import { getChatIdSafe, getScriptIdSafe } from './utils';
 import { z } from 'zod';
 
 /**
- * 获取酒馆的 API 连接预设列表
+ * 获取酒馆的 API 连接配置列表
  */
 export function getTavernApiPresets(): Array<{ name: string; value: string }> {
   try {
     const presets: Array<{ name: string; value: string }> = [];
     const mainDoc = window.parent?.document || document;
 
-    // 尝试多个可能的选择器
+    // 查找所有 select 元素，调试用
+    const allSelects = mainDoc.querySelectorAll('select');
+    console.log('📍 页面上所有 select 元素:');
+    allSelects.forEach((sel, i) => {
+      const s = sel as HTMLSelectElement;
+      if (s.options.length > 2) {
+        console.log(`  [${i}] id=${s.id}, name=${s.name}, class=${s.className}, options=${s.options.length}`);
+      }
+    });
+
+    // 尝试多个可能的选择器 - API 连接配置
     const selectors = [
-      '#connection_profile', // 连接配置
-      '#settings_preset_openai', // OpenAI 预设
-      '#openai_preset_list', // 预设列表
-      'select[name="connection_profile"]',
+      '#api_button_openai', // OpenAI API 按钮
+      '#reverse_proxy_preset', // 反向代理预设
+      '#proxy_preset', // 代理预设
+      '#api_url_scale', // API URL
+      '.api_button', // API 按钮类
     ];
 
     for (const selector of selectors) {
       const profileSelect = mainDoc.querySelector(selector) as HTMLSelectElement;
-      console.log(`📍 尝试选择器 ${selector}:`, profileSelect?.options?.length);
+      if (profileSelect && profileSelect.tagName === 'SELECT') {
+        console.log(`📍 尝试选择器 ${selector}:`, profileSelect?.options?.length);
 
-      if (profileSelect && profileSelect.options && profileSelect.options.length > 1) {
-        for (let i = 0; i < profileSelect.options.length; i++) {
-          const option = profileSelect.options[i];
-          // 跳过 <None> 和空值
-          if (option.value && option.value !== '' && option.text !== '<None>') {
-            presets.push({
-              name: option.text || option.value,
-              value: option.value,
-            });
+        if (profileSelect.options && profileSelect.options.length > 1) {
+          for (let i = 0; i < profileSelect.options.length; i++) {
+            const option = profileSelect.options[i];
+            if (option.value && option.value !== '' && option.text !== '<None>') {
+              presets.push({
+                name: option.text || option.value,
+                value: option.value,
+              });
+            }
           }
-        }
-        if (presets.length > 0) {
-          console.log(`✅ 从 ${selector} 获取到 ${presets.length} 个预设`);
-          return presets;
+          if (presets.length > 0) {
+            console.log(`✅ 从 ${selector} 获取到 ${presets.length} 个配置`);
+            return presets;
+          }
         }
       }
     }
 
     return presets;
   } catch (error) {
-    console.error('❌ 获取酒馆 API 预设失败:', error);
+    console.error('❌ 获取酒馆 API 配置失败:', error);
     return [];
   }
 }

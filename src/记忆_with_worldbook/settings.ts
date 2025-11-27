@@ -14,19 +14,51 @@ export function getTavernApiPresets(): Array<{ name: string; value: string }> {
     const presets: Array<{ name: string; value: string }> = [];
     const mainDoc = window.parent?.document || document;
 
-    // 使用正确的选择器 - openai_proxy_preset 是 API 连接配置
-    const profileSelect = mainDoc.querySelector('#openai_proxy_preset') as HTMLSelectElement;
-
-    if (profileSelect && profileSelect.options) {
-      for (let i = 0; i < profileSelect.options.length; i++) {
-        const option = profileSelect.options[i];
-        // 跳过空值和 None
-        if (option.value && option.value.trim() !== '') {
-          presets.push({
-            name: option.text || option.value,
-            value: option.value,
-          });
+    // 调试：打印所有包含 "connection" 或 "profile" 的元素
+    const allSelects = mainDoc.querySelectorAll('select');
+    console.log('🔍 查找 API 连接配置选择器...');
+    allSelects.forEach(sel => {
+      const s = sel as HTMLSelectElement;
+      const id = s.id.toLowerCase();
+      const cls = s.className.toLowerCase();
+      if (
+        id.includes('connection') ||
+        id.includes('profile') ||
+        id.includes('proxy') ||
+        cls.includes('connection') ||
+        cls.includes('profile')
+      ) {
+        console.log(`  📍 id=${s.id}, class=${s.className}, options=${s.options.length}`);
+        // 打印前5个选项
+        for (let i = 0; i < Math.min(5, s.options.length); i++) {
+          console.log(`     [${i}] value="${s.options[i].value}" text="${s.options[i].text}"`);
         }
+      }
+    });
+
+    // 尝试多个选择器
+    const selectors = [
+      '#connection_profile', // 连接配置
+      '#openai_proxy_preset', // 代理预设
+      '#reverse_proxy', // 反向代理
+      'select[id*="connection"]', // 包含 connection 的
+      'select[id*="profile"]', // 包含 profile 的
+    ];
+
+    for (const selector of selectors) {
+      const profileSelect = mainDoc.querySelector(selector) as HTMLSelectElement;
+      if (profileSelect && profileSelect.options && profileSelect.options.length > 2) {
+        console.log(`✅ 找到选择器 ${selector}，选项数: ${profileSelect.options.length}`);
+        for (let i = 0; i < profileSelect.options.length; i++) {
+          const option = profileSelect.options[i];
+          if (option.value && option.value.trim() !== '' && option.text !== 'None' && option.text !== '<None>') {
+            presets.push({
+              name: option.text || option.value,
+              value: option.value,
+            });
+          }
+        }
+        if (presets.length > 0) return presets;
       }
     }
 

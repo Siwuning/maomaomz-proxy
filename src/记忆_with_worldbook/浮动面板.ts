@@ -331,6 +331,39 @@ $(() => {
             min-height: 150px !important;
           }
 
+          /* 移动端：翻页状态栏生成器顶部header */
+          .pageable-statusbar-generator > .section-header {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+            padding: 15px !important;
+          }
+
+          .pageable-statusbar-generator > .section-header h3 {
+            text-align: center !important;
+            font-size: 15px !important;
+          }
+
+          .pageable-statusbar-generator > .section-header > div {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 6px !important;
+            width: 100% !important;
+          }
+
+          .pageable-statusbar-generator > .section-header > div > button {
+            padding: 8px 4px !important;
+            font-size: 11px !important;
+            flex-direction: column !important;
+            gap: 4px !important;
+            min-height: 56px !important;
+          }
+
+          .pageable-statusbar-generator > .section-header > div > button i {
+            margin-right: 0 !important;
+            font-size: 16px !important;
+          }
+
           /* 移动端：状态栏生成器专属优化 */
           .statusbar-generator {
             padding: 12px !important;
@@ -339,6 +372,33 @@ $(() => {
           .statusbar-generator > div[style*="display: grid"] > div {
             width: 100% !important;
             min-width: 0 !important;
+          }
+
+          /* 移动端：状态栏生成器顶部header改为纵向布局 */
+          .statusbar-generator > .section-header {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+            padding: 15px !important;
+          }
+
+          .statusbar-generator > .section-header h3 {
+            text-align: center !important;
+            font-size: 15px !important;
+          }
+
+          .statusbar-generator > .section-header > div {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 8px !important;
+            width: 100% !important;
+          }
+
+          .statusbar-generator > .section-header > div > button {
+            width: 100% !important;
+            justify-content: center !important;
+            padding: 10px 8px !important;
+            font-size: 12px !important;
           }
 
           /* 移动端：所有带固定宽度的元素强制改为100%宽度 */
@@ -393,13 +453,31 @@ $(() => {
 
           /* 移动端：开场白管理器顶部操作按钮优化 */
           .memory-panel-container .header-actions {
-            flex-wrap: wrap !important;
+            flex-direction: column !important;
+            gap: 8px !important;
+            width: 100% !important;
+          }
+
+          .memory-panel-container .header-actions .mini-button,
+          .memory-panel-container .header-actions button {
+            width: 100% !important;
             justify-content: center !important;
           }
 
-          .memory-panel-container .header-actions .mini-button {
-            flex: 1 1 auto !important;
-            min-width: 120px !important;
+          .memory-panel-container .header-actions .count-badge {
+            display: none !important;
+          }
+
+          /* 移动端：开场白管理器整个header纵向排列 */
+          .greetings-tab > .section-header {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+            padding: 15px !important;
+          }
+
+          .greetings-tab > .section-header h3 {
+            text-align: center !important;
           }
 
           /* 移动端：开场白管理器底部操作按钮堆叠 */

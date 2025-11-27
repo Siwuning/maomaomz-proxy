@@ -452,6 +452,7 @@
                2. This runs in a plugin/extension environment, not a public website
                3. The preview content is isolated from the main application -->
           <div
+            class="statusbar-preview"
             style="
               background: linear-gradient(135deg, #1e1e1e 0%, #252525 100%);
               border-radius: 12px;

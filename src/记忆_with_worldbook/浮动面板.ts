@@ -473,6 +473,13 @@ $(() => {
             overflow-x: hidden !important;
           }
 
+          /* 移动端：状态栏预览允许横向滚动，避免被裁剪，整体缩小 */
+          .statusbar-generator .statusbar-preview {
+            overflow-x: auto !important;
+            padding: 16px !important;
+            min-height: 320px !important;
+          }
+
           /* 移动端：开场白管理器整体布局优化 */
           .memory-panel-container .greetings-tab > div[style*="display: flex"][style*="gap: 20px"] {
             flex-direction: column !important;

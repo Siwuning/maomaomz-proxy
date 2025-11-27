@@ -153,30 +153,30 @@ $(() => {
             overflow-x: hidden !important;
           }
 
-          /* 移动端：按钮优化 - 更紧凑 */
+          /* 移动端：按钮优化 - 紧凑但可点击 */
           .memory-panel-container button,
           .memory-panel-container .el-button {
-            padding: 10px 14px !important;
-            font-size: 13px !important;
-            min-height: 44px !important;
-            border-radius: 8px !important;
+            padding: 8px 12px !important;
+            font-size: 12px !important;
+            min-height: 36px !important;
+            border-radius: 6px !important;
             font-weight: 500 !important;
           }
 
           /* 移动端：小按钮优化 */
           .memory-panel-container .mini-button,
           .memory-panel-container .show-button {
-            padding: 8px 12px !important;
-            min-height: 40px !important;
-            font-size: 12px !important;
-            border-radius: 8px !important;
+            padding: 6px 10px !important;
+            min-height: 32px !important;
+            font-size: 11px !important;
+            border-radius: 6px !important;
           }
 
-          /* 移动端：action-button 图标模式 */
+          /* 移动端：action-button */
           .memory-panel-container .action-button {
-            padding: 8px 10px !important;
-            min-height: 40px !important;
-            font-size: 12px !important;
+            padding: 6px 8px !important;
+            min-height: 32px !important;
+            font-size: 11px !important;
           }
 
           /* 移动端：复选框优化 */

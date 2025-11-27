@@ -3,10 +3,25 @@
 
 declare module 'vue' {
   // 使用 any 避免与真实类型冲突，仅用于消除 "没有导出的成员" 报错
+  export function createApp(rootComponent: any, rootProps?: any): any;
   export function ref<T = any>(value?: T): any;
+  export function reactive<T extends object>(target: T): T;
   export function computed<T = any>(getter: () => T): any;
   export function watch(source: any, callback: any, options?: any): any;
+  export function watchEffect(effect: () => void, options?: any): any;
   export function onMounted(hook: () => void): void;
   export function onUnmounted(hook: () => void): void;
+  export function onBeforeMount(hook: () => void): void;
+  export function onBeforeUnmount(hook: () => void): void;
   export function nextTick(callback?: () => void): Promise<void>;
+  export function defineComponent(options: any): any;
+  export function h(type: any, props?: any, children?: any): any;
+  export function provide(key: any, value: any): void;
+  export function inject(key: any, defaultValue?: any): any;
+  export function toRef(object: any, key: string): any;
+  export function toRefs(object: any): any;
+  export function unref(ref: any): any;
+  export function isRef(value: any): boolean;
+  export function shallowRef<T = any>(value?: T): any;
+  export function triggerRef(ref: any): void;
 }

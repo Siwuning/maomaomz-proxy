@@ -523,7 +523,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useTaskStore } from '../taskStore';
 
 const taskStore = useTaskStore();
@@ -800,7 +800,7 @@ const copySummary = async (task: any) => {
 };
 </script>
 
-<style>
+<style scoped>
 @keyframes slideIn {
   from {
     transform: translateY(100px);

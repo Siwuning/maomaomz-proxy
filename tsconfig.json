@@ -5,6 +5,7 @@
     "outDir": "dist",
     "baseUrl": "src",
     "resolveJsonModule": true,
+    "jsx": "preserve",
     "types": ["jquery", "jqueryui", "lodash", "toastr", "type-fest"],
     "paths": {
       "@sillytavern/*": ["../../../../../*"],

@@ -3416,7 +3416,7 @@ const handle_unhide_single = async (messageId: number) => {
 };
 </script>
 
-<style>
+<style scoped>
 .settings-tab {
   height: 100%;
   overflow-y: auto;

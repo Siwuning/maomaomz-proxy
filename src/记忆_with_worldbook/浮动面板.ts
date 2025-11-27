@@ -307,24 +307,69 @@ $(() => {
           .memory-panel-container div[style*="display: grid"],
           .memory-panel-container > div[style*="display: grid"],
           .panel-content > div[style*="display: grid"],
-          body [style*="display: grid"][style*="grid-template-columns"] {
+          body [style*="display: grid"][style*="grid-template-columns"],
+          .pageable-statusbar-generator > div[style*="display: grid"],
+          .statusbar-generator > div[style*="display: grid"],
+          [style*="grid-template-columns: 400px"],
+          [style*="grid-template-columns: 280px"],
+          [style*="grid-template-columns: 300px"] {
             display: flex !important;
             flex-direction: column !important;
             gap: 12px !important;
           }
 
+          /* 移动端：翻页状态栏生成器专属优化 */
+          .pageable-statusbar-generator {
+            padding: 12px !important;
+          }
+
+          .pageable-statusbar-generator h3 {
+            font-size: 16px !important;
+          }
+
+          .pageable-statusbar-generator textarea {
+            min-height: 150px !important;
+          }
+
+          /* 移动端：状态栏生成器专属优化 */
+          .statusbar-generator {
+            padding: 12px !important;
+          }
+
+          .statusbar-generator > div[style*="display: grid"] > div {
+            width: 100% !important;
+            min-width: 0 !important;
+          }
+
           /* 移动端：所有带固定宽度的元素强制改为100%宽度 */
           .memory-panel-container div[style*="width: 280px"],
           .memory-panel-container div[style*="width: 300px"],
+          .memory-panel-container div[style*="width: 400px"],
           .memory-panel-container div[style*="width: 500px"],
           .memory-panel-container div[style*="width: 600px"],
           .memory-panel-container div[style*="max-width: 600px"],
           .memory-panel-container div[style*="max-width: 90vw"],
           body #memoryManagementPanel div[style*="width:"],
-          body #memoryManagementPanel div[style*="min-height: 600px"] {
+          body #memoryManagementPanel div[style*="min-height: 600px"],
+          .pageable-statusbar-generator > div > div,
+          .statusbar-generator > div > div {
             width: 100% !important;
             max-width: 100% !important;
             min-width: auto !important;
+          }
+
+          /* 移动端：工具栏按钮组横向滚动 */
+          .memory-panel-container .tool-buttons,
+          .memory-panel-container [style*="display: flex"][style*="flex-wrap: wrap"] {
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            padding-bottom: 8px !important;
+          }
+
+          .memory-panel-container .tool-buttons > button,
+          .memory-panel-container .tool-buttons > div {
+            flex-shrink: 0 !important;
           }
 
           /* 移动端：强制所有子div在容器内正确显示 */

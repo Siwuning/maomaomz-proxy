@@ -94,7 +94,7 @@
           align-items: center;
           justify-content: space-between;
           padding: 8px 10px;
-          background: #1f2933;
+          background: #252525;
           border-bottom: 1px solid rgba(255, 255, 255, 0.06);
           flex-shrink: 0;
         "
@@ -129,7 +129,7 @@
         v-if="isMobileMenuOpen"
         class="mobile-tab-menu"
         style="
-          background: #111827;
+          background: #1a1a1a;
           border-bottom: 1px solid rgba(255, 255, 255, 0.05);
           flex-shrink: 0;
           padding: 6px 10px 8px;

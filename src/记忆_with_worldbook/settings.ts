@@ -76,11 +76,29 @@ export function getTavernCurrentModel(): string {
     console.log('🔍 开始检测酒馆模型...');
 
     if (typeof SillyTavern !== 'undefined') {
-      // 方法1: 使用 getChatCompletionModel
+      // 方法1: 使用 getChatCompletionModel（尝试不同的 source）
       if (typeof SillyTavern.getChatCompletionModel === 'function') {
-        const model = SillyTavern.getChatCompletionModel();
-        console.log('📍 getChatCompletionModel 返回:', model);
+        // 先不传参数试试
+        let model = SillyTavern.getChatCompletionModel();
+        console.log('📍 getChatCompletionModel() 返回:', model);
         if (model) return model;
+
+        // 尝试传入不同的 source
+        const sources = ['google', 'openai', 'claude', 'makersuite', 'ai_studio'];
+        for (const source of sources) {
+          try {
+            model = SillyTavern.getChatCompletionModel(source);
+            console.log(`📍 getChatCompletionModel('${source}') 返回:`, model);
+            if (model) return model;
+          } catch (e) {
+            // 忽略
+          }
+        }
+      }
+
+      // 方法1.5: 尝试从 CONNECT_API_MAP 获取
+      if (SillyTavern.CONNECT_API_MAP) {
+        console.log('📍 CONNECT_API_MAP:', Object.keys(SillyTavern.CONNECT_API_MAP));
       }
 
       // 方法2: 从 chatCompletionSettings 获取

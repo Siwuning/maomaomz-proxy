@@ -40,83 +40,39 @@
         <i class="fa-solid fa-chart-bar" style="color: #4a9eff; font-size: 18px"></i>
         状态栏生成器
       </h3>
-      <div style="display: flex; gap: 10px; flex-wrap: wrap">
+      <div class="toolbar-buttons">
         <button
-          style="
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-          "
+          class="toolbar-btn"
+          style="background: linear-gradient(135deg, #10b981 0%, #059669 100%)"
           @click="loadTemplate('abo')"
-          @mouseenter="(e: any) => (e.currentTarget.style.transform = 'translateY(-2px)')"
-          @mouseleave="(e: any) => (e.currentTarget.style.transform = 'translateY(0)')"
         >
-          <i class="fa-solid fa-magic" style="margin-right: 6px"></i>
-          快速加载 ABO 模板
+          <i class="fa-solid fa-magic"></i>
+          <span>ABO模板</span>
         </button>
         <button
-          style="
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-          "
+          class="toolbar-btn"
+          style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)"
           @click="showAIDialog"
-          @mouseenter="(e: any) => (e.currentTarget.style.transform = 'translateY(-2px)')"
-          @mouseleave="(e: any) => (e.currentTarget.style.transform = 'translateY(0)')"
         >
-          <i class="fa-solid fa-wand-magic-sparkles" style="margin-right: 6px"></i>
-          AI 智能编辑
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span>AI编辑</span>
         </button>
         <button
-          style="
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-          "
+          class="toolbar-btn"
+          style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)"
           @click="exportRegex"
-          @mouseenter="(e: any) => (e.currentTarget.style.transform = 'translateY(-2px)')"
-          @mouseleave="(e: any) => (e.currentTarget.style.transform = 'translateY(0)')"
         >
-          <i class="fa-solid fa-download" style="margin-right: 6px"></i>
-          导出正则 JSON
+          <i class="fa-solid fa-download"></i>
+          <span>导出JSON</span>
         </button>
         <button
-          style="
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-          "
+          class="toolbar-btn"
+          style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%)"
           title="清空所有配置和代码"
           @click="clearAll"
-          @mouseenter="(e: any) => (e.currentTarget.style.transform = 'translateY(-2px)')"
-          @mouseleave="(e: any) => (e.currentTarget.style.transform = 'translateY(0)')"
         >
-          <i class="fa-solid fa-trash" style="margin-right: 6px"></i>
-          清空
+          <i class="fa-solid fa-trash"></i>
+          <span>清空</span>
         </button>
       </div>
     </div>
@@ -3168,6 +3124,63 @@ function getSafeMaxTokens(requested: number): number {
   flex-direction: column;
   gap: 20px;
   background: #1a1a1a;
+}
+
+/* 工具栏按钮 */
+.toolbar-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.toolbar-btn:hover {
+  transform: translateY(-2px);
+}
+
+.toolbar-btn i {
+  font-size: 14px;
+}
+
+/* 移动端工具栏 */
+@media (max-width: 768px) {
+  .toolbar-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+
+  .toolbar-btn {
+    flex-direction: column;
+    padding: 12px 8px;
+    font-size: 11px;
+    gap: 4px;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .toolbar-btn i {
+    font-size: 18px;
+    margin: 0;
+  }
+
+  .toolbar-btn span {
+    font-size: 10px;
+  }
 }
 
 /* 滚动条样式 */

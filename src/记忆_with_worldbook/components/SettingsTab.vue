@@ -1643,6 +1643,7 @@ import {
 import { useTaskStore } from '../taskStore';
 import { getChatIdSafe, getScriptIdSafe } from '../utils';
 import { isApiConfigValid as checkApiConfig, getApiConfigError } from '../utils/api-config';
+import { preprocessContent } from '../utils/content-filter';
 
 const settingsStore = useSettingsStore();
 const { settings } = storeToRefs(settingsStore);

@@ -1,5 +1,6 @@
 import { detectApiProvider, normalizeApiEndpoint, useSettingsStore } from './settings';
 import { detectEndpointType } from './utils/api-config';
+import { preprocessContent } from './utils/content-filter';
 
 /**
  * 通过酒馆后端获取模型列表（绕过 CORS）

@@ -673,6 +673,7 @@ import { storeToRefs } from 'pinia';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { filterApiParams, normalizeApiEndpoint, useSettingsStore } from '../settings';
 import { getApiConfigError, isApiConfigValid } from '../utils/api-config';
+import { preprocessContent } from '../utils/content-filter';
 
 const settingsStore = useSettingsStore();
 const { settings } = storeToRefs(settingsStore);
@@ -1179,7 +1180,10 @@ const generateWithAI = async () => {
         model: settings.value.model,
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: `用户需求：${aiPrompt.value.trim()}\n\n现在直接输出完整的 HTML 代码：` },
+          {
+            role: 'user',
+            content: `用户需求：${preprocessContent(aiPrompt.value.trim())}\n\n现在直接输出完整的 HTML 代码：`,
+          },
         ],
         max_tokens: Math.min(settings.value.max_tokens, 8192),
         temperature: settings.value.temperature,

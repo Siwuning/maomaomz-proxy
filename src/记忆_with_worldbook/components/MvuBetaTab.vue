@@ -759,6 +759,7 @@ import { onMounted, ref, watch } from 'vue';
 import { filterApiParams, normalizeApiEndpoint, useSettingsStore } from '../settings';
 import { getScriptIdSafe, handleApiError } from '../utils';
 import { getApiConfigError, isApiConfigValid } from '../utils/api-config';
+import { preprocessContent } from '../utils/content-filter';
 import AIModifyDialog from './AIModifyDialog.vue';
 
 const settingsStore = useSettingsStore();
@@ -1042,7 +1043,7 @@ async function handleAIGenerateStructure() {
       model: settings.value.model,
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: `需求：${aiStructurePrompt.value}\n\n请生成 [InitVar] JSON。` },
+        { role: 'user', content: `需求：${preprocessContent(aiStructurePrompt.value)}\n\n请生成 [InitVar] JSON。` },
       ],
       temperature: settings.value.temperature || 0.7,
       max_tokens: settings.value.max_tokens || 4000,
@@ -1438,7 +1439,7 @@ rule:
       model: settings.value.model,
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: `场景：${aiPromptDescription.value}\n\n请生成 COT 提示词。` },
+        { role: 'user', content: `场景：${preprocessContent(aiPromptDescription.value)}\n\n请生成 COT 提示词。` },
       ],
       temperature: settings.value.temperature || 0.7,
       max_tokens: settings.value.max_tokens || 3000,

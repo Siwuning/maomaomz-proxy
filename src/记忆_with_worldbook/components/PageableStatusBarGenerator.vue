@@ -259,6 +259,7 @@ import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
 import { filterApiParams, normalizeApiEndpoint, useSettingsStore } from '../settings';
 import { getApiConfigError, isApiConfigValid } from '../utils/api-config';
+import { preprocessContent } from '../utils/content-filter';
 
 // Settings store
 const settingsStore = useSettingsStore();
@@ -395,7 +396,7 @@ const generateWithAI = async () => {
         {
           role: 'user',
           content: `🎨 用户需求：
-${aiPrompt.value.trim()}
+${preprocessContent(aiPrompt.value.trim())}
 
 📋 任务：
 根据以上需求，创造一个**令人惊艳、极致精美**的翻页状态栏！

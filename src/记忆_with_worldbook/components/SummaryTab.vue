@@ -260,6 +260,18 @@ import { summarizeText } from '../总结功能';
 
 const historyStore = useSummaryHistoryStore();
 
+// 兼容性辅助函数：优先使用新 API，回退到旧 API
+const getWorldbookNamesCompat = (): string[] => {
+  const tav = (window as any).TavernHelper;
+  if (typeof tav?.getWorldbookNames === 'function') {
+    return tav.getWorldbookNames();
+  }
+  if (typeof tav?.getLorebooks === 'function') {
+    return tav.getLorebooks();
+  }
+  throw new Error('无法获取世界书列表，请更新 SillyTavern 到最新版本');
+};
+
 // 响应式数据
 const summary_history = ref<Array<{ start_id: number; end_id: number; content: string }>>([]);
 const expandedState = ref<Map<number, boolean>>(new Map());
@@ -750,7 +762,7 @@ const createSummaryWorldbook = async () => {
 
     console.log('准备创建世界书:', worldbookName);
 
-    const existingWorldbooks = (window as any).TavernHelper.getWorldbookNames();
+    const existingWorldbooks = getWorldbookNamesCompat();
     if (existingWorldbooks.includes(worldbookName)) {
       window.toastr.warning(`世界书 "${worldbookName}" 已存在`);
       return;
@@ -780,7 +792,7 @@ const bindToWorldbook = async (content: string, summaryIndex: number) => {
       return;
     }
 
-    const worldbookNames = (window as any).TavernHelper.getWorldbookNames();
+    const worldbookNames = getWorldbookNamesCompat();
     if (worldbookNames.length === 0) {
       window.toastr.warning('没有可用的世界书，请先创建总结世界书');
       return;

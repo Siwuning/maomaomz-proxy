@@ -5,6 +5,7 @@ declare module 'vue' {
   // 使用 any 避免与真实类型冲突，仅用于消除 "没有导出的成员" 报错
   export function createApp(rootComponent: any, rootProps?: any): any;
   export function ref<T = any>(value?: T): any;
+  export type Ref<T = any> = { value: T };
   export function reactive<T extends object>(target: T): T;
   export function computed<T = any>(getter: () => T): any;
   export function watch(source: any, callback: any, options?: any): any;

@@ -2428,7 +2428,7 @@
 <script setup lang="ts">
 import { debounce } from 'lodash';
 import { storeToRefs } from 'pinia';
-import { onBeforeUnmount, onMounted, ref, Ref, watch } from 'vue';
+import { onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue';
 import { detectApiProvider, filterApiParams, normalizeApiEndpoint, useSettingsStore } from '../settings';
 import { copyToClipboard, getScriptIdSafe } from '../utils';
 import UIGenerator from './UIGenerator.vue';
@@ -2483,13 +2483,14 @@ const isDataLoaded = ref(false);
 // 加载可用的世界书列表（插件环境使用 TavernHelper）
 const loadAvailableWorldbooks = () => {
   try {
-    // 插件环境：优先使用 TavernHelper.getWorldbookNames()
-    if (
-      typeof (window as any).TavernHelper !== 'undefined' &&
-      typeof (window as any).TavernHelper.getWorldbookNames === 'function'
-    ) {
-      availableWorldbooks.value = (window as any).TavernHelper.getWorldbookNames();
-      console.log('✅ 已加载世界书列表 (TavernHelper):', availableWorldbooks.value);
+    const tav = (window as any).TavernHelper;
+    // 插件环境：优先使用新 API getWorldbookNames()，回退到旧 API getLorebooks()
+    if (typeof tav?.getWorldbookNames === 'function') {
+      availableWorldbooks.value = tav.getWorldbookNames();
+      console.log('✅ 已加载世界书列表 (getWorldbookNames):', availableWorldbooks.value);
+    } else if (typeof tav?.getLorebooks === 'function') {
+      availableWorldbooks.value = tav.getLorebooks();
+      console.log('✅ 已加载世界书列表 (getLorebooks - 旧版 API):', availableWorldbooks.value);
     } else {
       availableWorldbooks.value = [];
       console.warn('⚠️ TavernHelper 不可用，世界书功能受限');

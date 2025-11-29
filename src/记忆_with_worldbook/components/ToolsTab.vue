@@ -3828,22 +3828,12 @@ const handleGenerateWorldbookEntry = async () => {
     if (settings.value.use_tavern_api) {
       console.log('🍺 使用酒馆 API 发送世界书生成请求（绕过 CORS）...');
 
-      if (typeof SillyTavern === 'undefined' || typeof SillyTavern.generateQuietPrompt !== 'function') {
-        throw new Error('酒馆 API 不可用，请确保在 SillyTavern 环境中运行，或关闭"使用酒馆 API"选项');
-      }
-
-      // 合并 system 和 user 消息
-      const fullPrompt = requestPayload.messages.map((m: any) => m.content).join('\n\n');
-
-      const generateFn = SillyTavern.generateQuietPrompt();
-      generatedText = await generateFn(
-        fullPrompt,
-        false, // quiet_to_loud
-        true, // skip_wian
-        undefined,
-        undefined,
-        settings.value.max_tokens,
-      );
+      const { callAIWithTavernSupport } = await import('../utils/api');
+      generatedText = await callAIWithTavernSupport(requestPayload.messages, settings.value as any, {
+        onProgress: (p: number) => {
+          worldbookProgressPercent.value = Math.max(worldbookProgressPercent.value, p);
+        },
+      });
 
       if (!generatedText || generatedText.trim() === '') {
         throw new Error('酒馆 API 返回了空结果');
@@ -4023,22 +4013,12 @@ ${worldbookModifyRequest.value}`,
     if (settings.value.use_tavern_api) {
       console.log('🍺 使用酒馆 API 发送世界书修改请求（绕过 CORS）...');
 
-      if (typeof SillyTavern === 'undefined' || typeof SillyTavern.generateQuietPrompt !== 'function') {
-        throw new Error('酒馆 API 不可用，请确保在 SillyTavern 环境中运行，或关闭"使用酒馆 API"选项');
-      }
-
-      // 合并 system 和 user 消息
-      const fullPrompt = requestPayload.messages.map((m: any) => m.content).join('\n\n');
-
-      const generateFn = SillyTavern.generateQuietPrompt();
-      generatedText = await generateFn(
-        fullPrompt,
-        false, // quiet_to_loud
-        true, // skip_wian
-        undefined,
-        undefined,
-        settings.value.max_tokens,
-      );
+      const { callAIWithTavernSupport } = await import('../utils/api');
+      generatedText = await callAIWithTavernSupport(requestPayload.messages, settings.value as any, {
+        onProgress: (p: number) => {
+          worldbookProgressPercent.value = Math.max(worldbookProgressPercent.value, p);
+        },
+      });
 
       if (!generatedText || generatedText.trim() === '') {
         throw new Error('酒馆 API 返回了空结果');

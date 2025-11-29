@@ -2577,9 +2577,7 @@
                 "
               >
                 <div style="color: #fff; font-weight: 600; margin-bottom: 4px">{{ entry.name || '未命名条目' }}</div>
-                <div style="color: #888; font-size: 12px">
-                  关键词: {{ Array.isArray(entry.key) ? entry.key.join(', ') : entry.key || '无' }}
-                </div>
+                <div style="color: #888; font-size: 12px">关键词: {{ getEntryKeys(entry) }}</div>
               </div>
             </div>
           </div>
@@ -4342,6 +4340,23 @@ const closeBatchDialog = () => {
 const minimizeBatchDialog = () => {
   showBatchDialog.value = false;
   window.toastr.info('批量生成已转入后台运行，完成后将自动通知', '后台运行', { timeOut: 3000 });
+};
+
+// 获取条目的关键词（兼容不同结构）
+const getEntryKeys = (entry: any): string => {
+  // 优先读取 strategy.keys（新结构）
+  if (entry.strategy?.keys?.length > 0) {
+    return entry.strategy.keys.join(', ');
+  }
+  // 兼容 key 数组（旧结构）
+  if (Array.isArray(entry.key) && entry.key.length > 0) {
+    return entry.key.join(', ');
+  }
+  // 兼容 key 字符串
+  if (typeof entry.key === 'string' && entry.key) {
+    return entry.key;
+  }
+  return '无';
 };
 
 // 批量生成世界书条目

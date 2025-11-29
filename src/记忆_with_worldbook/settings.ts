@@ -156,9 +156,17 @@ export function getTavernApiConfigForDisplay(): { url: string; key: string; mode
       }
     }
 
-    // API Key
+    // API Key - 优先检查反代密码
     let key = '';
-    const keySelectors = ['#api_key_openai', '#custom_api_key', '#api_key', 'input[id*="api_key"]'];
+    const keySelectors = [
+      '#openai_proxy_password', // 反代密码（优先）
+      '#proxy_password', // 反代密码
+      '#api_key_openai',
+      '#custom_api_key',
+      '#api_key',
+      'input[id*="proxy_password"]',
+      'input[id*="api_key"]',
+    ];
     for (const sel of keySelectors) {
       const el = mainDoc.querySelector(sel) as HTMLInputElement;
       if (el && el.value) {
@@ -251,8 +259,16 @@ export function getTavernApiConfig() {
     // 根据主 API 类型设置配置
     if (mainApi === 'openai') {
       config.api_provider = 'openai';
-      config.api_endpoint = tavernConfig.api_url_scale || tavernConfig.api_url || 'https://api.openai.com/v1';
-      config.api_key = tavernConfig.api_key_scale || tavernConfig.api_key || '';
+      // 优先使用反向代理配置（reverse_proxy / proxy_password）
+      const hasReverseProxy = tavernConfig.reverse_proxy && tavernConfig.reverse_proxy.trim() !== '';
+      if (hasReverseProxy) {
+        config.api_endpoint = tavernConfig.reverse_proxy;
+        config.api_key = tavernConfig.proxy_password || '';
+        console.log('🔄 检测到反向代理配置，使用 reverse_proxy:', config.api_endpoint);
+      } else {
+        config.api_endpoint = tavernConfig.api_url_scale || tavernConfig.api_url || 'https://api.openai.com/v1';
+        config.api_key = tavernConfig.api_key_scale || tavernConfig.api_key || '';
+      }
       config.model = tavernConfig.openai_model || tavernConfig.model || 'gpt-4o-mini';
       config.max_tokens = tavernConfig.openai_max_tokens || 4000;
       config.temperature = tavernConfig.temp_openai || 0.7;

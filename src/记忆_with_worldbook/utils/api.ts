@@ -1,3 +1,4 @@
+import { filterApiParams } from '../settings';
 import { APISettings, ChatMessage } from '../types';
 
 /**
@@ -111,9 +112,6 @@ export async function callAIWithTavernSupport(
     onProgress?: (percent: number) => void;
   },
 ): Promise<string> {
-  const { filterApiParams } = await import('../settings');
-  const { normalizeApiEndpoint } = await import('../settings');
-
   // 如果启用了"使用酒馆 API"，通过酒馆后端发送请求（绕过 CORS）
   if (settings.use_tavern_api) {
     console.log('🍺 使用酒馆 API 发送请求（绕过 CORS）...');
@@ -460,9 +458,6 @@ ${messages.map(msg => `[${msg.role}]: ${msg.message}`).join('\n\n')}
     max_tokens: settings.max_tokens,
     temperature: settings.temperature,
   });
-
-  // 导入参数过滤函数
-  const { filterApiParams } = await import('../settings');
 
   const requestParams = {
     model: settings.model,

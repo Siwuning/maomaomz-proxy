@@ -1156,6 +1156,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { detectApiProvider, filterApiParams, normalizeApiEndpoint, useSettingsStore } from '../settings';
 import { useTaskStore } from '../taskStore';
 import { copyToClipboard, getScriptIdSafe } from '../utils';
+import { callAIWithTavernSupport } from '../utils/api';
 import { getApiConfigError, isApiConfigValid } from '../utils/api-config';
 import AIModifyDialog from './AIModifyDialog.vue';
 import CodeCompareDialog from './CodeCompareDialog.vue';
@@ -1724,7 +1725,6 @@ ${xmlInput.value.trim()}
     // 如果启用了"使用酒馆 API"，通过酒馆后端发送请求（绕过 CORS）
     if (settings.value.use_tavern_api) {
       console.log('🍺 使用酒馆 API 发送请求（绕过 CORS）...');
-      const { callAIWithTavernSupport } = await import('../utils/api');
       aiResponse = await callAIWithTavernSupport(requestParams.messages, settings.value);
     } else {
       const response = await fetch(apiUrl, {
@@ -1885,7 +1885,6 @@ ${modifyInstruction}
     // 如果启用了"使用酒馆 API"，通过酒馆后端发送请求（绕过 CORS）
     if (settings.value.use_tavern_api) {
       console.log('🍺 使用酒馆 API 发送请求（绕过 CORS）...');
-      const { callAIWithTavernSupport } = await import('../utils/api');
       aiResponse = await callAIWithTavernSupport(requestParams.messages, settings.value);
     } else {
       const response = await fetch(apiUrl, {
@@ -2061,7 +2060,6 @@ ${aiFieldDescription.value.trim()}
     // 如果启用了"使用酒馆 API"，通过酒馆后端发送请求（绕过 CORS）
     if (settings.value.use_tavern_api) {
       console.log('🍺 使用酒馆 API 发送请求（绕过 CORS）...');
-      const { callAIWithTavernSupport } = await import('../utils/api');
       aiResponse = await callAIWithTavernSupport(requestParams.messages, settings.value);
     } else {
       // 调用 AI API
@@ -2236,7 +2234,6 @@ ${modifyInstruction}
     // 如果启用了"使用酒馆 API"，通过酒馆后端发送请求（绕过 CORS）
     if (settings.value.use_tavern_api) {
       console.log('🍺 使用酒馆 API 发送请求（绕过 CORS）...');
-      const { callAIWithTavernSupport } = await import('../utils/api');
       aiResponse = await callAIWithTavernSupport(requestParams.messages, settings.value);
     } else {
       const response = await fetch(apiUrl, {
@@ -2690,7 +2687,6 @@ ${currentFiles}
     // 如果启用了"使用酒馆 API"，通过酒馆后端发送请求（绕过 CORS）
     if (settings.value.use_tavern_api) {
       console.log('🍺 使用酒馆 API 发送请求（绕过 CORS）...');
-      const { callAIWithTavernSupport } = await import('../utils/api');
       resultText = await callAIWithTavernSupport(requestParams.messages, settings.value);
       taskStore.updateTaskProgress(taskId, 50, `等待AI响应 (${settings.value.model})`);
     } else {
@@ -2848,7 +2844,6 @@ FILE_END
     // 如果启用了"使用酒馆 API"，通过酒馆后端发送请求（绕过 CORS）
     if (settings.value.use_tavern_api) {
       console.log('🍺 使用酒馆 API 发送请求（绕过 CORS）...');
-      const { callAIWithTavernSupport } = await import('../utils/api');
       resultText = await callAIWithTavernSupport(requestParams.messages, settings.value);
     } else {
       const response = await fetch(apiUrl, {

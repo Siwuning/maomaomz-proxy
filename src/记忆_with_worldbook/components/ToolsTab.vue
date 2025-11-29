@@ -2431,6 +2431,7 @@ import { storeToRefs } from 'pinia';
 import { onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue';
 import { detectApiProvider, filterApiParams, normalizeApiEndpoint, useSettingsStore } from '../settings';
 import { copyToClipboard, getScriptIdSafe } from '../utils';
+import { callAIWithTavernSupport } from '../utils/api';
 import UIGenerator from './UIGenerator.vue';
 
 const settingsStore = useSettingsStore();
@@ -2907,7 +2908,7 @@ const handleAntiClicheProcess = async () => {
     // 如果启用了"使用酒馆 API"，通过酒馆后端发送请求（绕过 CORS）
     if (settings.value.use_tavern_api) {
       console.log('🍺 使用酒馆 API 发送反八股请求（绕过 CORS）...');
-      const { callAIWithTavernSupport } = await import('../utils/api');
+
       generatedText = await callAIWithTavernSupport(requestPayload.messages, settings.value, {
         onProgress: p => (antiClicheProgressPercent.value = p),
       });
@@ -3001,7 +3002,7 @@ const handleModifyAntiCliche = async () => {
     // 如果启用了"使用酒馆 API"，通过酒馆后端发送请求（绕过 CORS）
     if (settings.value.use_tavern_api) {
       console.log('🍺 使用酒馆 API 发送反八股修改请求（绕过 CORS）...');
-      const { callAIWithTavernSupport } = await import('../utils/api');
+
       modifiedText = await callAIWithTavernSupport(requestPayload.messages, settings.value, {
         onProgress: p => (antiClicheProgressPercent.value = p),
       });
@@ -3212,7 +3213,7 @@ const handleGenerateCharacterCard = async () => {
     // 如果启用了"使用酒馆 API"，通过酒馆后端发送请求（绕过 CORS）
     if (settings.value.use_tavern_api) {
       console.log('🍺 使用酒馆 API 发送角色卡生成请求（绕过 CORS）...');
-      const { callAIWithTavernSupport } = await import('../utils/api');
+
       generatedText = await callAIWithTavernSupport(requestPayload.messages, settings.value, {
         onProgress: p => (characterProgressPercent.value = p),
       });
@@ -3344,7 +3345,7 @@ ${modifyRequest.value}`,
     // 如果启用了"使用酒馆 API"，通过酒馆后端发送请求（绕过 CORS）
     if (settings.value.use_tavern_api) {
       console.log('🍺 使用酒馆 API 发送角色卡修改请求（绕过 CORS）...');
-      const { callAIWithTavernSupport } = await import('../utils/api');
+
       modifiedCard = await callAIWithTavernSupport(requestPayload.messages, settings.value, {
         onProgress: p => (characterProgressPercent.value = p),
       });
@@ -3828,7 +3829,6 @@ const handleGenerateWorldbookEntry = async () => {
     if (settings.value.use_tavern_api) {
       console.log('🍺 使用酒馆 API 发送世界书生成请求（绕过 CORS）...');
 
-      const { callAIWithTavernSupport } = await import('../utils/api');
       generatedText = await callAIWithTavernSupport(requestPayload.messages, settings.value as any, {
         onProgress: (p: number) => {
           worldbookProgressPercent.value = Math.max(worldbookProgressPercent.value, p);
@@ -4013,7 +4013,6 @@ ${worldbookModifyRequest.value}`,
     if (settings.value.use_tavern_api) {
       console.log('🍺 使用酒馆 API 发送世界书修改请求（绕过 CORS）...');
 
-      const { callAIWithTavernSupport } = await import('../utils/api');
       generatedText = await callAIWithTavernSupport(requestPayload.messages, settings.value as any, {
         onProgress: (p: number) => {
           worldbookProgressPercent.value = Math.max(worldbookProgressPercent.value, p);

@@ -307,63 +307,90 @@ ${updateInfo.notes}
     const TH = (window as any).TavernHelper;
     const updateButton = document.getElementById('maomaomz-update-now') as HTMLButtonElement;
 
-    // 检查是否有 TavernHelper API
-    if (TH?.updateExtension) {
-      try {
-        // 更新按钮状态
-        if (updateButton) {
-          updateButton.disabled = true;
-          updateButton.innerHTML = '⏳ 正在更新...';
-          updateButton.style.opacity = '0.7';
+    // 更新按钮状态
+    if (updateButton) {
+      updateButton.disabled = true;
+      updateButton.innerHTML = '⏳ 正在更新...';
+      updateButton.style.opacity = '0.7';
+    }
+
+    (window as any).toastr?.info('🔄 正在更新插件，请稍候...', '更新中');
+
+    try {
+      let updateSuccess = false;
+
+      // 方法1: TavernHelper API
+      if (TH?.updateExtension) {
+        try {
+          const response = await TH.updateExtension('maomaomz');
+          if (response && response.ok) {
+            updateSuccess = true;
+          }
+        } catch (e) {
+          console.warn('TavernHelper API 更新失败，尝试其他方法...', e);
         }
-
-        (window as any).toastr?.info('🔄 正在更新插件，请稍候...', '更新中');
-
-        // 调用 TavernHelper 的更新 API
-        const response = await TH.updateExtension('maomaomz');
-
-        if (response && response.ok) {
-          // 关闭对话框
-          document.getElementById('maomaomz-update-overlay')?.remove();
-
-          (window as any).toastr?.success(`✅ 更新成功！3秒后自动刷新页面...`, '🎉 更新完成', { timeOut: 3000 });
-
-          // 3秒后刷新页面
-          setTimeout(() => {
-            if (TH?.triggerSlash) {
-              TH.triggerSlash('/reload-page');
-            } else {
-              window.location.reload();
-            }
-          }, 3000);
-        } else {
-          throw new Error('更新请求返回失败');
-        }
-      } catch (error) {
-        console.error('❌ 一键更新失败:', error);
-
-        // 恢复按钮状态
-        if (updateButton) {
-          updateButton.disabled = false;
-          updateButton.innerHTML = '🚀 立即更新';
-          updateButton.style.opacity = '1';
-        }
-
-        // 降级：显示手动更新指引
-        (window as any).toastr?.warning(
-          `⚠️ 一键更新失败，请手动更新：\n\n1️⃣ 点击左侧【扩展】图标\n2️⃣ 找到【猫猫的记忆管理工具】\n3️⃣ 点击【立即更新】按钮`,
-          '请手动更新',
-          { timeOut: 10000 },
-        );
       }
-    } else {
-      // 没有 TavernHelper API，使用旧的方式
-      document.getElementById('maomaomz-update-overlay')?.remove();
 
-      (window as any).toastr?.success(
-        `📦 请按以下步骤更新：\n\n1️⃣ 点击左侧【扩展】图标\n2️⃣ 找到【猫猫的记忆管理工具】\n3️⃣ 点击【立即更新】按钮\n4️⃣ 等待更新完成后刷新页面\n\n✨ 新版本 v${updateInfo.latestVersion} 即可安装成功！`,
-        '🎉 如何更新到最新版本',
-        { timeOut: 15000, extendedTimeOut: 5000 },
+      // 方法2: 直接调用 SillyTavern API
+      if (!updateSuccess) {
+        try {
+          const response = await fetch('/api/extensions/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ extensionName: 'third-party/maomaomz' }),
+          });
+          if (response.ok) {
+            updateSuccess = true;
+          }
+        } catch (e) {
+          console.warn('直接 API 更新失败，尝试其他方法...', e);
+        }
+      }
+
+      // 方法3: 使用 git pull 方式
+      if (!updateSuccess) {
+        try {
+          const response = await fetch('/api/extensions/install', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: 'https://github.com/mzrodyu/maomaomz' }),
+          });
+          if (response.ok) {
+            updateSuccess = true;
+          }
+        } catch (e) {
+          console.warn('重装更新失败...', e);
+        }
+      }
+
+      if (updateSuccess) {
+        // 关闭对话框
+        document.getElementById('maomaomz-update-overlay')?.remove();
+
+        (window as any).toastr?.success(`✅ 更新成功！3秒后自动刷新页面...`, '🎉 更新完成', { timeOut: 3000 });
+
+        // 3秒后刷新页面
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
+      } else {
+        throw new Error('所有更新方法都失败了');
+      }
+    } catch (error) {
+      console.error('❌ 一键更新失败:', error);
+
+      // 恢复按钮状态
+      if (updateButton) {
+        updateButton.disabled = false;
+        updateButton.innerHTML = '🚀 立即更新';
+        updateButton.style.opacity = '1';
+      }
+
+      // 降级：显示手动更新指引
+      (window as any).toastr?.warning(
+        `⚠️ 一键更新失败，请手动更新：\n\n1️⃣ 点击左侧【扩展】图标\n2️⃣ 找到【猫猫的记忆管理工具】\n3️⃣ 点击【立即更新】按钮`,
+        '请手动更新',
+        { timeOut: 10000 },
       );
     }
   });

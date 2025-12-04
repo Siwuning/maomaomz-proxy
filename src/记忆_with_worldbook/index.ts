@@ -296,19 +296,77 @@ $(() => {
                     const hideCommand = `/hide ${start_id}-${end_id}`;
                     console.log(`🙈 执行自动隐藏: ${hideCommand}`);
 
-                    // 使用 SillyTavern.executeSlashCommandsWithOptions 执行斜杠命令
-                    if (typeof SillyTavern !== 'undefined' && SillyTavern.executeSlashCommandsWithOptions) {
-                      const result = await SillyTavern.executeSlashCommandsWithOptions(hideCommand);
-                      console.log('🙈 隐藏命令执行结果:', result);
-                      if (!result.isError) {
-                        window.toastr.info(`🙈 已隐藏楼层 ${start_id}-${end_id}`);
-                      } else {
-                        console.warn('⚠️ 隐藏命令执行失败:', result.errorMessage);
-                        window.toastr.warning(`⚠️ 隐藏失败: ${result.errorMessage}`);
+                    // 尝试多种方式执行斜杠命令
+                    let executed = false;
+
+                    // 方式1: SillyTavern.getContext().executeSlashCommands (推荐)
+                    if (!executed && typeof SillyTavern !== 'undefined' && SillyTavern.getContext) {
+                      try {
+                        const context = SillyTavern.getContext();
+                        if (context && typeof context.executeSlashCommands === 'function') {
+                          console.log('🔄 使用 SillyTavern.getContext().executeSlashCommands');
+                          await context.executeSlashCommands(hideCommand);
+                          executed = true;
+                          window.toastr.info(`🙈 已隐藏楼层 ${start_id}-${end_id}`);
+                        }
+                      } catch (e) {
+                        console.warn('⚠️ getContext().executeSlashCommands 失败:', e);
                       }
-                    } else {
-                      console.warn('⚠️ 无法执行隐藏命令：找不到 executeSlashCommandsWithOptions');
-                      window.toastr.warning('⚠️ 隐藏功能不可用：酒馆版本可能不支持');
+                    }
+
+                    // 方式2: SillyTavern.executeSlashCommandsWithOptions
+                    if (!executed && typeof SillyTavern !== 'undefined' && SillyTavern.executeSlashCommandsWithOptions) {
+                      try {
+                        console.log('🔄 使用 SillyTavern.executeSlashCommandsWithOptions');
+                        const result = await SillyTavern.executeSlashCommandsWithOptions(hideCommand);
+                        console.log('🙈 隐藏命令执行结果:', result);
+                        executed = true;
+                        if (!result.isError) {
+                          window.toastr.info(`🙈 已隐藏楼层 ${start_id}-${end_id}`);
+                        } else {
+                          window.toastr.warning(`⚠️ 隐藏失败: ${result.errorMessage}`);
+                        }
+                      } catch (e) {
+                        console.warn('⚠️ executeSlashCommandsWithOptions 失败:', e);
+                      }
+                    }
+
+                    // 方式3: 全局 executeSlashCommands 函数
+                    if (!executed && typeof (window as any).executeSlashCommands === 'function') {
+                      try {
+                        console.log('🔄 使用全局 executeSlashCommands');
+                        await (window as any).executeSlashCommands(hideCommand);
+                        executed = true;
+                        window.toastr.info(`🙈 已隐藏楼层 ${start_id}-${end_id}`);
+                      } catch (e) {
+                        console.warn('⚠️ 全局 executeSlashCommands 失败:', e);
+                      }
+                    }
+
+                    // 方式4: TavernHelper.executeSlashCommands
+                    if (!executed && typeof (window as any).TavernHelper !== 'undefined') {
+                      const TH = (window as any).TavernHelper;
+                      if (typeof TH.executeSlashCommands === 'function') {
+                        try {
+                          console.log('🔄 使用 TavernHelper.executeSlashCommands');
+                          await TH.executeSlashCommands(hideCommand);
+                          executed = true;
+                          window.toastr.info(`🙈 已隐藏楼层 ${start_id}-${end_id}`);
+                        } catch (e) {
+                          console.warn('⚠️ TavernHelper.executeSlashCommands 失败:', e);
+                        }
+                      }
+                    }
+
+                    if (!executed) {
+                      console.warn('⚠️ 所有斜杠命令执行方式都不可用');
+                      console.log('🔍 可用的 API:', {
+                        SillyTavern: typeof SillyTavern !== 'undefined',
+                        'SillyTavern.getContext': typeof SillyTavern !== 'undefined' && !!SillyTavern.getContext,
+                        'window.executeSlashCommands': typeof (window as any).executeSlashCommands,
+                        TavernHelper: typeof (window as any).TavernHelper !== 'undefined',
+                      });
+                      window.toastr.warning('⚠️ 隐藏功能不可用，请手动执行: ' + hideCommand);
                     }
                   } catch (hideError) {
                     console.error('❌ 自动隐藏失败:', hideError);

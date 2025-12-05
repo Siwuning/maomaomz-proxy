@@ -90,9 +90,83 @@
           <label style="display: block; margin-bottom: 8px; color: #ccc; font-size: 13px; font-weight: 500">
             输入文本：
           </label>
+          <!-- 快速读取按钮 -->
+          <div style="display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap">
+            <button
+              style="
+                padding: 6px 12px;
+                background: #2a2a2a;
+                border: 1px solid #3a3a3a;
+                border-radius: 4px;
+                color: #17a2b8;
+                font-size: 11px;
+                cursor: pointer;
+              "
+              @click="loadAntiClicheFromChar('description')"
+            >
+              📝 角色描述
+            </button>
+            <button
+              style="
+                padding: 6px 12px;
+                background: #2a2a2a;
+                border: 1px solid #3a3a3a;
+                border-radius: 4px;
+                color: #17a2b8;
+                font-size: 11px;
+                cursor: pointer;
+              "
+              @click="loadAntiClicheFromChar('personality')"
+            >
+              💭 角色性格
+            </button>
+            <button
+              style="
+                padding: 6px 12px;
+                background: #2a2a2a;
+                border: 1px solid #3a3a3a;
+                border-radius: 4px;
+                color: #17a2b8;
+                font-size: 11px;
+                cursor: pointer;
+              "
+              @click="loadAntiClicheFromChar('scenario')"
+            >
+              🎬 场景
+            </button>
+            <button
+              style="
+                padding: 6px 12px;
+                background: #2a2a2a;
+                border: 1px solid #3a3a3a;
+                border-radius: 4px;
+                color: #17a2b8;
+                font-size: 11px;
+                cursor: pointer;
+              "
+              @click="loadAntiClicheFromChar('mes_example')"
+            >
+              📖 示例对话
+            </button>
+            <select
+              v-model="antiClicheWorldbook"
+              style="
+                padding: 6px 10px;
+                background: #2a2a2a;
+                border: 1px solid #3a3a3a;
+                border-radius: 4px;
+                color: #10b981;
+                font-size: 11px;
+              "
+              @change="loadAntiClicheFromWorldbook"
+            >
+              <option value="">📚 从世界书读取...</option>
+              <option v-for="wb in availableWorldbooks" :key="wb" :value="wb">{{ wb }}</option>
+            </select>
+          </div>
           <textarea
             v-model="antiClicheInput"
-            placeholder="请输入需要清理的文本..."
+            placeholder="请输入需要清理的文本...&#10;💡 也可点击上方按钮快速读取角色卡或世界书内容"
             style="
               width: 100%;
               height: 120px;
@@ -392,6 +466,219 @@
                 清空修改需求
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NPC 快速生成工具 -->
+    <div class="tool-section">
+      <div
+        class="section-header"
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 15px 20px;
+          background: linear-gradient(
+            135deg,
+            rgba(30, 30, 30, 0.95) 0%,
+            rgba(38, 38, 38, 0.9) 50%,
+            rgba(30, 30, 30, 0.95) 100%
+          );
+          border: 1px solid rgba(255, 193, 7, 0.3);
+          border-radius: 12px;
+          margin-bottom: 4px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        "
+        @click="toggleTool('npcGen')"
+      >
+        <h4
+          style="
+            margin: 0;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          "
+        >
+          <i class="fa-solid fa-users" style="color: #ffc107; font-size: 18px"></i>
+          NPC 快速生成
+        </h4>
+        <i
+          :class="isToolExpanded('npcGen') ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'"
+          style="color: #888; font-size: 14px; transition: transform 0.3s ease"
+        ></i>
+      </div>
+
+      <div v-show="isToolExpanded('npcGen')" class="section-content" style="padding: 20px">
+        <div class="tool-description" style="margin-bottom: 15px">
+          <p style="margin: 0 0 8px 0; color: #ccc; font-size: 12px">
+            <i class="fa-solid fa-info-circle" style="margin-right: 6px; color: #ffc107"></i>
+            快速生成配角 NPC 设定，读取当前角色卡和世界书作为背景参考。
+          </p>
+        </div>
+
+        <div class="form-group" style="margin: 15px 0">
+          <label style="display: block; margin-bottom: 8px; color: #ccc; font-size: 13px; font-weight: 500">
+            NPC 描述（简短即可）：
+          </label>
+          <textarea
+            v-model="npcDescription"
+            placeholder="例如：酒馆老板，中年男性，健谈，知道很多八卦，对主角有好感"
+            style="
+              width: 100%;
+              height: 80px;
+              padding: 12px;
+              background: #2a2a2a;
+              border: 1px solid #3a3a3a;
+              border-radius: 6px;
+              color: #e0e0e0;
+              font-size: 13px;
+              resize: vertical;
+              font-family: inherit;
+            "
+          ></textarea>
+        </div>
+
+        <!-- 流式传输开关 -->
+        <div class="form-group" style="margin: 15px 0">
+          <label style="display: flex; align-items: center; gap: 8px; color: #ccc; font-size: 13px; cursor: pointer">
+            <input v-model="enableNpcStreaming" type="checkbox" style="cursor: pointer" />
+            启用流式传输
+          </label>
+        </div>
+
+        <!-- 进度条 -->
+        <div v-if="isGeneratingNpc && npcProgressPercent > 0" class="progress-bar-container" style="margin: 15px 0">
+          <div
+            class="progress-bar"
+            style="width: 100%; height: 8px; background: #2a2a2a; border-radius: 4px; overflow: hidden"
+          >
+            <div
+              :style="{
+                width: npcProgressPercent + '%',
+                height: '100%',
+                background: '#ffc107',
+                transition: 'width 0.3s',
+              }"
+            ></div>
+          </div>
+          <p style="margin: 5px 0 0 0; color: #ffc107; font-size: 11px; text-align: center">
+            生成中... {{ npcProgressPercent.toFixed(0) }}%
+          </p>
+        </div>
+
+        <div class="button-group" style="display: flex; gap: 12px; margin-bottom: 15px">
+          <button
+            :disabled="isGeneratingNpc || !npcDescription.trim()"
+            style="
+              padding: 10px 20px;
+              background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+              border: none;
+              border-radius: 8px;
+              color: #1a1a1a;
+              font-size: 13px;
+              font-weight: 600;
+              cursor: pointer;
+            "
+            @click="handleGenerateNpc"
+          >
+            <i class="fa-solid fa-magic" style="margin-right: 6px"></i>
+            {{ isGeneratingNpc ? '生成中...' : '生成 NPC' }}
+          </button>
+          <button
+            style="
+              padding: 10px 20px;
+              background: #3a3a3a;
+              border: none;
+              border-radius: 8px;
+              color: #ccc;
+              font-size: 13px;
+              cursor: pointer;
+            "
+            @click="
+              npcDescription = '';
+              npcOutput = '';
+            "
+          >
+            <i class="fa-solid fa-trash" style="margin-right: 6px"></i>
+            清空
+          </button>
+        </div>
+
+        <!-- 输出区域 -->
+        <div v-if="npcOutput" class="output-section">
+          <h5 style="margin: 0 0 12px 0; color: #fff; font-size: 14px; font-weight: 600">
+            <i class="fa-solid fa-check-circle" style="margin-right: 6px; color: #28a745"></i>
+            生成的 NPC：
+          </h5>
+          <div
+            style="
+              background: #1e1e1e;
+              border: 1px solid #3a3a3a;
+              border-radius: 6px;
+              padding: 15px;
+              color: #e0e0e0;
+              font-size: 13px;
+              line-height: 1.6;
+              white-space: pre-wrap;
+              max-height: 300px;
+              overflow-y: auto;
+            "
+          >
+            {{ npcOutput }}
+          </div>
+
+          <div style="margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center">
+            <button
+              style="
+                padding: 8px 16px;
+                background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                border: none;
+                border-radius: 6px;
+                color: white;
+                font-size: 12px;
+                cursor: pointer;
+              "
+              @click="copyToClipboard(npcOutput, 'NPC 已复制')"
+            >
+              <i class="fa-solid fa-copy" style="margin-right: 6px"></i>
+              复制
+            </button>
+            <select
+              v-model="npcInsertWorldbook"
+              style="
+                padding: 8px 12px;
+                background: #1a1a1a;
+                border: 1px solid #3a3a3a;
+                border-radius: 6px;
+                color: #e0e0e0;
+                font-size: 12px;
+              "
+            >
+              <option value="">插入到世界书...</option>
+              <option v-for="wb in availableWorldbooks" :key="wb" :value="wb">{{ wb }}</option>
+            </select>
+            <button
+              v-if="npcInsertWorldbook"
+              style="
+                padding: 8px 16px;
+                background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+                border: none;
+                border-radius: 6px;
+                color: #1a1a1a;
+                font-size: 12px;
+                cursor: pointer;
+              "
+              @click="insertNpcToWorldbook"
+            >
+              <i class="fa-solid fa-download" style="margin-right: 6px"></i>
+              插入
+            </button>
           </div>
         </div>
       </div>
@@ -3160,6 +3447,7 @@ const antiClicheProgressPercent = ref(0); // 反八股处理进度
 const antiClicheModifyRequest = ref(''); // 反八股修改需求
 const isModifyingAntiCliche = ref(false); // 是否正在修改
 const antiClicheLevel = ref<'light' | 'moderate' | 'deep'>('moderate'); // 清理强度
+const antiClicheWorldbook = ref(''); // 反八股读取的世界书
 
 // 清理强度选项
 const antiClicheLevels = [
@@ -3200,6 +3488,15 @@ const characterProgressPercent = ref(0); // 角色卡生成进度
 const characterInsertPosition = ref('description'); // 角色卡插入位置
 const isInsertingCharacter = ref(false); // 是否正在插入角色卡
 const characterInsertWorldbook = ref(''); // 插入世界书时选择的世界书
+
+// NPC 快速生成工具相关
+const npcDescription = ref('');
+const npcOutput = ref('');
+const isGeneratingNpc = ref(false);
+const npcProgressPercent = ref(0);
+const enableNpcStreaming = ref(false);
+const npcInsertWorldbook = ref('');
+
 const characterInsertPositions = [
   { value: 'description', label: '📝 角色描述 (Description)', type: 'char' },
   { value: 'personality', label: '💭 角色性格 (Personality)', type: 'char' },
@@ -3785,11 +4082,184 @@ const handleModifyAntiCliche = async () => {
   }
 };
 
+// 从角色卡读取内容到反八股
+const loadAntiClicheFromChar = (field: string) => {
+  try {
+    const tav = (window as any).TavernHelper;
+    if (tav?.getCharData) {
+      const char = tav.getCharData('current');
+      if (char) {
+        const fieldMap: Record<string, string> = {
+          description: char.description || char.data?.description || '',
+          personality: char.personality || char.data?.personality || '',
+          scenario: char.scenario || char.data?.scenario || '',
+          mes_example: char.mes_example || char.data?.mes_example || '',
+        };
+        const content = fieldMap[field] || '';
+        if (content) {
+          antiClicheInput.value = content;
+          window.toastr.success(`已读取角色卡 ${field}`);
+        } else {
+          window.toastr.warning(`角色卡 ${field} 为空`);
+        }
+        return;
+      }
+    }
+    window.toastr.warning('请先选择一个角色');
+  } catch (e) {
+    console.error('读取角色卡失败:', e);
+    window.toastr.error('读取失败');
+  }
+};
+
+// 从世界书读取内容到反八股
+const loadAntiClicheFromWorldbook = async () => {
+  if (!antiClicheWorldbook.value) return;
+
+  try {
+    const tav = (window as any).TavernHelper;
+    if (tav?.getWorldbook) {
+      const entries = await tav.getWorldbook(antiClicheWorldbook.value);
+      if (entries?.length) {
+        // 合并所有条目内容
+        const allContent = entries
+          .filter((e: any) => e.content)
+          .map((e: any) => `【${e.name || e.comment || '条目'}】\n${e.content}`)
+          .join('\n\n');
+        if (allContent) {
+          antiClicheInput.value = allContent;
+          window.toastr.success(`已读取 ${entries.length} 个条目`);
+        } else {
+          window.toastr.warning('世界书条目内容为空');
+        }
+      } else {
+        window.toastr.warning('世界书没有条目');
+      }
+    }
+  } catch (e) {
+    console.error('读取世界书失败:', e);
+    window.toastr.error('读取失败');
+  } finally {
+    antiClicheWorldbook.value = '';
+  }
+};
+
 // 清空反八股修改需求
 const clearAntiClicheModifyRequest = () => {
   antiClicheModifyRequest.value = '';
   saveToolsDataImmediate();
   window.toastr.success('修改需求已清空');
+};
+
+// NPC 快速生成函数
+const handleGenerateNpc = async () => {
+  if (!npcDescription.value.trim()) {
+    window.toastr.warning('请输入 NPC 描述');
+    return;
+  }
+
+  try {
+    isGeneratingNpc.value = true;
+    npcProgressPercent.value = 0;
+    window.toastr.info('正在生成 NPC...');
+
+    // 获取当前角色卡和世界书作为背景
+    let context = '';
+    const tav = (window as any).TavernHelper;
+    if (tav?.getCharData) {
+      const char = tav.getCharData('current');
+      if (char) {
+        context += `【主角信息】\n角色名：${char.name || '未知'}\n`;
+        if (char.description || char.data?.description) {
+          context += `背景：${(char.description || char.data?.description).substring(0, 500)}...\n`;
+        }
+      }
+    }
+
+    const systemPrompt = `你是一个专业的配角 NPC 设计师。根据用户的简短描述，生成一个精简但完整的 NPC 设定。
+
+${context ? context + '\n' : ''}要求：
+1. 设定要精简，控制在 300 字以内
+2. 包含：姓名、外貌特征、性格特点、与主角的关系/态度、标志性行为或口头禅
+3. 风格自然，避免八股套话
+4. 直接输出设定内容，不要解释或前言`;
+
+    const requestPayload = {
+      model: settings.value.model,
+      max_tokens: 1000,
+      temperature: 0.8,
+      stream: enableNpcStreaming.value,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `请为以下描述生成 NPC 设定：\n${npcDescription.value}` },
+      ],
+    };
+
+    let generatedText = '';
+
+    if (settings.value.use_tavern_api) {
+      generatedText = await callAIWithTavernSupport(requestPayload.messages, settings.value, {
+        onProgress: p => (npcProgressPercent.value = p),
+      });
+    } else if (enableNpcStreaming.value) {
+      generatedText = await generateWithStreaming(requestPayload, npcProgressPercent);
+    } else {
+      const apiUrl = normalizeApiEndpoint(settings.value.api_endpoint);
+      const filteredPayload = filterApiParams(requestPayload, settings.value.api_endpoint);
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${settings.value.api_key}`,
+        },
+        body: JSON.stringify(filteredPayload),
+      });
+
+      if (!response.ok) throw new Error(`API 请求失败 (${response.status})`);
+      const data = await response.json();
+      generatedText = data.choices[0].message.content.trim();
+      npcProgressPercent.value = 100;
+    }
+
+    npcOutput.value = cleanCharacterCardOutput(generatedText);
+    saveToolsDataImmediate();
+    window.toastr.success('NPC 生成完成！');
+  } catch (error) {
+    console.error('NPC 生成失败:', error);
+    window.toastr.error(translateError(error, '生成'));
+  } finally {
+    isGeneratingNpc.value = false;
+    npcProgressPercent.value = 0;
+  }
+};
+
+// 插入 NPC 到世界书
+const insertNpcToWorldbook = async () => {
+  if (!npcOutput.value || !npcInsertWorldbook.value) {
+    window.toastr.warning('请先生成 NPC 并选择目标世界书');
+    return;
+  }
+
+  try {
+    const tav = (window as any).TavernHelper;
+    if (!tav?.createWorldbookEntries) {
+      throw new Error('TavernHelper.createWorldbookEntries 不可用');
+    }
+
+    const newEntry = {
+      content: npcOutput.value,
+      comment: 'NPC - ' + new Date().toLocaleString(),
+      keys: ['NPC', '配角'],
+      enabled: true,
+    };
+
+    await tav.createWorldbookEntries(npcInsertWorldbook.value, [newEntry], { render: 'immediate' });
+    window.toastr.success(`已插入到「${npcInsertWorldbook.value}」`);
+    npcInsertWorldbook.value = '';
+  } catch (error) {
+    console.error('插入失败:', error);
+    window.toastr.error('插入失败');
+  }
 };
 
 // 开场白生成工具相关函数

@@ -108,6 +108,40 @@
           ></textarea>
         </div>
 
+        <!-- 清理强度选择 -->
+        <div class="form-group" style="margin: 15px 0">
+          <label style="display: block; margin-bottom: 8px; color: #ccc; font-size: 13px; font-weight: 500">
+            清理强度：
+          </label>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap">
+            <label
+              v-for="level in antiClicheLevels"
+              :key="level.value"
+              style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 8px 14px;
+                background: #2a2a2a;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s;
+              "
+              :style="{
+                background: antiClicheLevel === level.value ? level.color + '20' : '#2a2a2a',
+                border: antiClicheLevel === level.value ? '1px solid ' + level.color : '1px solid #3a3a3a',
+              }"
+            >
+              <input v-model="antiClicheLevel" type="radio" :value="level.value" style="display: none" />
+              <i :class="level.icon" :style="{ color: level.color }"></i>
+              <span style="color: #e0e0e0; font-size: 12px">{{ level.label }}</span>
+            </label>
+          </div>
+          <p style="margin: 8px 0 0 0; color: #888; font-size: 11px">
+            {{ antiClicheLevelDescription }}
+          </p>
+        </div>
+
         <!-- 流式传输开关 -->
         <div class="form-group" style="margin: 15px 0">
           <label style="display: flex; align-items: center; gap: 8px; color: #ccc; font-size: 13px; cursor: pointer">
@@ -2688,7 +2722,7 @@
 <script setup lang="ts">
 import { debounce } from 'lodash';
 import { storeToRefs } from 'pinia';
-import { onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue';
 import { detectApiProvider, filterApiParams, normalizeApiEndpoint, useSettingsStore } from '../settings';
 import { copyToClipboard, getScriptIdSafe } from '../utils';
 import { callAIWithTavernSupport } from '../utils/api';
@@ -2707,6 +2741,37 @@ const enableAntiClicheStreaming = ref(false); // 反八股是否启用流式传�
 const antiClicheProgressPercent = ref(0); // 反八股处理进度
 const antiClicheModifyRequest = ref(''); // 反八股修改需求
 const isModifyingAntiCliche = ref(false); // 是否正在修改
+const antiClicheLevel = ref<'light' | 'moderate' | 'deep'>('moderate'); // 清理强度
+
+// 清理强度选项
+const antiClicheLevels = [
+  {
+    value: 'light',
+    label: '轻度',
+    icon: 'fa-solid fa-feather',
+    color: '#10b981',
+    desc: '只删除最明显的套话词汇，保留大部分文学表达',
+  },
+  {
+    value: 'moderate',
+    label: '适度',
+    icon: 'fa-solid fa-balance-scale',
+    color: '#667eea',
+    desc: '删除八股词汇和文学腔，保持信息量',
+  },
+  {
+    value: 'deep',
+    label: '深度',
+    icon: 'fa-solid fa-fire',
+    color: '#ff6b6b',
+    desc: '彻底清理所有八股表述，转为简洁人话',
+  },
+] as const;
+
+// 清理强度描述
+const antiClicheLevelDescription = computed(() => {
+  return antiClicheLevels.find(l => l.value === antiClicheLevel.value)?.desc || '';
+});
 const characterDescription = ref('');
 const characterCardOutput = ref('');
 const isGeneratingCharacter = ref(false);
@@ -2794,11 +2859,12 @@ const loadToolsData = () => {
       antiClicheOutput.value = savedData.tools_antiCliche.output || '';
       enableAntiClicheStreaming.value = savedData.tools_antiCliche.enableStreaming || false;
       antiClicheModifyRequest.value = savedData.tools_antiCliche.modifyRequest || '';
+      antiClicheLevel.value = savedData.tools_antiCliche.level || 'moderate';
       console.log('✅ 已恢复反八股数据:', {
         input: antiClicheInput.value.substring(0, 50),
         output: antiClicheOutput.value.substring(0, 50),
         enableStreaming: enableAntiClicheStreaming.value,
-        modifyRequest: antiClicheModifyRequest.value.substring(0, 30),
+        level: antiClicheLevel.value,
       });
     }
 
@@ -2895,6 +2961,7 @@ const saveToolsDataImmediate = () => {
         output: antiClicheOutput.value,
         enableStreaming: enableAntiClicheStreaming.value,
         modifyRequest: antiClicheModifyRequest.value,
+        level: antiClicheLevel.value,
       },
       tools_characterCard: {
         description: characterDescription.value,
@@ -2996,6 +3063,79 @@ const isToolExpanded = (toolName: string) => {
 
 // copyToClipboard 函数已从 utils.ts 导入
 
+// 根据清理强度生成提示词
+const getAntiClichePrompt = (level: 'light' | 'moderate' | 'deep'): string => {
+  const baseRules = `# 📋 八股词汇清单
+
+**模糊词**：一丝、一抹、一缕、一股、似乎、几乎、近乎、仿佛
+**比喻词**：如同、宛如、恰似、像是、好像、就像
+**对比句**："不是...而是..."、"既...又..."
+**强调词**：猛地、重重地、狂野、激烈地、不容置疑
+**修饰废话**："不易察觉"、"难以察觉"、"带着xx意味"
+**眼神描写**："眼里闪过xxx"、"嘴角上扬"、"视线交汇"
+**动物比喻**："像小兽"、"像猫咪"、"野兽般的"
+**气氛渲染**："气氛凝重"、"空气凝固"
+**对白标注**："（带着不屑的口吻）"、"（轻声说）"`;
+
+  if (level === 'light') {
+    return `你是文本编辑助手，进行轻度八股清理。
+
+# 🎯 轻度清理原则
+- **只删除最明显的套话**：一丝、一抹、似乎、仿佛
+- **保留大部分文学表达**：比喻、修辞可以保留
+- **信息量100%保持**：不删任何实质内容
+- **改动最小化**：能不改就不改
+
+${baseRules}
+
+# ⚠️ 轻度模式只处理上述"模糊词"和"强调词"，其他保留！
+
+直接输出清理后的文本，不要任何解释。`;
+  }
+
+  if (level === 'deep') {
+    return `你是文本编辑助手，进行深度八股清理。
+
+# 🎯 深度清理原则
+- **彻底清理所有八股**：套话、比喻、文学腔全部删除
+- **转为简洁人话**：用最直白的方式表达
+- **保持核心信息**：设定、对话、动作保留
+- **段落可以合并**：精简为更紧凑的表达
+
+${baseRules}
+
+# 🔥 深度模式额外清理：
+- 所有比喻修辞 → 直接描述
+- 冗长描写 → 一句话概括
+- 精确数字（168cm）→ 模糊化（个子高）
+- 重复信息 → 合并
+
+直接输出清理后的文本，不要任何解释。`;
+  }
+
+  // moderate（默认）
+  return `你是专业的文本编辑助手，专注于清理角色卡/世界书/开场白中的AI文学腔和八股表述。
+
+# 🎯 第一原则（最重要！）
+**信息量守恒**：输入500字，输出也应该接近500字！
+- ❌ 错误：把五段话压缩成两句话
+- ✅ 正确：只替换/删除八股词汇，保留所有实质内容
+
+${baseRules}
+
+# 💡 工作方式
+- 把文学腔改成日常口语
+- 把套路比喻改成直接描述
+- 保留所有对白、设定、动作
+
+# ✅ 必须保留
+1. 所有""内的台词
+2. 核心设定：背景、职业、关系
+3. 基础动作和简单情绪
+
+直接输出清理后的文本，不要任何解释。`;
+};
+
 // 反八股工具处理函数
 const handleAntiClicheProcess = async () => {
   if (!antiClicheInput.value.trim()) {
@@ -3006,169 +3146,18 @@ const handleAntiClicheProcess = async () => {
   try {
     isProcessingAntiCliche.value = true;
     antiClicheProgressPercent.value = 0;
-    window.toastr.info('AI正在分析文本...', '反八股清理', { timeOut: 15000 });
+    const levelLabel = antiClicheLevels.find(l => l.value === antiClicheLevel.value)?.label || '适度';
+    window.toastr.info(`AI正在${levelLabel}清理...`, '反八股清理', { timeOut: 15000 });
 
     const requestPayload = {
       model: settings.value.model,
       max_tokens: settings.value.max_tokens || 8000,
-      temperature: 0.7,
+      temperature: antiClicheLevel.value === 'light' ? 0.5 : antiClicheLevel.value === 'deep' ? 0.8 : 0.7,
       stream: enableAntiClicheStreaming.value,
       messages: [
         {
           role: 'system',
-          content: `你是专业的文本编辑助手，专注于清理角色卡/世界书/开场白中的AI文学腔和八股表述。
-
-# 🎯 第一原则（最重要！）
-
-## ⚠️ 信息量守恒定律
-**输入500字，输出也应该接近500字！信息量必须相同！**
-
-- ❌ 错误：把五段话压缩成两句话
-- ❌ 错误：删除整个句子或段落
-- ❌ 错误：把详细描述变成简略概括
-- ✅ 正确：只替换/删除八股词汇，保留所有实质内容
-- ✅ 正确：用更自然的表达替换文学腔，而不是简单删除
-
-## 💡 工作方式
-**不是"删除工"，而是"改写师"：**
-- 不要想着"删删删"
-- 要想着"怎么用人话说同样的事"
-- 把文学腔改成日常口语
-- 把套路比喻改成直接描述
-
----
-
-# 📋 清理规则（三级分类）
-
-## 🔴 第一级：必须删除（最明显的八股）
-
-### 1️⃣ AI套话词汇（见到就删）
-**模糊词**：一丝、一抹、一缕、一股、似乎、几乎、近乎、仿佛
-**比喻词**：如同、宛如、恰似、像是、好像、就像
-**对比句**："不是...而是..."、"既...又..."、"与其...不如"
-**强调词**：猛地、重重地、狂野、激烈地、恨不得、不容置疑
-**修饰废话**："不易察觉"、"难以察觉"、"带着xx意味"、"充满了某种"
-
-### 2️⃣ AI文学腔描写（全部删除）
-- **眼神/视线**："眼里闪过xxx"、"嘴角上扬"、"视线交汇" → 直接删
-- **心理状态**："她感到害怕"、"他内心矛盾" → 改成对白或动作
-- **声音描述**："声音沙哑"、"声音里带着..." → 全删
-- **动物比喻**："像小兽"、"像猫咪"、"野兽般的" → 全删
-- **气氛渲染**："气氛凝重"、"空气凝固" → 全删
-- **对白标注**："（带着不屑的口吻）"、"（轻声说）" → 全删
-
-### 3️⃣ 所有格主语（改写）
-- ❌ "她的声音"、"他的眼神" → 直接删或改主语
-- ❌ "她的性格是..." → 改为 "她很..."
-
-### 4️⃣ 精确数据（模糊化）
-- ❌ "身高168cm"、"一米六八" → ✅ "个子高"
-- ❌ "体重50kg" → ✅ "很瘦" 或直接删
-- ❌ "罩杯C" → ✅ "胸部丰满" 或直接删
-
----
-
-## 🟡 第二级：改写替换（文学腔 → 人话）
-
-### 文学腔比喻 → 直接描述
-| 文学腔 | 人话 |
-|--------|------|
-| 醇厚的香气扑面而来 | 闻到酒味了 / 有股酒香 |
-| 如同黑曜石般璀璨的眼眸 | 黑眼睛 / 眼睛很黑 |
-| 心中涌起复杂的情绪 | 心里矛盾 / 又怕又期待 |
-| 冷暖交织的气息 | 冷香和酒味混在一起 |
-| 致命的诱惑 | 忍不住想靠近 |
-| 矛盾而极具吸引力 | 说不上来，但就是想看 |
-
-### 对仗结构 → 口语化
-- "既冷冽又醇厚" → "冷香和酒味"
-- "既矛盾又复杂" → "很矛盾"
-- "不是温柔而是傲慢" → "傲慢，不温柔"
-
----
-
-## 🟢 第三级：必须保留（核心内容）
-
-### ✅ 完全保留：
-1. **所有对白**：包括""内的所有台词
-2. **核心设定**：人物背景、职业、关系
-3. **基础动作**：走、坐、站、拿、放
-4. **简单情绪**：开心、难过、生气（这些可以保留）
-5. **具体信息**：年龄、地点、时间、事件
-
-### ✅ 可以保留：
-- 自然的形容词（不是套话比喻）
-- 日常化的描述
-- 有意义的细节
-
----
-
-# 💡 对比示例（学习正确做法）
-
-## 示例1：角色卡八股清理
-
-**❌ 输入（AI八股）：**
-角色A似乎有些困惑，眼里闪过一丝不易察觉的疑惑，她用不容置疑的语气说："你是谁？"她的声音低沉而富有磁性，如同野兽般的低吼。
-
-角色A出生于贵族家庭，她有着一头如同黑曜石般的长发，双眸宛如深邃的湖泊，身高168cm，罩杯C。她的性格并不是温柔的，而是傲慢且狂热的。
-
-她对魔法有着近乎狂热的追求，仿佛那是她生命的全部意义。语料："哼，你这种凡人怎么会理解我的想法。"（带着不屑的口吻）
-
-**❌ 错误输出（过度删减，信息量丢失）：**
-角色A问："你是谁？"
-角色A出生于贵族家庭，有黑色长发。
-语料："你不会理解我的想法。"
-
-**✅ 正确输出（保持信息量，只去八股）：**
-角色A停了停。"你是谁？"
-
-角色A出生于贵族家庭，黑色长发，黑眼睛，个子高，胸部丰满。傲慢，对很多事都很热情。喜欢阅读，经常一个人待在图书馆。
-
-角色A对魔法很痴迷，投入了很多时间研究。她怕一些东西。
-
-语料："哼，你这种凡人怎么会理解我的想法。"
-
-**改写思路：**
-- "似乎有些困惑，眼里闪过..." → "停了停"（行为代替心理+眼神）
-- "她的声音...如同野兽..." → 全删（声音描写+比喻）
-- "如同黑曜石般的长发" → "黑色长发"（删套话比喻）
-- "身高168cm，罩杯C" → "个子高，胸部丰满"（模糊化数字）
-- "并不是...而是..." → "傲慢"（删对比句）
-- "（带着不屑的口吻）" → 删（对白标注）
-- **对白完全保留**，设定信息全保留
-
----
-
-## 示例2：信息素描写清理
-
-**❌ 输入（文学腔）：**
-一阵既冷冽又醇厚的香气飘来，混合着冬日雪松与温热白兰地的味道，矛盾而极具吸引力。浓郁而滚烫的信息素正从他身上源源不断地散发出来，那冰冷的雪杉气息已经被醇厚的白兰地酒香彻底包裹，充满了毫无防备的、致命的诱惑。
-
-**✅ 正确输出（人话）：**
-闻到香味，雪松和白兰地混在一起。滚烫的信息素从他身上散出来，雪杉味被酒香盖过了。
-
-**改写思路：**
-- "一阵" → "闻到"（删"一"+量词）
-- "既...又..." → 删（删对仗结构）
-- "矛盾而极具吸引力" → 删（删文学腔评价）
-- "浓郁而滚烫" → "滚烫"（删冗余形容词）
-- "充满了...致命的诱惑" → 删（删夸张描述）
-- **保留核心信息**：雪松、白兰地、信息素、滚烫、混合、盖过
-
----
-
-# 🎯 最终执行要求
-
-1. **信息量守恒**：输入多少字，输出接近多少字
-2. **段落数守恒**：输入几段，输出几段
-3. **对白完整**：所有""内的台词必须100%保留
-4. **设定保留**：背景、职业、关系等核心设定全保留
-5. **只改八股**：只处理上述明确列出的八股表述
-6. **直接输出**：不要任何解释、标注、说明，直接给清理后的文本
-
----
-
-**现在开始清理，记住：你是"改写师"而不是"删除工"！**`,
+          content: getAntiClichePrompt(antiClicheLevel.value),
         },
         {
           role: 'user',

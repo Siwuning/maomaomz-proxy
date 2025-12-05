@@ -11,26 +11,6 @@
       <div style="display: flex; align-items: center; gap: 8px">
         <span v-if="stats" style="font-size: 11px; color: #888"> 上次计算: {{ lastUpdatedText }} </span>
         <button
-          style="
-            padding: 8px 14px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 500;
-            background: #10b981;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-          "
-          title="打开酒馆的提示词查看器查看精确值"
-          @click="openPromptInspector"
-        >
-          <i class="fa-solid fa-eye"></i>
-          精确统计
-        </button>
-        <button
           :disabled="loading"
           style="
             padding: 8px 14px;
@@ -45,10 +25,11 @@
             align-items: center;
             gap: 6px;
           "
+          title="使用酒馆官方 API 计算 Token"
           @click="handleRefresh"
         >
-          <i :class="loading ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-rotate'"></i>
-          {{ loading ? '重新计算中...' : '粗略估算' }}
+          <i :class="loading ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-chart-pie'"></i>
+          {{ loading ? '计算中...' : '重新计算' }}
         </button>
       </div>
     </div>
@@ -94,14 +75,14 @@
             border: 1px solid #333;
           "
         >
-          <div style="font-size: 12px; color: #aaa; margin-bottom: 4px">总 Tokens（粗略估算）</div>
+          <div style="font-size: 12px; color: #aaa; margin-bottom: 4px">总 Tokens</div>
           <div style="font-size: 22px; font-weight: 700; color: #f97316">
             {{ formatNumber(stats.totalTokens) }}
           </div>
-          <div style="font-size: 11px; color: #ef4444; margin-top: 4px">
-            ⚠️ 此数值仅供参考，可能与实际发送不符
+          <div style="font-size: 11px; color: #888; margin-top: 4px">
+            角色卡 + 蓝灯世界书 + 聊天 + 预设
             <br />
-            <span style="color: #888">💡 精确值请使用酒馆的「提示词查看器」(Ctrl+P)</span>
+            <span style="color: #666">💡 使用酒馆官方 API 计算</span>
           </div>
         </div>
 
@@ -986,95 +967,7 @@ function handleRefresh() {
   void calculateTokenStats();
 }
 
-// 获取精确 token 统计（使用酒馆的 tokenizer）
-async function openPromptInspector() {
-  loading.value = true;
-  try {
-    const w = window as any;
-    const st = w.SillyTavern;
-    const tav = w.TavernHelper;
-
-    // 获取 tokenizer 函数
-    const tokenize = (text: string): number => {
-      if (!text) return 0;
-      // 尝试多种方式获取 tokenizer
-      if (st?.getContext) {
-        const ctx = st.getContext();
-        if (typeof ctx.getTokenCount === 'function') {
-          return ctx.getTokenCount(text);
-        }
-      }
-      if (tav && typeof tav.getTokenCount === 'function') {
-        return tav.getTokenCount(text);
-      }
-      if (typeof w.getTokenCount === 'function') {
-        return w.getTokenCount(text);
-      }
-      // 估算
-      const cn = (text.match(/[\u4e00-\u9fff]/g) || []).length;
-      return Math.ceil(cn / 1.5 + (text.length - cn) / 4);
-    };
-
-    const result = {
-      chat: 0,
-      character: 0,
-      worldbook: 0,
-      system: 0,
-      total: 0,
-    };
-
-    // 1. 聊天内容
-    const messages = st?.chat || tav?.getChatMessages?.('0-{{lastMessageId}}') || [];
-    const visibleMsgs = messages.filter((m: any) => !m.is_hidden && !m.hidden);
-    for (const m of visibleMsgs) {
-      const content = m.mes || m.message || '';
-      if (content) result.chat += tokenize(content);
-    }
-
-    // 2. 角色卡
-    const char = tav?.getCharData?.('current') || st?.characters?.[st?.characterId];
-    if (char) {
-      const fields = [
-        char.description,
-        char.personality,
-        char.scenario,
-        char.first_mes,
-        char.mes_example,
-        char.data?.system_prompt,
-        char.data?.post_history_instructions,
-      ].filter(Boolean);
-      result.character = tokenize(fields.join('\n'));
-    }
-
-    // 3. 世界书（蓝灯）
-    result.worldbook = stats.value?.totalConstantTokens || 0;
-
-    // 4. 系统提示
-    result.system = stats.value?.systemPromptTokens || 0;
-
-    // 计算总数
-    result.total = result.chat + result.character + result.worldbook + result.system;
-
-    // 更新显示
-    if (stats.value) {
-      stats.value.chatTokens = result.chat;
-      stats.value.totalTokens = result.total;
-    }
-
-    w.toastr?.success(`📊 精确统计完成！总 Token: ${result.total.toLocaleString()}`);
-    console.log('[TokenStats] 精确统计结果:', result);
-  } catch (e) {
-    console.error('精确统计失败:', e);
-    (window as any).toastr?.error('统计失败: ' + (e as Error).message);
-  } finally {
-    loading.value = false;
-  }
-}
-
-// 注：事件监听在此环境不可用，只能使用估算值
-// 精确的 token 数需要使用酒馆的「提示词查看器」
 onMounted(() => {
   // 默认不自动计算，避免每次打开面板都扫一次。用户手动点击按钮即可。
-  // 注：事件监听在此环境不可用，只能使用估算值
 });
 </script>

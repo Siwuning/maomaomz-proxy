@@ -425,8 +425,13 @@ function sourceTotal(s: SourceStats): number {
 function getTokenCount(text: string | null | undefined): number {
   if (!text || typeof text !== 'string') return 0;
   try {
+    // 插件在 iframe 中，需要访问父窗口的 SillyTavern
+    const parentWindow = window.parent as any;
+    if (parentWindow?.SillyTavern && typeof parentWindow.SillyTavern.getTokenCount === 'function') {
+      return parentWindow.SillyTavern.getTokenCount(text);
+    }
+    // 备用：当前窗口
     const w = window as any;
-    // 直接使用 SillyTavern.getTokenCount - 这是官方方法
     if (w.SillyTavern && typeof w.SillyTavern.getTokenCount === 'function') {
       return w.SillyTavern.getTokenCount(text);
     }

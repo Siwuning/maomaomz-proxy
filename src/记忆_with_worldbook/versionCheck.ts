@@ -147,45 +147,32 @@ export async function checkForUpdates(force: boolean = false): Promise<{
     }
 
     console.log('🔍 检查更新中...');
-    console.log(`📌 当前 commit: ${CURRENT_COMMIT}`);
+    console.log(`📌 当前版本: ${CURRENT_VERSION}`);
 
-    const latest = await fetchLatestCommit();
+    // 直接从 CDN 获取远程版本号（不调用 GitHub API，避免限流）
+    const remoteVersion = await fetchRemoteVersion();
 
-    if (!latest) {
-      console.warn('⚠️ 无法获取最新 commit 信息');
+    if (!remoteVersion) {
+      console.warn('⚠️ 无法获取远程版本信息');
       return null;
     }
 
     // 保存检查时间
     localStorage.setItem(LAST_CHECK_KEY, Date.now().toString());
 
-    // 获取远程版本号
-    const remoteVersion = await fetchRemoteVersion();
-
     // 比较版本号（只有远程版本更高才算有更新）
     let hasUpdate = false;
-    if (remoteVersion && compareVersions(remoteVersion, CURRENT_VERSION) > 0) {
+    if (compareVersions(remoteVersion, CURRENT_VERSION) > 0) {
       hasUpdate = true;
       console.log(`📌 发现新版本: 本地 ${CURRENT_VERSION} → 远程 ${remoteVersion}`);
     } else {
-      console.log(`✅ 已是最新版本: ${CURRENT_VERSION}（远程: ${remoteVersion || '未知'}）`);
-    }
-
-    console.log(`📌 远程 commit: ${latest.commit}, 本地 commit: ${CURRENT_COMMIT}`);
-
-    // 检查是否被忽略
-    if (!force) {
-      const ignoredCommit = localStorage.getItem(IGNORED_COMMIT_KEY);
-      if (ignoredCommit === latest.commit) {
-        console.log(`ℹ️ commit ${latest.commit} 已被用户忽略`);
-        return null;
-      }
+      console.log(`✅ 已是最新版本: ${CURRENT_VERSION}（远程: ${remoteVersion}）`);
     }
 
     return {
       hasUpdate,
-      latestVersion: remoteVersion || CURRENT_VERSION,
-      latestCommit: latest.commit,
+      latestVersion: remoteVersion,
+      latestCommit: remoteVersion, // 用版本号代替 commit
       currentVersion: CURRENT_VERSION,
       currentCommit: CURRENT_COMMIT,
       updateUrl: `https://github.com/${GITHUB_REPO}`,

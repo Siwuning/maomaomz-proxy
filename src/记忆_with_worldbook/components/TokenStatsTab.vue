@@ -425,19 +425,35 @@ async function getTokenCountAsync(text: string | null | undefined): Promise<numb
   if (!text) return 0;
   try {
     const w = window as any;
-    // 优先使用官方异步方法
-    if (w.SillyTavern && typeof w.SillyTavern.getTokenCountAsync === 'function') {
-      return await w.SillyTavern.getTokenCountAsync(text);
+    // 1. 优先使用 getContext().getTokenCountAsync
+    if (w.SillyTavern?.getContext) {
+      const ctx = w.SillyTavern.getContext();
+      if (typeof ctx?.getTokenCountAsync === 'function') {
+        return await ctx.getTokenCountAsync(text);
+      }
+      if (typeof ctx?.getTokenCount === 'function') {
+        return ctx.getTokenCount(text);
+      }
     }
-    // 降级到同步方法
-    if (w.SillyTavern && typeof w.SillyTavern.getTokenCount === 'function') {
-      return w.SillyTavern.getTokenCount(text);
+    // 2. TavernHelper.getTokenCount
+    if (w.TavernHelper && typeof w.TavernHelper.getTokenCount === 'function') {
+      return w.TavernHelper.getTokenCount(text);
+    }
+    // 3. 全局 getTokenCountForString（酒馆内部函数）
+    if (typeof w.getTokenCountForString === 'function') {
+      return w.getTokenCountForString(text);
+    }
+    // 4. 全局 getTokenCount
+    if (typeof w.getTokenCount === 'function') {
+      return w.getTokenCount(text);
     }
   } catch (e) {
     console.warn('getTokenCount 调用失败，使用近似值:', e);
   }
-  // 粗略估算：英文 4 字符一个 token，中文大约 1-2 字符
-  return Math.ceil(text.length / 4);
+  // 粗略估算：中文约 1.5 字符一个 token，英文约 4 字符
+  const chineseChars = (text.match(/[\u4e00-\u9fff]/g) || []).length;
+  const otherChars = text.length - chineseChars;
+  return Math.ceil(chineseChars / 1.5 + otherChars / 4);
 }
 
 // 同步版本（兼容旧代码）
@@ -445,13 +461,32 @@ function getTokenCount(text: string | null | undefined): number {
   if (!text) return 0;
   try {
     const w = window as any;
-    if (w.SillyTavern && typeof w.SillyTavern.getTokenCount === 'function') {
-      return w.SillyTavern.getTokenCount(text);
+    // 1. 优先使用 getContext().getTokenCount
+    if (w.SillyTavern?.getContext) {
+      const ctx = w.SillyTavern.getContext();
+      if (typeof ctx?.getTokenCount === 'function') {
+        return ctx.getTokenCount(text);
+      }
+    }
+    // 2. TavernHelper.getTokenCount
+    if (w.TavernHelper && typeof w.TavernHelper.getTokenCount === 'function') {
+      return w.TavernHelper.getTokenCount(text);
+    }
+    // 3. 全局 getTokenCountForString
+    if (typeof w.getTokenCountForString === 'function') {
+      return w.getTokenCountForString(text);
+    }
+    // 4. 全局 getTokenCount
+    if (typeof w.getTokenCount === 'function') {
+      return w.getTokenCount(text);
     }
   } catch (e) {
     console.warn('getTokenCount 调用失败，使用近似值:', e);
   }
-  return Math.ceil(text.length / 4);
+  // 粗略估算：中文约 1.5 字符一个 token，英文约 4 字符
+  const chineseChars = (text.match(/[\u4e00-\u9fff]/g) || []).length;
+  const otherChars = text.length - chineseChars;
+  return Math.ceil(chineseChars / 1.5 + otherChars / 4);
 }
 
 function collectPresetPromptTexts(st: any, tav: any): { texts: string[]; details: string } {

@@ -92,6 +92,46 @@
           <i class="fa-solid fa-plus"></i> 创建总结世界书
         </button>
         <button
+          v-if="summary_history.length > 0"
+          class="mini-button export-button"
+          style="
+            padding: 6px 12px;
+            background: #17a2b8;
+            border: 1px solid #138496;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+          "
+          @click="exportAllSummaries"
+        >
+          <i class="fa-solid fa-download"></i> 导出全部
+        </button>
+        <button
+          v-if="summary_history.length > 0"
+          class="mini-button clear-button"
+          style="
+            padding: 6px 12px;
+            background: #dc3545;
+            border: 1px solid #c82333;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+          "
+          @click="clearAllSummaries"
+        >
+          <i class="fa-solid fa-trash-can"></i> 清空全部
+        </button>
+        <button
           class="mini-button debug-button"
           style="
             padding: 6px 12px;
@@ -730,6 +770,75 @@ const deleteSummary = (index: number) => {
     } catch (error) {
       console.error('删除总结失败:', error);
       window.toastr.error('删除总结失败');
+    }
+  }
+};
+
+// 导出全部总结
+const exportAllSummaries = () => {
+  try {
+    if (summary_history.value.length === 0) {
+      window.toastr.warning('没有可导出的总结记录');
+      return;
+    }
+
+    // 获取角色名
+    let characterName = '未知角色';
+    try {
+      const currentCharacter = (window as any).TavernHelper?.getCharData?.('current');
+      if (currentCharacter?.name) {
+        characterName = currentCharacter.name.replace(/[<>:"/\\|?*]/g, '_').trim();
+      }
+    } catch (e) {
+      console.warn('获取角色信息失败:', e);
+    }
+
+    // 构建导出内容
+    const exportData = {
+      exportTime: new Date().toISOString(),
+      characterName,
+      totalCount: summary_history.value.length,
+      summaries: summary_history.value.map((item, index) => ({
+        index: index + 1,
+        startFloor: item.start_id,
+        endFloor: item.end_id,
+        content: item.content,
+      })),
+    };
+
+    // 下载为 JSON 文件
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `总结记录_${characterName}_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    window.toastr.success(`已导出 ${summary_history.value.length} 条总结记录`);
+  } catch (error) {
+    console.error('导出总结失败:', error);
+    window.toastr.error('导出失败');
+  }
+};
+
+// 清空全部总结
+const clearAllSummaries = () => {
+  if (summary_history.value.length === 0) {
+    window.toastr.warning('没有可清空的总结记录');
+    return;
+  }
+
+  if (confirm(`确定要清空全部 ${summary_history.value.length} 条总结记录吗？此操作不可恢复！`)) {
+    try {
+      historyStore.clearSummaryHistory();
+      summary_history.value = [];
+      window.toastr.success('已清空全部总结记录');
+    } catch (error) {
+      console.error('清空总结失败:', error);
+      window.toastr.error('清空失败');
     }
   }
 };

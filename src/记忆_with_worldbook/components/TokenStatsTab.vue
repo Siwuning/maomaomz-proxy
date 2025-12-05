@@ -421,40 +421,64 @@ function sourceTotal(s: SourceStats): number {
   return s.c + s.s + s.v;
 }
 
-// 使用 SillyTavern.getTokenCount 计算 token（这是酒馆官方方法）
+// 缓存 tokenizer 函数引用
+let cachedTokenizer: ((text: string) => number) | null = null;
+
+// 查找可用的 tokenizer
+function findTokenizer(): ((text: string) => number) | null {
+  if (cachedTokenizer) return cachedTokenizer;
+
+  try {
+    // 按优先级尝试不同的访问方式
+    const contexts = [window, window.parent, window.top, (window as any).opener].filter(Boolean);
+
+    for (const ctx of contexts) {
+      try {
+        const c = ctx as any;
+        if (c?.SillyTavern?.getTokenCount) {
+          console.log('[TokenStats] 找到 tokenizer: SillyTavern.getTokenCount');
+          cachedTokenizer = (text: string) => c.SillyTavern.getTokenCount(text);
+          return cachedTokenizer;
+        }
+        if (c?.TavernHelper?.getTokenCount) {
+          console.log('[TokenStats] 找到 tokenizer: TavernHelper.getTokenCount');
+          cachedTokenizer = (text: string) => c.TavernHelper.getTokenCount(text);
+          return cachedTokenizer;
+        }
+        if (typeof c?.getTokenCount === 'function') {
+          console.log('[TokenStats] 找到 tokenizer: 全局 getTokenCount');
+          cachedTokenizer = c.getTokenCount;
+          return cachedTokenizer;
+        }
+      } catch {
+        // 跨域访问可能会失败，忽略
+      }
+    }
+  } catch (e) {
+    console.warn('[TokenStats] 查找 tokenizer 失败:', e);
+  }
+
+  console.warn('[TokenStats] 未找到可用的 tokenizer，将使用估算');
+  return null;
+}
+
+// 使用 SillyTavern.getTokenCount 计算 token
 function getTokenCount(text: string | null | undefined): number {
   if (!text || typeof text !== 'string') return 0;
-  try {
-    const w = window as any;
 
-    // 方法1: 直接 SillyTavern（插件可能直接注入）
-    if (w.SillyTavern?.getTokenCount) {
-      const result = w.SillyTavern.getTokenCount(text);
-      return result;
+  const tokenizer = findTokenizer();
+  if (tokenizer) {
+    try {
+      return tokenizer(text);
+    } catch (e) {
+      console.warn('[TokenStats] tokenizer 调用失败:', e);
     }
-
-    // 方法2: 父窗口 SillyTavern
-    const pw = window.parent as any;
-    if (pw?.SillyTavern?.getTokenCount) {
-      const result = pw.SillyTavern.getTokenCount(text);
-      return result;
-    }
-
-    // 方法3: TavernHelper
-    if (w.TavernHelper?.getTokenCount) {
-      return w.TavernHelper.getTokenCount(text);
-    }
-
-    // 方法4: 全局 getTokenCount
-    if (typeof w.getTokenCount === 'function') {
-      return w.getTokenCount(text);
-    }
-
-    console.warn('[TokenStats] 未找到可用的 tokenizer');
-  } catch (e) {
-    console.warn('getTokenCount 调用失败:', e);
   }
-  return 0;
+
+  // 降级：粗略估算
+  const chineseChars = (text.match(/[\u4e00-\u9fff]/g) || []).length;
+  const otherChars = text.length - chineseChars;
+  return Math.ceil(chineseChars / 1.5 + otherChars / 4);
 }
 
 function collectPresetPromptTexts(st: any, tav: any): { texts: string[]; details: string } {

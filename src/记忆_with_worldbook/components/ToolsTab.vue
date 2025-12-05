@@ -492,7 +492,7 @@
           cursor: pointer;
           transition: all 0.3s ease;
         "
-        @click="toggleTool('npcGen')"
+        @click="toggleToolExpanded('npcGen')"
       >
         <h4
           style="

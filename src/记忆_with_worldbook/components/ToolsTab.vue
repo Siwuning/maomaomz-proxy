@@ -1042,6 +1042,217 @@
       </div>
     </div>
 
+    <!-- 角色关系分析工具 -->
+    <div class="tool-section">
+      <div
+        class="section-header"
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 15px 20px;
+          background: linear-gradient(
+            135deg,
+            rgba(30, 30, 30, 0.95) 0%,
+            rgba(38, 38, 38, 0.9) 50%,
+            rgba(30, 30, 30, 0.95) 100%
+          );
+          border: 1px solid rgba(233, 30, 99, 0.3);
+          border-radius: 12px;
+          margin-bottom: 4px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        "
+        @click="toggleToolExpanded('relationMap')"
+      >
+        <h4
+          style="
+            margin: 0;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          "
+        >
+          <i class="fa-solid fa-heart" style="color: #e91e63; font-size: 18px"></i>
+          角色关系分析
+        </h4>
+        <i
+          :class="isToolExpanded('relationMap') ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'"
+          style="color: #888; font-size: 14px"
+        ></i>
+      </div>
+
+      <div v-show="isToolExpanded('relationMap')" class="section-content" style="padding: 20px">
+        <div class="tool-description" style="margin-bottom: 15px">
+          <p style="margin: 0; color: #ccc; font-size: 12px">
+            <i class="fa-solid fa-info-circle" style="margin-right: 6px; color: #e91e63"></i>
+            分析角色卡和世界书，提取角色关系图谱。
+          </p>
+        </div>
+
+        <div class="form-group" style="margin: 15px 0">
+          <label style="display: block; margin-bottom: 8px; color: #ccc; font-size: 13px; font-weight: 500"
+            >分析来源：</label
+          >
+          <div style="display: flex; gap: 10px; flex-wrap: wrap">
+            <label
+              style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 8px 14px;
+                border-radius: 8px;
+                cursor: pointer;
+              "
+              :style="{
+                background: relationIncludeChar ? 'rgba(23, 162, 184, 0.2)' : '#2a2a2a',
+                border: relationIncludeChar ? '1px solid #17a2b8' : '1px solid #3a3a3a',
+              }"
+            >
+              <input v-model="relationIncludeChar" type="checkbox" style="display: none" />
+              <span style="color: #e0e0e0; font-size: 12px">📝 角色卡</span>
+            </label>
+            <select
+              v-model="relationWorldbook"
+              style="
+                padding: 8px 12px;
+                background: #2a2a2a;
+                border: 1px solid #3a3a3a;
+                border-radius: 8px;
+                color: #10b981;
+                font-size: 12px;
+              "
+            >
+              <option value="">📚 选择世界书...</option>
+              <option v-for="wb in availableWorldbooks" :key="wb" :value="wb">{{ wb }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div v-if="isAnalyzingRelation && relationProgress > 0" style="margin: 15px 0">
+          <div style="width: 100%; height: 8px; background: #2a2a2a; border-radius: 4px; overflow: hidden">
+            <div
+              :style="{
+                width: relationProgress + '%',
+                height: '100%',
+                background: '#e91e63',
+                transition: 'width 0.3s',
+              }"
+            ></div>
+          </div>
+          <p style="margin: 5px 0 0 0; color: #e91e63; font-size: 11px; text-align: center">
+            分析中... {{ relationProgress.toFixed(0) }}%
+          </p>
+        </div>
+
+        <div class="button-group" style="display: flex; gap: 12px; margin-bottom: 15px">
+          <button
+            :disabled="isAnalyzingRelation || (!relationIncludeChar && !relationWorldbook)"
+            style="
+              padding: 10px 20px;
+              background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%);
+              border: none;
+              border-radius: 8px;
+              color: white;
+              font-size: 13px;
+              font-weight: 600;
+              cursor: pointer;
+            "
+            @click="handleAnalyzeRelation"
+          >
+            <i class="fa-solid fa-heart" style="margin-right: 6px"></i>
+            {{ isAnalyzingRelation ? '分析中...' : '分析关系' }}
+          </button>
+          <button
+            style="
+              padding: 10px 20px;
+              background: #3a3a3a;
+              border: none;
+              border-radius: 8px;
+              color: #ccc;
+              font-size: 13px;
+              cursor: pointer;
+            "
+            @click="relationOutput = ''"
+          >
+            <i class="fa-solid fa-trash" style="margin-right: 6px"></i>清空
+          </button>
+        </div>
+
+        <div v-if="relationOutput" class="output-section">
+          <h5 style="margin: 0 0 12px 0; color: #fff; font-size: 14px; font-weight: 600">
+            <i class="fa-solid fa-project-diagram" style="margin-right: 6px; color: #e91e63"></i>角色关系图谱：
+          </h5>
+          <div
+            style="
+              background: #1e1e1e;
+              border: 1px solid #3a3a3a;
+              border-radius: 6px;
+              padding: 15px;
+              color: #e0e0e0;
+              font-size: 13px;
+              line-height: 1.8;
+              white-space: pre-wrap;
+              max-height: 400px;
+              overflow-y: auto;
+            "
+          >
+            {{ relationOutput }}
+          </div>
+          <div style="margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap">
+            <button
+              style="
+                padding: 8px 16px;
+                background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                border: none;
+                border-radius: 6px;
+                color: white;
+                font-size: 12px;
+                cursor: pointer;
+              "
+              @click="copyToClipboard(relationOutput, '关系图谱已复制')"
+            >
+              <i class="fa-solid fa-copy" style="margin-right: 6px"></i>复制
+            </button>
+            <select
+              v-model="relationInsertWorldbook"
+              style="
+                padding: 8px 12px;
+                background: #2a2a2a;
+                border: 1px solid #3a3a3a;
+                border-radius: 6px;
+                color: #10b981;
+                font-size: 12px;
+              "
+            >
+              <option value="">📚 插入到世界书...</option>
+              <option v-for="wb in availableWorldbooks" :key="wb" :value="wb">{{ wb }}</option>
+            </select>
+            <button
+              v-if="relationInsertWorldbook"
+              :disabled="isInsertingRelation"
+              style="
+                padding: 8px 16px;
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                border: none;
+                border-radius: 6px;
+                color: white;
+                font-size: 12px;
+                cursor: pointer;
+              "
+              @click="insertRelationToWorldbook"
+            >
+              <i class="fa-solid fa-download" style="margin-right: 6px"></i
+              >{{ isInsertingRelation ? '插入中...' : '插入' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 开场白生成工具 -->
     <div class="tool-section">
       <div
@@ -3870,6 +4081,15 @@ const tokenCompressLevels = [
   { value: 'aggressive', label: '激进 (极简)', color: '#dc3545' },
 ];
 
+// 角色关系分析工具相关
+const relationIncludeChar = ref(true);
+const relationWorldbook = ref('');
+const relationOutput = ref('');
+const isAnalyzingRelation = ref(false);
+const relationProgress = ref(0);
+const relationInsertWorldbook = ref('');
+const isInsertingRelation = ref(false);
+
 const characterInsertPositions = [
   { value: 'description', label: '📝 角色描述 (Description)', type: 'char' },
   { value: 'personality', label: '💭 角色性格 (Personality)', type: 'char' },
@@ -4662,6 +4882,133 @@ ${levelPrompts[tokenCompressLevel.value]}
   } finally {
     isCompressingToken.value = false;
     tokenCompressProgress.value = 0;
+  }
+};
+
+// 角色关系分析
+const handleAnalyzeRelation = async () => {
+  if (!relationIncludeChar.value && !relationWorldbook.value) {
+    window.toastr.warning('请选择至少一个分析来源');
+    return;
+  }
+
+  try {
+    isAnalyzingRelation.value = true;
+    relationProgress.value = 0;
+    window.toastr.info('正在分析角色关系...');
+
+    let content = '';
+    const tav = (window as any).TavernHelper;
+
+    if (relationIncludeChar.value && tav?.getCharData) {
+      const char = tav.getCharData('current');
+      if (char) {
+        content += `【主角色卡】\n角色名：${char.name || '未知'}\n`;
+        const desc = char.description || char.data?.description;
+        if (desc) content += `描述：${desc}\n`;
+        const personality = char.personality || char.data?.personality;
+        if (personality) content += `性格：${personality}\n`;
+        const scenario = char.scenario || char.data?.scenario;
+        if (scenario) content += `场景：${scenario}\n`;
+        content += '\n';
+      }
+    }
+
+    if (relationWorldbook.value && tav?.getWorldbook) {
+      const entries = await tav.getWorldbook(relationWorldbook.value);
+      if (entries?.length) {
+        content += `【世界书条目】\n`;
+        entries.forEach((e: any) => {
+          if (e.content) content += `[${e.name || e.comment || '条目'}]\n${e.content}\n\n`;
+        });
+      }
+    }
+
+    if (!content.trim()) {
+      window.toastr.warning('没有找到可分析的内容');
+      isAnalyzingRelation.value = false;
+      return;
+    }
+
+    const systemPrompt = `你是一个角色关系分析专家。请分析提供的角色设定，提取所有角色及其关系。
+
+输出格式要求：
+1. 首先列出所有角色（包括主角和配角）
+2. 然后用图谱形式展示关系，使用 emoji 标注关系类型：
+   - 💕 恋人/暧昧
+   - 💗 亲密/喜欢
+   - 👨‍👩‍👧 家人
+   - 🤝 朋友/同伴
+   - ⚔️ 敌对/竞争
+   - 👔 上下级/主从
+   - 🤔 复杂/纠葛
+   - ❓ 未知/待探索
+3. 对重要关系给出简短说明
+4. 保持简洁，避免废话`;
+
+    const requestPayload = {
+      model: settings.value.model,
+      max_tokens: 2000,
+      temperature: 0.5,
+      stream: true,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `请分析以下内容中的角色关系：\n\n${content}` },
+      ],
+    };
+
+    let result = '';
+    if (settings.value.use_tavern_api) {
+      result = await callAIWithTavernSupport(requestPayload.messages, settings.value, {
+        onProgress: p => (relationProgress.value = p),
+      });
+    } else {
+      result = await generateWithStreaming(requestPayload, relationProgress);
+    }
+
+    relationOutput.value = cleanCharacterCardOutput(result);
+    saveToolsDataImmediate();
+    window.toastr.success('关系分析完成！');
+  } catch (error) {
+    console.error('关系分析失败:', error);
+    window.toastr.error(translateError(error, '分析'));
+  } finally {
+    isAnalyzingRelation.value = false;
+    relationProgress.value = 0;
+  }
+};
+
+// 插入关系图谱到世界书
+const insertRelationToWorldbook = async () => {
+  if (!relationOutput.value || !relationInsertWorldbook.value) {
+    window.toastr.warning('请先生成关系图谱并选择世界书');
+    return;
+  }
+
+  try {
+    isInsertingRelation.value = true;
+    const tav = (window as any).TavernHelper;
+
+    if (tav?.createWorldbookEntries) {
+      await tav.createWorldbookEntries(relationInsertWorldbook.value, [
+        {
+          name: '角色关系图谱',
+          content: relationOutput.value,
+          keys: ['关系', '人物', '角色'],
+          comment: '由猫猫工具自动生成',
+          enabled: true,
+        },
+      ]);
+      window.toastr.success('已插入到世界书');
+      relationInsertWorldbook.value = '';
+    } else {
+      window.toastr.error('TavernHelper API 不可用');
+    }
+  } catch (e) {
+    console.error('插入失败:', e);
+    window.toastr.error('插入失败');
+  } finally {
+    isInsertingRelation.value = false;
   }
 };
 

@@ -147,13 +147,13 @@ export async function checkForUpdates(force: boolean = false): Promise<{
     // 获取远程版本号
     const remoteVersion = await fetchRemoteVersion();
 
-    // 比较版本号（版本号不同才算有更新）
+    // 比较版本号（只有远程版本更高才算有更新）
     let hasUpdate = false;
-    if (remoteVersion && remoteVersion !== CURRENT_VERSION) {
+    if (remoteVersion && compareVersions(remoteVersion, CURRENT_VERSION) > 0) {
       hasUpdate = true;
-      console.log(`📌 版本不同: 本地 ${CURRENT_VERSION} → 远程 ${remoteVersion}`);
+      console.log(`📌 发现新版本: 本地 ${CURRENT_VERSION} → 远程 ${remoteVersion}`);
     } else {
-      console.log(`✅ 版本相同: ${CURRENT_VERSION}，无需更新`);
+      console.log(`✅ 已是最新版本: ${CURRENT_VERSION}（远程: ${remoteVersion || '未知'}）`);
     }
 
     console.log(`📌 远程 commit: ${latest.commit}, 本地 commit: ${CURRENT_COMMIT}`);

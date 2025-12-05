@@ -2530,6 +2530,62 @@
             </button>
           </div>
 
+          <!-- 插入到角色卡 -->
+          <div
+            class="insert-section"
+            style="
+              margin-top: 20px;
+              padding: 15px;
+              background: rgba(23, 162, 184, 0.1);
+              border: 1px solid rgba(23, 162, 184, 0.3);
+              border-radius: 8px;
+            "
+          >
+            <h5 style="margin: 0 0 12px 0; color: #17a2b8; font-size: 13px; font-weight: 600">
+              <i class="fa-solid fa-file-import" style="margin-right: 6px"></i>
+              插入到当前角色卡
+            </h5>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap">
+              <select
+                v-model="characterInsertPosition"
+                style="
+                  flex: 1;
+                  min-width: 200px;
+                  padding: 8px 12px;
+                  background: #1a1a1a;
+                  border: 1px solid #3a3a3a;
+                  border-radius: 6px;
+                  color: #e0e0e0;
+                  font-size: 12px;
+                "
+              >
+                <option v-for="pos in characterInsertPositions" :key="pos.value" :value="pos.value">
+                  {{ pos.label }}
+                </option>
+              </select>
+              <button
+                :disabled="isInsertingCharacter"
+                style="
+                  padding: 8px 16px;
+                  background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+                  border: none;
+                  border-radius: 6px;
+                  color: white;
+                  font-size: 12px;
+                  font-weight: 600;
+                  cursor: pointer;
+                  transition: all 0.3s ease;
+                  white-space: nowrap;
+                "
+                @click="insertCharacterCard"
+              >
+                <i class="fa-solid fa-download" style="margin-right: 6px"></i>
+                {{ isInsertingCharacter ? '插入中...' : '插入' }}
+              </button>
+            </div>
+            <p style="margin: 8px 0 0 0; color: #888; font-size: 11px">⚠️ 插入会覆盖所选位置的原有内容，请谨慎操作</p>
+          </div>
+
           <!-- 角色卡修改区域 -->
           <div class="modify-section" style="margin-top: 25px; border-top: 2px dashed #3a3a3a; padding-top: 20px">
             <h5 style="margin: 0 0 12px 0; color: #fff; font-size: 14px; font-weight: 600">
@@ -3115,6 +3171,18 @@ const modifyRequest = ref('');
 const isModifyingCharacter = ref(false);
 const enableCharacterStreaming = ref(false); // 角色卡生成是否启用流式传输
 const characterProgressPercent = ref(0); // 角色卡生成进度
+const characterInsertPosition = ref('description'); // 角色卡插入位置
+const isInsertingCharacter = ref(false); // 是否正在插入角色卡
+const characterInsertPositions = [
+  { value: 'description', label: '角色描述 (Description)' },
+  { value: 'personality', label: '角色性格 (Personality)' },
+  { value: 'scenario', label: '场景 (Scenario)' },
+  { value: 'first_mes', label: '首条消息 (First Message)' },
+  { value: 'mes_example', label: '示例对话 (Example Messages)' },
+  { value: 'system_prompt', label: '系统提示词 (System Prompt)' },
+  { value: 'post_history_instructions', label: '后历史指令 (Jailbreak)' },
+  { value: 'creator_notes', label: '创作者备注 (Creator Notes)' },
+];
 
 // 开场白生成工具相关
 const greetingGenRequest = ref('');
@@ -4187,6 +4255,104 @@ const copyCharacterCard = () => {
 
   // 使用统一的复制函数
   copyToClipboard(characterCardOutput.value, '角色卡已复制到剪贴板');
+};
+
+// 插入角色卡到当前角色
+const insertCharacterCard = async () => {
+  if (!characterCardOutput.value) {
+    window.toastr.warning('没有可插入的内容');
+    return;
+  }
+
+  try {
+    isInsertingCharacter.value = true;
+    const position = characterInsertPosition.value;
+    const positionLabel = characterInsertPositions.find(p => p.value === position)?.label || position;
+
+    window.toastr.info(`正在插入到「${positionLabel}」...`);
+
+    // 获取当前角色
+    const tav = (window as any).TavernHelper;
+    const st = (window as any).SillyTavern || (window as any).parent?.SillyTavern;
+
+    // 方式1: 使用 TavernHelper.setCharData (如果可用)
+    if (tav?.setCharData) {
+      await tav.setCharData('current', { [position]: characterCardOutput.value });
+      window.toastr.success(`已插入到「${positionLabel}」`);
+      return;
+    }
+
+    // 方式2: 使用 SillyTavern API
+    if (st?.getContext) {
+      const ctx = st.getContext();
+
+      // 获取当前角色数据
+      const charId = ctx.characterId ?? ctx.characters?.findIndex?.((c: any) => c.avatar === ctx.character?.avatar);
+      if (charId === undefined || charId < 0) {
+        throw new Error('未找到当前角色');
+      }
+
+      // 更新角色数据
+      const updateData: any = {};
+
+      // 根据位置设置对应字段
+      if (['system_prompt', 'post_history_instructions', 'creator_notes'].includes(position)) {
+        // V2 字段在 data 下
+        updateData[`data.${position}`] = characterCardOutput.value;
+      } else {
+        updateData[position] = characterCardOutput.value;
+      }
+
+      // 调用保存 API
+      const response = await fetch('/api/characters/edit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          avatar_url: ctx.characters?.[charId]?.avatar,
+          ...updateData,
+        }),
+      });
+
+      if (response.ok) {
+        window.toastr.success(`已插入到「${positionLabel}」，请刷新页面查看`);
+        return;
+      }
+    }
+
+    // 方式3: 直接操作 DOM (最后的降级方案)
+    const fieldMap: Record<string, string> = {
+      description: '#description_textarea, textarea[name="description"]',
+      personality: '#personality_textarea, textarea[name="personality"]',
+      scenario: '#scenario_textarea, textarea[name="scenario"]',
+      first_mes: '#firstmessage_textarea, textarea[name="first_mes"]',
+      mes_example: '#mes_example_textarea, textarea[name="mes_example"]',
+      system_prompt: '#character_system_prompt, textarea[name="system_prompt"]',
+      post_history_instructions: '#character_jailbreak, textarea[name="post_history_instructions"]',
+      creator_notes: '#creator_notes_textarea, textarea[name="creator_notes"]',
+    };
+
+    const selector = fieldMap[position];
+    if (selector) {
+      // 尝试在 parent window 中查找
+      const parentDoc = window.parent?.document || document;
+      const textarea = parentDoc.querySelector(selector) as HTMLTextAreaElement;
+      if (textarea) {
+        textarea.value = characterCardOutput.value;
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        textarea.dispatchEvent(new Event('change', { bubbles: true }));
+        window.toastr.success(`已插入到「${positionLabel}」，记得保存角色卡！`);
+        return;
+      }
+    }
+
+    window.toastr.warning('无法自动插入，已复制到剪贴板，请手动粘贴');
+    copyToClipboard(characterCardOutput.value);
+  } catch (error) {
+    console.error('插入角色卡失败:', error);
+    window.toastr.error('插入失败: ' + (error as Error).message);
+  } finally {
+    isInsertingCharacter.value = false;
+  }
 };
 
 // 清空反八股表单

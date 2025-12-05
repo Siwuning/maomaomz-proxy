@@ -79,9 +79,9 @@
             {{ formatNumber(stats.totalTokens) }}
           </div>
           <div style="font-size: 11px; color: #777; margin-top: 4px">
-            角色卡 + 世界书 + 聊天 + 预设 的估算值
+            角色卡 + 蓝灯世界书 + 聊天 + 预设
             <br />
-            <span style="color: #888">💡 精确值请使用酒馆的「提示词查看器」</span>
+            <span style="color: #888">💡 绿灯/向量条目需触发才计入，精确值请用「提示词查看器」</span>
           </div>
         </div>
 
@@ -996,10 +996,11 @@ async function calculateTokenStats(): Promise<void> {
       local.chatTokens = 0;
     }
 
-    // 总 Token = 角色卡 + 世界书 + 聊天内容 + 预设相关
+    // 总 Token = 角色卡 + 蓝灯世界书(constant) + 聊天内容 + 预设相关
+    // 注意：只计算蓝灯条目，因为绿灯/向量条目是动态触发的
     local.totalTokens =
       local.characterCardTokens +
-      local.lorebookTokens +
+      local.totalConstantTokens + // 只用蓝灯，不用全部世界书
       local.chatTokens +
       local.systemPromptTokens +
       local.personaTokens +

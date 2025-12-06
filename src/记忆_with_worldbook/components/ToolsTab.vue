@@ -6050,7 +6050,22 @@ const generateWithStreaming = async (
 
     const data = await response.json();
     progressRef.value = 100;
-    return data.choices?.[0]?.message?.content?.trim() || '';
+
+    // 检测内容过滤/安全拦截
+    const finishReason = data.choices?.[0]?.finish_reason;
+    if (finishReason === 'content_filter' || finishReason === 'PROHIBITED_CONTENT') {
+      throw new Error(
+        `内容被 AI 安全过滤器拦截 (finish_reason: ${finishReason})\n\n` +
+          `输入内容可能包含敏感词汇，或请求的输出被认为不符合安全准则。\n` +
+          `建议检查并修改输入内容，或尝试换一个模型。`,
+      );
+    }
+
+    const content = data.choices?.[0]?.message?.content?.trim();
+    if (!content) {
+      console.warn('⚠️ API 返回数据缺少内容:', JSON.stringify(data).substring(0, 300));
+    }
+    return content || '';
   }
 
   // 对于支持流式的服务，确保 stream 参数存在

@@ -222,28 +222,31 @@ async function fetchWithRetry(
 }
 
 // 规范化API端点
-export function normalizeApiEndpoint(endpoint: string, path: string = ''): string {
+export function normalizeApiEndpoint(endpoint: string, path: string = '/chat/completions'): string {
   try {
     const url = new URL(endpoint);
 
+    // 如果已经包含完整路径，直接返回
+    if (endpoint.includes('/chat/completions') || endpoint.includes('/models')) {
+      return endpoint;
+    }
+
     // 特殊处理 Gemini OpenAI 兼容端点
-    if (endpoint.includes('generativelanguage.googleapis.com')) {
-      // 确保正确的路径格式: /v1beta/openai/chat/completions
-      if (path === '/chat/completions' && !endpoint.endsWith('/chat/completions')) {
-        // 清理可能的重复路径
-        const cleanPath = url.pathname.replace(/\/v1beta\/openai.*$/, '/v1beta/openai');
-        url.pathname = cleanPath + '/chat/completions';
-      }
+    // 格式: https://generativelanguage.googleapis.com/v1beta/openai
+    // 正确 URL: /v1beta/openai/chat/completions (不需要再加 /v1)
+    if (endpoint.includes('/v1beta/openai') || endpoint.includes('/openai')) {
+      // 确保路径正确拼接
+      const cleanPathname = url.pathname.endsWith('/') ? url.pathname.slice(0, -1) : url.pathname;
+      url.pathname = cleanPathname + path;
       return url.toString();
     }
 
-    // 标准处理
-    if (path && !url.pathname.endsWith('/')) {
-      url.pathname += '/';
+    // 标准处理：确保有 /v1 前缀
+    let pathname = url.pathname.endsWith('/') ? url.pathname.slice(0, -1) : url.pathname;
+    if (!pathname.endsWith('/v1')) {
+      pathname += '/v1';
     }
-    if (path) {
-      url.pathname += path.startsWith('/') ? path.slice(1) : path;
-    }
+    url.pathname = pathname + path;
     return url.toString();
   } catch (error) {
     throw new Error(`API 端点格式不正确: ${endpoint}`);
@@ -532,6 +535,16 @@ ${messages.map(msg => `[${msg.role}]: ${msg.message}`).join('\n\n')}
   }
 
   const data = await response.json();
+
+  // 检测内容过滤/安全拦截
+  const finishReason = data.choices?.[0]?.finish_reason;
+  if (finishReason === 'content_filter' || finishReason === 'PROHIBITED_CONTENT') {
+    throw new Error(
+      `内容被 AI 安全过滤器拦截 (finish_reason: ${finishReason})\n\n` +
+        `输入内容可能包含敏感词汇，或请求的输出被认为不符合安全准则。\n` +
+        `建议检查并修改输入内容，或尝试换一个模型。`,
+    );
+  }
 
   if (!data.choices || !data.choices[0] || !data.choices[0].message?.content) {
     throw new Error('API 返回数据格式错误');

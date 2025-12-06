@@ -364,6 +364,13 @@ export function normalizeApiEndpoint(endpoint: string, path: string = '/chat/com
   // 移除末尾的斜杠
   let baseUrl = trimmed.endsWith('/') ? trimmed.slice(0, -1) : trimmed;
 
+  // 特殊处理 Google Gemini OpenAI 兼容端点
+  // 格式: https://generativelanguage.googleapis.com/v1beta/openai
+  // 正确 URL: /v1beta/openai/chat/completions (不需要再加 /v1)
+  if (baseUrl.includes('/v1beta/openai') || baseUrl.includes('/openai')) {
+    return baseUrl + path;
+  }
+
   // 如果 URL 不包含 /v1，自动添加 /v1
   if (!baseUrl.endsWith('/v1')) {
     baseUrl = baseUrl + '/v1';

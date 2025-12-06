@@ -791,6 +791,23 @@ ${messages.map(msg => `[${msg.role === 'user' ? userName : charName}]: ${preproc
   if (!summary_content) {
     console.error('❌ 无法从返回数据中提取总结内容');
     console.error('📋 API 返回的完整数据结构:', JSON.stringify(data, null, 2));
+
+    // 检测内容过滤/安全拦截
+    const finishReason = data.choices?.[0]?.finish_reason;
+    if (finishReason === 'content_filter' || finishReason === 'PROHIBITED_CONTENT') {
+      throw new Error(
+        `❌ 内容被 AI 安全过滤器拦截\n\n` +
+          `API 返回了 finish_reason: "${finishReason}"\n\n` +
+          `这通常意味着：\n` +
+          `• 输入内容可能包含敏感词汇或主题\n` +
+          `• 请求的输出被认为不符合安全准则\n\n` +
+          `建议：\n` +
+          `• 检查并修改输入内容，避免敏感词汇\n` +
+          `• 尝试换一个模型或 API 服务\n` +
+          `• 如使用 Gemini，可尝试调整安全设置`,
+      );
+    }
+
     throw new Error(
       `API 返回数据格式不符合预期。\n\n` +
         `期望格式: { choices: [{ message: { content: "..." } }] }\n\n` +

@@ -104,6 +104,14 @@ export default {
         return await handleUnbanEndpoint(request, env, corsHeaders);
       } else if (path === '/get-banned-endpoints') {
         return await handleGetBannedEndpoints(request, env, corsHeaders);
+      } else if (path === '/delete-endpoint') {
+        return await handleDeleteEndpoint(request, env, corsHeaders);
+      } else if (path === '/add-blacklist') {
+        return await handleAddBlacklist(request, env, corsHeaders);
+      } else if (path === '/get-blacklist') {
+        return await handleGetBlacklist(request, env, corsHeaders);
+      } else if (path === '/remove-blacklist') {
+        return await handleRemoveBlacklist(request, env, corsHeaders);
       } else if (path === '/whitelist-endpoint') {
         return await handleWhitelistEndpoint(request, env, corsHeaders);
       } else if (path === '/unwhitelist-endpoint') {
@@ -277,11 +285,55 @@ async function handleVerify(request, env, corsHeaders) {
         reason: 'BANNED_ENDPOINT',
       });
 
-      // 🎣 钓鱼模式：不暴露真实原因，让他来找你
+      // 🎣 钓鱼模式：不暴露真实原因，让他来帖子找你
       return jsonResponse(
         {
           valid: false,
-          message: `❌ 授权验证失败\n\n如有疑问请联系管理员`,
+          message: `❌ 授权服务暂时不可用\n\n请稍后重试，若持续失败可前往帖子反馈`,
+        },
+        200,
+        corsHeaders,
+      );
+    }
+
+    // 🔥 检查 API 端点是否在黑名单中（贩子端点，支持模糊匹配）
+    const blacklistStr = await redisGet('blacklist_endpoints');
+    const blacklist = blacklistStr ? JSON.parse(blacklistStr) : {};
+
+    // 模糊匹配：检查用户端点是否包含黑名单中的任何关键词
+    let matchedBlacklist = null;
+    if (cleanApiEndpoint !== 'unknown') {
+      const lowerEndpoint = cleanApiEndpoint.toLowerCase();
+      for (const key of Object.keys(blacklist)) {
+        const lowerKey = key.toLowerCase();
+        // 检查是否包含（支持 www.xxx.com、api.xxx.com、xxx.com/v1 等各种形式）
+        if (lowerEndpoint.includes(lowerKey) || lowerKey.includes(lowerEndpoint)) {
+          matchedBlacklist = blacklist[key];
+          matchedBlacklist.matchedKey = key;
+          break;
+        }
+      }
+    }
+
+    if (matchedBlacklist) {
+      console.log(
+        `☠️ 黑名单 API 端点尝试验证: ${cleanApiEndpoint} (匹配: ${matchedBlacklist.matchedKey}, 站点: ${matchedBlacklist.siteName})`,
+      );
+
+      // 记录被拒绝的访问
+      await logVerification(env, {
+        code,
+        isValid: false,
+        apiEndpoint: cleanApiEndpoint,
+        timestamp: timestamp || new Date().toISOString(),
+        reason: 'BLACKLIST_ENDPOINT',
+      });
+
+      // 🎣 钓鱼模式
+      return jsonResponse(
+        {
+          valid: false,
+          message: `❌ 授权服务暂时不可用\n\n请稍后重试，若持续失败可前往帖子反馈`,
         },
         200,
         corsHeaders,
@@ -635,6 +687,7 @@ function handleAdmin(env) {
                 <div class="nav-item" onclick="showPage('banned')"><span class="icon">🚫</span><span class="label">禁用列表</span></div>
                 <div class="nav-item" onclick="showPage('suspicious')"><span class="icon">⚠️</span><span class="label">可疑列表</span></div>
                 <div class="nav-item" onclick="showPage('whitelist')"><span class="icon">✅</span><span class="label">白名单</span></div>
+                <div class="nav-item" onclick="showPage('blacklist')"><span class="icon">☠️</span><span class="label">黑名单</span></div>
             </div>
             <div class="nav-group">
                 <div class="nav-group-title">设置</div>
@@ -671,8 +724,12 @@ function handleAdmin(env) {
                 <div class="stat-card"><div class="stat-value" id="statEndpoints">0</div><div class="stat-label">API端点</div></div>
             </div>
             <div class="card">
-                <div class="card-title">� 历史授权码</div>
+                <div class="card-title">💎 历史授权码</div>
                 <div id="historyList" class="scroll-container" style="max-height: 180px;"><p style="color: #888; text-align: center;">加载中...</p></div>
+            </div>
+            <div class="card" style="border: 2px solid #f59e0b;">
+                <div class="card-title" style="color: #f59e0b;">🆕 新端点提醒（24小时内）</div>
+                <div id="newEndpointsList" style="max-height: 200px; overflow-y: auto;"><p style="color: #888; text-align: center;">加载中...</p></div>
             </div>
         </div>
 
@@ -815,6 +872,23 @@ function handleAdmin(env) {
             <div class="card"><div id="whitelistEndpointsList" class="scroll-container"><p style="color: #888; text-align: center;">加载中...</p></div></div>
         </div>
 
+        <!-- 黑名单（贩子API端点） -->
+        <div id="page-blacklist" class="page">
+            <div class="page-header"><h2>☠️ 黑名单</h2><p>已知贩子API端点（手动添加，支持模糊匹配）</p></div>
+            <div class="card" style="margin-bottom: 16px; padding: 16px;">
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 12px;">
+                    <input type="text" id="blacklistSiteName" placeholder="站点名称（如：某某API站）" style="flex: 0 0 200px; padding: 10px 14px; background: #0f0f0f; border: 1px solid #3a3a3a; border-radius: 6px; color: #fff; font-size: 14px;" />
+                    <input type="text" id="blacklistEndpoint" placeholder="端点URL或域名关键词（支持完整URL）" style="flex: 1; min-width: 250px; padding: 10px 14px; background: #0f0f0f; border: 1px solid #3a3a3a; border-radius: 6px; color: #fff; font-size: 14px;" />
+                    <button onclick="addBlacklist()" style="padding: 10px 20px; background: #7c2d12; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">☠️ 添加黑名单</button>
+                </div>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <input type="text" id="blacklistSearch" placeholder="🔍 搜索黑名单..." style="flex: 1; padding: 10px 14px; background: #0f0f0f; border: 1px solid #3a3a3a; border-radius: 6px; color: #fff; font-size: 14px;" oninput="filterBlacklist()" />
+                    <span id="blacklistCount" style="color: #888; font-size: 13px;"></span>
+                </div>
+            </div>
+            <div id="blacklistGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 16px;"><p style="color: #888; text-align: center;">加载中...</p></div>
+        </div>
+
         <!-- 插件信息 -->
         <div id="page-plugin-info" class="page">
             <div class="page-header"><h2>📦 插件信息管理</h2><p>更新插件版本号和说明</p></div>
@@ -840,6 +914,7 @@ function handleAdmin(env) {
             if (pageId === 'dashboard') refreshStats();
             if (pageId === 'auto-update') loadAutoUpdateConfig();
             if (pageId === 'plugin-info') loadPluginInfo();
+            if (pageId === 'blacklist') loadBlacklist();
         }
 
         // 自动更新开关
@@ -860,9 +935,20 @@ function handleAdmin(env) {
             const savedKey = localStorage.getItem('adminKey');
             if (savedKey) {
                 document.getElementById('adminKey').value = savedKey;
-                refreshStats();
+                // 延迟100ms确保DOM完全就绪
+                setTimeout(function() {
+                    refreshStats();
+                }, 100);
             }
             loadPluginInfo();
+
+            // 自动刷新（每30秒）
+            setInterval(function() {
+                const adminKey = document.getElementById('adminKey').value;
+                if (adminKey && document.getElementById('page-dashboard').classList.contains('active')) {
+                    refreshStats();
+                }
+            }, 30000);
         };
 
         // 显示提示消息
@@ -1063,6 +1149,36 @@ function handleAdmin(env) {
                     } else {
                         historyList.innerHTML = '<p style="color: #888; text-align: center;">暂无历史记录</p>';
                     }
+
+                    // 🆕 新端点提醒（24小时内首次出现的）
+                    const newEndpointsList = document.getElementById('newEndpointsList');
+                    const now = new Date();
+                    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                    const newEndpoints = (data.apiEndpoints || []).filter(function(ep) {
+                        if (!ep.firstAccess) return false;
+                        const firstAccessDate = new Date(ep.firstAccess);
+                        return firstAccessDate > oneDayAgo && !ep.isWhitelisted;
+                    }).sort(function(a, b) {
+                        return new Date(b.firstAccess) - new Date(a.firstAccess);
+                    });
+
+                    if (newEndpoints.length > 0) {
+                        newEndpointsList.innerHTML = newEndpoints.map(function(ep) {
+                            var safeEndpoint = String(ep.endpoint || '').split(String.fromCharCode(39)).join('').split(String.fromCharCode(34)).join('');
+                            var borderColor = ep.isBanned ? '#7c2d12' : (ep.isSuspicious ? '#f59e0b' : '#f59e0b');
+                            var badge = ep.isBanned ? '<span style="background:#7c2d12;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;margin-left:8px;">已禁用</span>' :
+                                       (ep.isSuspicious ? '<span style="background:#f59e0b;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;margin-left:8px;">可疑</span>' : '');
+                            return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#1a1a1a;border-left:3px solid ' + borderColor + ';border-radius:6px;margin-bottom:8px;">' +
+                                '<div style="flex:1;">' +
+                                    '<div style="font-family:Courier New,monospace;color:#4a9eff;font-size:13px;word-break:break-all;">' + (ep.endpoint || '(空)') + badge + '</div>' +
+                                    '<div style="color:#666;font-size:11px;margin-top:4px;">首次: ' + new Date(ep.firstAccess).toLocaleString("zh-CN") + ' | 访问: ' + (ep.accessCount || 1) + '次</div>' +
+                                '</div>' +
+                                '<button onclick="banEndpoint(this.dataset.ep)" data-ep="' + safeEndpoint + '" style="padding:4px 10px;background:#dc2626;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:11px;">禁用</button>' +
+                            '</div>';
+                        }).join('');
+                    } else {
+                        newEndpointsList.innerHTML = '<p style="color: #10b981; text-align: center;">✅ 最近24小时无新端点</p>';
+                    }
                 } else {
                     showAlert('❌ ' + result.message, 'error');
                 }
@@ -1225,13 +1341,16 @@ function handleAdmin(env) {
                         ? '<button onclick="unsuspiciousEndpoint(this.dataset.ep)" data-ep="' + safeEndpoint + '" style="padding: 6px 14px; background: #6b7280; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">移除可疑</button>'
                         : '<button onclick="suspiciousEndpoint(this.dataset.ep)" data-ep="' + safeEndpoint + '" style="padding: 6px 14px; background: #f59e0b; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">⚠️ 可疑</button>';
 
+                    // 删除按钮
+                    var deleteButton = '<button onclick="deleteEndpoint(this.dataset.ep)" data-ep="' + safeEndpoint + '" style="padding: 6px 14px; background: #374151; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">🗑️ 删除</button>';
+
                     return '<div style="background: #1a1a1a; border: 2px solid ' + borderColor + '; border-radius: 12px; padding: 20px; ' + (isBanned ? 'opacity: 0.6;' : '') + '" data-endpoint="' + safeEndpoint + '">' +
                         '<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">' +
                             bannedBadge + whitelistBadge + suspiciousBadge +
                         '</div>' +
-                        '<div style="font-family: Courier New, monospace; font-weight: 700; color: ' + (isBanned ? '#666' : '#4a9eff') + '; font-size: 16px; word-break: break-all; margin-bottom: 16px; line-height: 1.4;">' +
+                        '<a href="' + (endpoint.endpoint && endpoint.endpoint.startsWith('http') ? endpoint.endpoint : 'https://' + (endpoint.endpoint || '')) + '" target="_blank" style="display: block; font-family: Courier New, monospace; font-weight: 700; color: ' + (isBanned ? '#666' : '#4a9eff') + '; font-size: 16px; word-break: break-all; margin-bottom: 16px; line-height: 1.4; text-decoration: underline; cursor: pointer;">' +
                             (endpoint.endpoint || '(空)') +
-                        '</div>' +
+                        '</a>' +
                         '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">' +
                             '<span style="color: #888; font-size: 13px;">访问次数</span>' +
                             '<span style="color: #10b981; font-weight: 700; font-size: 28px;">' + (endpoint.accessCount || 0) + '</span>' +
@@ -1247,7 +1366,7 @@ function handleAdmin(env) {
                             '</div>' +
                         '</div>' +
                         '<div style="display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap;">' +
-                            banButton + suspiciousButton + whitelistButton +
+                            banButton + suspiciousButton + whitelistButton + deleteButton +
                         '</div>' +
                     '</div>';
                 }).join('');
@@ -1439,9 +1558,10 @@ function handleAdmin(env) {
                 const listDiv = document.getElementById('suspiciousEndpointsList');
                 if (result.success && result.data && result.data.length > 0) {
                     listDiv.innerHTML = result.data.map(function(item) {
+                        var linkUrl = item.endpoint && item.endpoint.startsWith('http') ? item.endpoint : 'https://' + (item.endpoint || '');
                         return '<div class="list-item" style="display: flex; justify-content: space-between; align-items: center; border-left-color: #f59e0b;">' +
                             '<div>' +
-                                '<div style="font-family: Courier New, monospace; color: #f59e0b; font-weight: 700; font-size: 14px; margin-bottom: 4px;">' + item.endpoint + '</div>' +
+                                '<a href="' + linkUrl + '" target="_blank" style="display: block; font-family: Courier New, monospace; color: #f59e0b; font-weight: 700; font-size: 14px; margin-bottom: 4px; text-decoration: underline; cursor: pointer;">' + item.endpoint + '</a>' +
                                 '<div style="color: #666; font-size: 11px;">添加时间: ' + new Date(item.addedAt).toLocaleString('zh-CN') + '</div>' +
                             '</div>' +
                             '<button onclick="unsuspiciousEndpoint(this.dataset.ep)" data-ep="' + item.endpoint + '" style="padding: 4px 10px; background: #6b7280; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">移除</button>' +
@@ -1516,6 +1636,36 @@ function handleAdmin(env) {
             }
         }
 
+        // 删除 API 端点记录
+        async function deleteEndpoint(endpoint) {
+            if (!confirm('确定要删除 ' + endpoint + ' 的记录吗？')) return;
+
+            const adminKey = document.getElementById('adminKey').value;
+            if (!adminKey) {
+                showAlert('❌ 请先输入管理员密钥', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/delete-endpoint', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adminKey, endpoint })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert('✅ 已删除: ' + endpoint, 'success');
+                    refreshStats();
+                } else {
+                    showAlert('❌ ' + result.message, 'error');
+                }
+            } catch (error) {
+                showAlert('❌ 网络错误: ' + error.message, 'error');
+            }
+        }
+
         // 加载禁用列表
         async function loadBannedEndpoints() {
             const adminKey = document.getElementById('adminKey').value;
@@ -1559,6 +1709,132 @@ function handleAdmin(env) {
                 }
             } catch (error) {
                 console.error('加载禁用列表失败:', error);
+            }
+        }
+
+        // 添加黑名单
+        async function addBlacklist() {
+            const siteName = document.getElementById('blacklistSiteName').value.trim();
+            const endpoint = document.getElementById('blacklistEndpoint').value.trim();
+            const adminKey = document.getElementById('adminKey').value;
+
+            if (!adminKey) {
+                showAlert('❌ 请先输入管理员密钥', 'error');
+                return;
+            }
+            if (!siteName) {
+                showAlert('❌ 请输入站点名称', 'error');
+                return;
+            }
+            if (!endpoint) {
+                showAlert('❌ 请输入端点URL', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/add-blacklist', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adminKey, siteName, endpoint })
+                });
+                const result = await response.json();
+                showAlert(result.message, result.success ? 'success' : 'error');
+                if (result.success) {
+                    document.getElementById('blacklistSiteName').value = '';
+                    document.getElementById('blacklistEndpoint').value = '';
+                    loadBlacklist();
+                }
+            } catch (error) {
+                showAlert('❌ 网络错误: ' + error.message, 'error');
+            }
+        }
+
+        // 加载黑名单
+        async function loadBlacklist() {
+            const adminKey = document.getElementById('adminKey').value;
+            if (!adminKey) return;
+
+            try {
+                const response = await fetch('/get-blacklist', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adminKey })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    window.allBlacklist = result.data || [];
+                    renderBlacklist(window.allBlacklist);
+                }
+            } catch (error) {
+                console.error('加载黑名单失败:', error);
+            }
+        }
+
+        // 渲染黑名单卡片
+        function renderBlacklist(list) {
+            const grid = document.getElementById('blacklistGrid');
+            const countSpan = document.getElementById('blacklistCount');
+
+            if (list && list.length > 0) {
+                countSpan.textContent = '共 ' + list.length + ' 个';
+                grid.innerHTML = list.map(function(item) {
+                    var safeEndpoint = String(item.endpoint || '').split(String.fromCharCode(39)).join('').split(String.fromCharCode(34)).join('');
+                    var displayUrl = item.endpoint || '';
+                    // 如果不是完整URL，构造一个用于跳转
+                    var linkUrl = displayUrl.startsWith('http') ? displayUrl : 'https://' + displayUrl;
+
+                    return '<div style="background: #1a1a1a; border: 2px solid #7c2d12; border-radius: 12px; padding: 20px;" data-sitename="' + (item.siteName || '') + '" data-endpoint="' + safeEndpoint + '">' +
+                        '<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">' +
+                            '<span style="background: #7c2d12; color: #fff; padding: 4px 12px; border-radius: 6px; font-size: 14px; font-weight: 700;">☠️ ' + (item.siteName || '未知站点') + '</span>' +
+                        '</div>' +
+                        '<a href="' + linkUrl + '" target="_blank" style="display: block; font-family: Courier New, monospace; font-weight: 600; color: #4a9eff; font-size: 15px; word-break: break-all; margin-bottom: 12px; text-decoration: underline; cursor: pointer;">' + displayUrl + '</a>' +
+                        '<div style="color: #666; font-size: 12px; margin-bottom: 14px;">添加时间: ' + (item.addedAt ? new Date(item.addedAt).toLocaleString("zh-CN") : '-') + '</div>' +
+                        '<button onclick="removeBlacklist(this.dataset.ep)" data-ep="' + safeEndpoint + '" style="padding: 8px 16px; background: #374151; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">🗑️ 移除</button>' +
+                    '</div>';
+                }).join('');
+            } else {
+                countSpan.textContent = '';
+                grid.innerHTML = '<p style="color: #888; text-align: center; grid-column: 1 / -1;">暂无黑名单记录</p>';
+            }
+        }
+
+        // 搜索黑名单
+        function filterBlacklist() {
+            const searchText = document.getElementById('blacklistSearch').value.toLowerCase();
+            let filtered = window.allBlacklist || [];
+
+            if (searchText) {
+                filtered = filtered.filter(function(item) {
+                    return (item.siteName || '').toLowerCase().includes(searchText) ||
+                           (item.endpoint || '').toLowerCase().includes(searchText);
+                });
+            }
+
+            renderBlacklist(filtered);
+        }
+
+        // 移除黑名单
+        async function removeBlacklist(endpoint) {
+            if (!confirm('确定要从黑名单移除 ' + endpoint + ' 吗？')) return;
+
+            const adminKey = document.getElementById('adminKey').value;
+            if (!adminKey) {
+                showAlert('❌ 请先输入管理员密钥', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/remove-blacklist', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adminKey, endpoint })
+                });
+                const result = await response.json();
+                showAlert(result.message, result.success ? 'success' : 'error');
+                if (result.success) loadBlacklist();
+            } catch (error) {
+                showAlert('❌ 网络错误: ' + error.message, 'error');
             }
         }
 
@@ -1984,6 +2260,58 @@ async function handleUnbanEndpoint(request, env, corsHeaders) {
     );
   } catch (error) {
     console.error('解禁端点失败:', error);
+    return jsonResponse({ success: false, message: '❌ 操作失败: ' + error.message }, 500, corsHeaders);
+  }
+}
+
+/**
+ * 删除 API 端点记录
+ */
+async function handleDeleteEndpoint(request, env, corsHeaders) {
+  try {
+    const { adminKey, endpoint } = await request.json();
+
+    // 验证管理员密钥
+    if (!adminKey || adminKey !== env.ADMIN_SECRET) {
+      return jsonResponse({ success: false, message: '❌ 管理员密钥错误' }, 403, corsHeaders);
+    }
+
+    if (!endpoint) {
+      return jsonResponse({ success: false, message: '❌ 端点不能为空' }, 400, corsHeaders);
+    }
+
+    // 从 api_endpoints 中删除
+    const endpointsStr = await redisGet('api_endpoints');
+    const endpoints = endpointsStr ? JSON.parse(endpointsStr) : {};
+    delete endpoints[endpoint];
+    await redisSet('api_endpoints', JSON.stringify(endpoints));
+
+    // 同时从禁用列表、白名单、可疑列表中删除
+    const bannedStr = await redisGet('banned_endpoints');
+    const banned = bannedStr ? JSON.parse(bannedStr) : {};
+    delete banned[endpoint];
+    await redisSet('banned_endpoints', JSON.stringify(banned));
+
+    const whitelistStr = await redisGet('whitelist_endpoints');
+    const whitelist = whitelistStr ? JSON.parse(whitelistStr) : {};
+    delete whitelist[endpoint];
+    await redisSet('whitelist_endpoints', JSON.stringify(whitelist));
+
+    const suspiciousStr = await redisGet('suspicious_endpoints');
+    const suspicious = suspiciousStr ? JSON.parse(suspiciousStr) : {};
+    delete suspicious[endpoint];
+    await redisSet('suspicious_endpoints', JSON.stringify(suspicious));
+
+    return jsonResponse(
+      {
+        success: true,
+        message: `✅ 已删除 API 端点记录: ${endpoint}`,
+      },
+      200,
+      corsHeaders,
+    );
+  } catch (error) {
+    console.error('删除端点失败:', error);
     return jsonResponse({ success: false, message: '❌ 操作失败: ' + error.message }, 500, corsHeaders);
   }
 }
@@ -2525,5 +2853,88 @@ async function handleGetSuspiciousEndpoints(request, env, corsHeaders) {
     return jsonResponse({ success: true, data: list }, 200, corsHeaders);
   } catch (error) {
     return jsonResponse({ success: false, message: '❌ 获取失败: ' + error.message }, 500, corsHeaders);
+  }
+}
+
+/**
+ * 添加到黑名单（贩子API端点）
+ */
+async function handleAddBlacklist(request, env, corsHeaders) {
+  try {
+    const { adminKey, siteName, endpoint } = await request.json();
+
+    if (!adminKey || adminKey !== env.ADMIN_SECRET) {
+      return jsonResponse({ success: false, message: '❌ 管理员密钥错误' }, 403, corsHeaders);
+    }
+
+    if (!siteName || !endpoint) {
+      return jsonResponse({ success: false, message: '❌ 站点名称和端点不能为空' }, 400, corsHeaders);
+    }
+
+    const blacklistStr = await redisGet('blacklist_endpoints');
+    const blacklist = blacklistStr ? JSON.parse(blacklistStr) : {};
+
+    blacklist[endpoint] = {
+      endpoint: endpoint,
+      siteName: siteName,
+      addedAt: new Date().toISOString(),
+    };
+
+    await redisSet('blacklist_endpoints', JSON.stringify(blacklist));
+
+    return jsonResponse({ success: true, message: '✅ 已添加到黑名单: ' + siteName }, 200, corsHeaders);
+  } catch (error) {
+    return jsonResponse({ success: false, message: '❌ 操作失败: ' + error.message }, 500, corsHeaders);
+  }
+}
+
+/**
+ * 获取黑名单
+ */
+async function handleGetBlacklist(request, env, corsHeaders) {
+  try {
+    const { adminKey } = await request.json();
+
+    if (!adminKey || adminKey !== env.ADMIN_SECRET) {
+      return jsonResponse({ success: false, message: '❌ 管理员密钥错误' }, 403, corsHeaders);
+    }
+
+    const blacklistStr = await redisGet('blacklist_endpoints');
+    const blacklist = blacklistStr ? JSON.parse(blacklistStr) : {};
+
+    const list = Object.values(blacklist);
+    list.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt));
+
+    return jsonResponse({ success: true, data: list }, 200, corsHeaders);
+  } catch (error) {
+    return jsonResponse({ success: false, message: '❌ 获取失败: ' + error.message }, 500, corsHeaders);
+  }
+}
+
+/**
+ * 从黑名单移除
+ */
+async function handleRemoveBlacklist(request, env, corsHeaders) {
+  try {
+    const { adminKey, endpoint } = await request.json();
+
+    if (!adminKey || adminKey !== env.ADMIN_SECRET) {
+      return jsonResponse({ success: false, message: '❌ 管理员密钥错误' }, 403, corsHeaders);
+    }
+
+    if (!endpoint) {
+      return jsonResponse({ success: false, message: '❌ 端点不能为空' }, 400, corsHeaders);
+    }
+
+    const blacklistStr = await redisGet('blacklist_endpoints');
+    const blacklist = blacklistStr ? JSON.parse(blacklistStr) : {};
+
+    delete blacklist[endpoint];
+
+    await redisSet('blacklist_endpoints', JSON.stringify(blacklist));
+
+    return jsonResponse({ success: true, message: '✅ 已从黑名单移除' }, 200, corsHeaders);
+  } catch (error) {
+    return jsonResponse({ success: false, message: '❌ 操作失败: ' + error.message }, 500, corsHeaders);
   }
 }

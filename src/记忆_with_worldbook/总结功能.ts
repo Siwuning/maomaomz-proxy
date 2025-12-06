@@ -230,13 +230,28 @@ async function tavernProxyFetch(url: string, options: RequestInit = {}): Promise
     // 静默处理
   }
 
-  // 所有代理方式都失败，抛出详细错误
+  // 所有代理方式都失败，根据 API 类型给出不同的提示
+  const isDeepSeek = url.includes('api.deepseek.com');
+  const isOpenAI = url.includes('api.openai.com');
+  const isOfficialApi = isDeepSeek || isOpenAI;
+
+  if (isOfficialApi) {
+    throw new Error(
+      `无法连接到 API 端点 (CORS 错误)\n\n` +
+        `⚠️ 检测到您使用的是官方 API（${isDeepSeek ? 'DeepSeek' : 'OpenAI'}），官方 API 不支持浏览器直接访问。\n\n` +
+        `✅ 解决方案（推荐）：\n` +
+        `在插件设置中开启「使用酒馆 API」选项\n\n` +
+        `⚙️ 前提条件：\n` +
+        `确保酒馆主界面已配置好相同的 API 连接`,
+    );
+  }
+
   throw new Error(
     `无法连接到 API 端点 (CORS 错误)\n\n` +
       `💡 解决方案：\n` +
-      `1. 在酒馆主界面配置相同的 API（Chat Completion → Custom）\n` +
-      `2. 使用支持 CORS 的反代服务\n` +
-      `3. 或联系反代提供者添加 CORS 支持`,
+      `1. 在插件设置中开启「使用酒馆 API」选项（推荐）\n` +
+      `2. 或在酒馆主界面配置相同的 API（Chat Completion → Custom）\n` +
+      `3. 或使用支持 CORS 的反代服务`,
   );
 }
 

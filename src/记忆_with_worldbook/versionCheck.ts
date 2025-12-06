@@ -132,22 +132,7 @@ export async function checkForUpdates(force: boolean = false): Promise<{
   notes?: string;
 } | null> {
   try {
-    // 非强制检查时，24小时内只检查一次
-    if (!force) {
-      const lastCheck = localStorage.getItem(LAST_CHECK_KEY);
-      if (lastCheck) {
-        const lastCheckTime = parseInt(lastCheck);
-        const now = Date.now();
-        const oneDay = 24 * 60 * 60 * 1000;
-        if (now - lastCheckTime < oneDay) {
-          console.log('ℹ️ 距离上次检查不到24小时，跳过自动检查');
-          return null;
-        }
-      }
-    }
-
-    console.log('🔍 检查更新中...');
-    console.log(`📌 当前版本: ${CURRENT_VERSION}`);
+    // 每次加载都检测（CDN 不限流）
 
     // 直接从 CDN 获取远程版本号（不调用 GitHub API，避免限流）
     const remoteVersion = await fetchRemoteVersion();
@@ -156,9 +141,6 @@ export async function checkForUpdates(force: boolean = false): Promise<{
       console.warn('⚠️ 无法获取远程版本信息');
       return null;
     }
-
-    // 保存检查时间
-    localStorage.setItem(LAST_CHECK_KEY, Date.now().toString());
 
     // 比较版本号（只有远程版本更高才算有更新）
     let hasUpdate = false;

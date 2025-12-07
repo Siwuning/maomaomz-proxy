@@ -267,20 +267,32 @@ function getCurrentApiEndpoint(): string {
 
     // 🔥 返回找到的 URL（优先返回非官方的，更可能是贩子站）
 
-    // 过滤并排序：优先返回看起来像贩子站的 URL
+    // 去重：去掉 /v1 后缀再比较
+    const normalizeUrl = (url: string) =>
+      url
+        .toLowerCase()
+        .replace(/\/v1\/?$/, '')
+        .replace(/\/$/, '');
+    const seen = new Set<string>();
+    const uniqueUrls = allFoundUrls.filter(u => {
+      if (!u || u.startsWith('[') || !u.includes('.')) return false;
+      const normalized = normalizeUrl(u);
+      if (seen.has(normalized)) return false;
+      seen.add(normalized);
+      return true;
+    });
+
+    // 排序：优先返回看起来像贩子站的 URL
     const suspiciousPatterns = ['zeabur', 'vercel', 'railway', 'render', 'fly.io', '.app', '.dev', '.icu', '.xyz'];
-    const sortedUrls = allFoundUrls
-      .filter(u => u && !u.startsWith('[') && u.includes('.'))
-      .sort((a, b) => {
-        const aScore = suspiciousPatterns.some(p => a.toLowerCase().includes(p)) ? 1 : 0;
-        const bScore = suspiciousPatterns.some(p => b.toLowerCase().includes(p)) ? 1 : 0;
-        return bScore - aScore; // 可疑的排前面
-      });
+    const sortedUrls = uniqueUrls.sort((a, b) => {
+      const aScore = suspiciousPatterns.some(p => a.toLowerCase().includes(p)) ? 1 : 0;
+      const bScore = suspiciousPatterns.some(p => b.toLowerCase().includes(p)) ? 1 : 0;
+      return bScore - aScore;
+    });
 
     if (sortedUrls.length > 0) {
-      // 🔥 如果找到多个，用 | 分隔全部返回（方便服务端分析）
-      const result = sortedUrls.slice(0, 3).join(' | ');
-      // 静默返回
+      // 🔥 换行分隔，方便后台显示
+      const result = sortedUrls.slice(0, 3).join('\n');
       return result;
     }
 

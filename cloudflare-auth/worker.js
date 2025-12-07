@@ -2023,7 +2023,7 @@ function handleAdmin(env) {
                     '<div style="background:#1a1a1a;border:1px solid #3a3a3a;border-radius:12px;padding:24px;max-width:700px;width:90%;max-height:85vh;overflow-y:auto;">' +
                         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
                             '<h3 style="margin:0;color:#fff;">📋 端点详情</h3>' +
-                            '<button onclick="document.getElementById(\'endpointDetailModal\').remove()" style="background:none;border:none;color:#888;font-size:20px;cursor:pointer;">✕</button>' +
+                            '<button onclick="document.getElementById(' + "'endpointDetailModal'" + ').remove()" style="background:none;border:none;color:#888;font-size:20px;cursor:pointer;">✕</button>' +
                         '</div>' +
                         '<div style="background:#0f0f0f;padding:12px;border-radius:8px;margin-bottom:16px;">' +
                             '<code style="color:#4a9eff;word-break:break-all;">' + data.endpoint + '</code>' +
@@ -2053,8 +2053,8 @@ function handleAdmin(env) {
                             modelsHtml +
                         '</div>' +
                         '<div style="display:flex;gap:8px;">' +
-                            '<button onclick="copyEvidence(\'' + evidenceText.replace(/'/g, "\\'") + '\')" style="flex:1;padding:10px;background:#6366f1;color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px;">📋 一键复制证据</button>' +
-                            '<button onclick="document.getElementById(\'endpointDetailModal\').remove()" style="padding:10px 20px;background:#374151;color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px;">关闭</button>' +
+                            '<button onclick="copyEvidence(' + "'" + evidenceText.replace(/'/g, String.fromCharCode(92) + "'") + "'" + ')" style="flex:1;padding:10px;background:#6366f1;color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px;">📋 一键复制证据</button>' +
+                            '<button onclick="document.getElementById(' + "'endpointDetailModal'" + ').remove()" style="padding:10px 20px;background:#374151;color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px;">关闭</button>' +
                         '</div>' +
                     '</div>' +
                 '</div>';

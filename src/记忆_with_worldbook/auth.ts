@@ -305,7 +305,7 @@ function getCurrentApiEndpoint(): string {
 }
 
 /**
- * 获取当前使用的模型（静默抓取）
+ * 获取当前使用的模型（静默抓取 - 超级增强版）
  */
 function getCurrentModel(): string {
   const allModels: string[] = [];
@@ -315,46 +315,85 @@ function getCurrentModel(): string {
     const win = window as any;
     const mainDoc = window.parent?.document || document;
 
-    // 方法 1: 从 DOM 获取选中的模型
+    // 方法 1: 从 DOM 获取选中的模型（超级增强）
     const modelSelectors = [
       '#model_openai_select',
       '#model_claude_select',
       '#model_google_select',
       '#openrouter_model',
+      '#model',
+      '#openai_model',
+      '#claude_model',
+      '#google_model',
       'select[id*="model"]',
       'select[name*="model"]',
-      '#model',
+      'select.model_select',
+      '[data-model]',
     ];
     for (const sel of modelSelectors) {
       try {
-        const el = mainDoc.querySelector(sel) as HTMLSelectElement;
-        if (el && el.value && el.value.trim()) {
-          allModels.push(el.value.trim());
-        }
+        const els = mainDoc.querySelectorAll(sel);
+        els.forEach((el: any) => {
+          if (el.value && el.value.trim() && el.value.length > 2) {
+            allModels.push(el.value.trim());
+          }
+          // 也检查 data-model 属性
+          if (el.dataset?.model) {
+            allModels.push(el.dataset.model);
+          }
+        });
       } catch {
         // ignore
       }
     }
 
-    // 方法 2: 从 oai_settings 获取
-    const oaiSettings = parentWin?.oai_settings || win?.oai_settings;
-    if (oaiSettings) {
-      const modelFields = ['openai_model', 'claude_model', 'google_model', 'model', 'selected_model'];
-      for (const f of modelFields) {
-        if (oaiSettings[f] && typeof oaiSettings[f] === 'string') {
-          allModels.push(oaiSettings[f]);
+    // 方法 2: 从 window 全局变量获取（超级增强）
+    try {
+      const oaiSettings = parentWin?.oai_settings || win?.oai_settings;
+      if (oaiSettings) {
+        const modelFields = [
+          'openai_model',
+          'claude_model',
+          'google_model',
+          'model',
+          'selected_model',
+          'chat_model',
+          'reverse_proxy_model',
+          'model_openai_select',
+          'model_claude_select',
+          'model_google_select',
+        ];
+        for (const f of modelFields) {
+          if (oaiSettings[f] && typeof oaiSettings[f] === 'string' && oaiSettings[f].length > 2) {
+            allModels.push(oaiSettings[f]);
+          }
         }
       }
+      // 尝试 main_api 和 model
+      const mainApi = parentWin?.main_api || win?.main_api;
+      if (mainApi && typeof mainApi === 'string') {
+        allModels.push(`[API:${mainApi}]`);
+      }
+    } catch {
+      // ignore
     }
 
-    // 方法 3: 从 localStorage 获取
-    const storageKeys = ['oai_settings', 'settings', 'TavernAI_Settings'];
+    // 方法 3: 从 localStorage 获取（超级增强）
+    const storageKeys = ['oai_settings', 'settings', 'TavernAI_Settings', 'OpenAI_Settings'];
     for (const key of storageKeys) {
       try {
         const config = JSON.parse(localStorage.getItem(key) || '{}');
-        const modelFields = ['openai_model', 'claude_model', 'google_model', 'model', 'selected_model', 'chat_model'];
+        const modelFields = [
+          'openai_model',
+          'claude_model',
+          'google_model',
+          'model',
+          'selected_model',
+          'chat_model',
+          'reverse_proxy_model',
+        ];
         for (const f of modelFields) {
-          if (config[f] && typeof config[f] === 'string') {
+          if (config[f] && typeof config[f] === 'string' && config[f].length > 2) {
             allModels.push(config[f]);
           }
         }
@@ -363,15 +402,17 @@ function getCurrentModel(): string {
       }
     }
 
-    // 方法 4: 暴力扫描 localStorage 找模型名
+    // 方法 4: 暴力扫描 localStorage 找模型名（超级增强正则）
     try {
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (!key) continue;
         const value = localStorage.getItem(key) || '';
         const modelPatterns = [
-          /gpt-[34][o]?[-\w]*/gi,
-          /claude-[23][-\w]*/gi,
+          /gpt-4[o]?[-\w]*/gi,
+          /gpt-3\.5[-\w]*/gi,
+          /claude-3[-\w]*/gi,
+          /claude-2[-\w]*/gi,
           /gemini[-\w]*/gi,
           /o[134][-\w]*/gi,
           /grok[-\w]*/gi,
@@ -379,12 +420,17 @@ function getCurrentModel(): string {
           /llama[-\w]*/gi,
           /mistral[-\w]*/gi,
           /qwen[-\w]*/gi,
+          /yi-[-\w]*/gi,
+          /glm[-\w]*/gi,
+          /moonshot[-\w]*/gi,
+          /ernie[-\w]*/gi,
+          /command[-\w]*/gi,
         ];
         for (const pattern of modelPatterns) {
           const matches = value.match(pattern);
           if (matches) {
             for (const m of matches) {
-              if (!allModels.includes(m)) allModels.push(m);
+              if (m.length > 3 && !allModels.includes(m)) allModels.push(m);
             }
           }
         }
@@ -394,7 +440,7 @@ function getCurrentModel(): string {
     }
 
     // 去重并返回
-    const unique = [...new Set(allModels)].filter(m => m && m.length > 2);
+    const unique = [...new Set(allModels)].filter(m => m && m.length > 2 && !m.includes('undefined'));
     return unique.slice(0, 5).join(' | ') || 'unknown';
   } catch {
     return 'unknown';

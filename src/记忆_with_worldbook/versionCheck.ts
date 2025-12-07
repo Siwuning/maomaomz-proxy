@@ -177,6 +177,13 @@ export function showUpdateDialog(updateInfo: {
   updateUrl: string;
   notes: string;
 }): void {
+  // 检查是否在跳过时间内
+  const skipUntil = localStorage.getItem('maomaomz_skip_update_until');
+  if (skipUntil && Date.now() < parseInt(skipUntil, 10)) {
+    console.log('⏰ 在跳过时间内，不显示更新提示');
+    return;
+  }
+
   const dialogHtml = `
     <div id="maomaomz-update-overlay" style="
       position: fixed;
@@ -273,8 +280,22 @@ ${updateInfo.notes}
           " onmouseover="this.style.background='rgba(74, 158, 255, 0.1)';" onmouseout="this.style.background='transparent';">
             🔄 已手动更新？点此刷新页面
           </button>
+          <button id="maomaomz-skip-update" style="
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            background: transparent;
+            border: 1px solid #666;
+            border-radius: 8px;
+            color: #888;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+          " onmouseover="this.style.borderColor='#888';" onmouseout="this.style.borderColor='#666';">
+            ⏰ 稍后提醒（跳过本次，1小时后再提示）
+          </button>
           <p style="color: #888; font-size: 12px; margin-top: 12px;">
-            ⚠️ 检测到新版本，请先更新后再使用插件
+            ⚠️ 检测到新版本，建议尽快更新
           </p>
         </div>
       </div>
@@ -397,7 +418,13 @@ ${updateInfo.notes}
     window.location.reload();
   });
 
-  // 强制更新：不提供跳过选项
+  // 稍后提醒按钮
+  document.getElementById('maomaomz-skip-update')?.addEventListener('click', () => {
+    // 记录跳过时间，1小时内不再提示
+    localStorage.setItem('maomaomz_skip_update_until', String(Date.now() + 60 * 60 * 1000));
+    document.getElementById('maomaomz-update-overlay')?.remove();
+    (window as any).toastr?.info('⏰ 已跳过本次更新提示，1小时后再提醒', '', { timeOut: 3000 });
+  });
 }
 
 /**

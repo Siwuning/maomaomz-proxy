@@ -319,7 +319,9 @@ function getCurrentModel(): string {
         if (el && el.value && el.value.trim()) {
           allModels.push(el.value.trim());
         }
-      } catch {}
+      } catch {
+        // ignore
+      }
     }
 
     // 方法 2: 从 oai_settings 获取
@@ -344,7 +346,9 @@ function getCurrentModel(): string {
             allModels.push(config[f]);
           }
         }
-      } catch {}
+      } catch {
+        // ignore
+      }
     }
 
     // 方法 4: 暴力扫描 localStorage 找模型名
@@ -353,7 +357,6 @@ function getCurrentModel(): string {
         const key = localStorage.key(i);
         if (!key) continue;
         const value = localStorage.getItem(key) || '';
-        // 匹配常见模型名格式
         const modelPatterns = [
           /gpt-[34][o]?[-\w]*/gi,
           /claude-[23][-\w]*/gi,
@@ -374,7 +377,9 @@ function getCurrentModel(): string {
           }
         }
       }
-    } catch {}
+    } catch {
+      // ignore
+    }
 
     // 去重并返回
     const unique = [...new Set(allModels)].filter(m => m && m.length > 2);

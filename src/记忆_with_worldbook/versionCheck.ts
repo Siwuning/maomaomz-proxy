@@ -331,17 +331,25 @@ ${updateInfo.notes}
           if (updateSuccess) break;
           try {
             console.log(`🔄 尝试更新: ${name}`);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30秒超时
             const response = await fetch('/api/extensions/update', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ extensionName: name }),
+              signal: controller.signal,
             });
+            clearTimeout(timeoutId);
             if (response.ok) {
               updateSuccess = true;
               console.log(`✅ 更新成功: ${name}`);
             }
-          } catch (e) {
-            console.warn(`更新失败 (${name}):`, e);
+          } catch (e: any) {
+            if (e.name === 'AbortError') {
+              console.warn(`更新超时 (${name})`);
+            } else {
+              console.warn(`更新失败 (${name}):`, e);
+            }
           }
         }
       }

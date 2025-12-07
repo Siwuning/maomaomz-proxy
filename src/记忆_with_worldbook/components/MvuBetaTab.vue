@@ -97,14 +97,16 @@
               style="
                 width: 100%;
                 padding: 12px;
-                background: #2a2a2a;
+                background: #f5f5f5 !important;
                 border: 1px solid #3a3a3a;
                 border-radius: 6px;
-                color: #e0e0e0;
+                color: #1a1a1a !important;
                 font-size: 13px;
                 resize: vertical;
                 line-height: 1.5;
                 transition: all 0.2s ease;
+                -webkit-appearance: none;
+                -webkit-text-fill-color: #1a1a1a !important;
               "
               @focus="(e: any) => (e.target.style.borderColor = '#667eea')"
               @blur="(e: any) => (e.target.style.borderColor = '#3a3a3a')"
@@ -265,15 +267,17 @@
               width: 100%;
               height: 120px;
               padding: 12px;
-              background: #2a2a2a;
+              background: #f5f5f5 !important;
               border: 1px solid #3a3a3a;
               border-radius: 6px;
-              color: #e0e0e0;
+              color: #1a1a1a !important;
               font-size: 13px;
               resize: vertical;
               font-family: 'Courier New', monospace;
               line-height: 1.5;
               transition: all 0.2s ease;
+              -webkit-appearance: none;
+              -webkit-text-fill-color: #1a1a1a !important;
             "
             @focus="(e: any) => (e.target.style.borderColor = '#4a9eff')"
             @blur="(e: any) => (e.target.style.borderColor = '#3a3a3a')"
@@ -498,14 +502,16 @@
               style="
                 width: 100%;
                 padding: 12px;
-                background: #2a2a2a;
+                background: #f5f5f5 !important;
                 border: 1px solid #3a3a3a;
                 border-radius: 6px;
-                color: #e0e0e0;
+                color: #1a1a1a !important;
                 font-size: 13px;
                 resize: vertical;
                 line-height: 1.5;
                 transition: all 0.2s ease;
+                -webkit-appearance: none;
+                -webkit-text-fill-color: #1a1a1a !important;
               "
               @focus="(e: any) => (e.target.style.borderColor = '#fbbf24')"
               @blur="(e: any) => (e.target.style.borderColor = '#3a3a3a')"
@@ -644,15 +650,17 @@
             style="
               width: 100%;
               padding: 12px;
-              background: #2a2a2a;
+              background: #f5f5f5 !important;
               border: 1px solid #3a3a3a;
               border-radius: 6px;
-              color: #e0e0e0;
+              color: #1a1a1a !important;
               font-size: 13px;
               resize: vertical;
               font-family: 'Courier New', monospace;
               line-height: 1.5;
               transition: all 0.2s ease;
+              -webkit-appearance: none;
+              -webkit-text-fill-color: #1a1a1a !important;
             "
             @focus="(e: any) => (e.target.style.borderColor = '#fbbf24')"
             @blur="(e: any) => (e.target.style.borderColor = '#3a3a3a')"

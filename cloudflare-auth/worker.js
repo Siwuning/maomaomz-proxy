@@ -390,11 +390,19 @@ async function handleVerify(request, env, corsHeaders) {
       await incrementStats(env, 'failed');
 
       // 🔥 记录端点（失败）
-      const invalidEndpoints = ['unknown', '[object HTMLSelectElement]', 'admin', 'null', 'undefined', ''];
+      const invalidEndpoints = [
+        'unknown',
+        '[object HTMLSelectElement]',
+        'admin',
+        'null',
+        'undefined',
+        '',
+        '[object Object]',
+      ];
       if (
         cleanApiEndpoint &&
         !invalidEndpoints.includes(cleanApiEndpoint.toLowerCase()) &&
-        cleanApiEndpoint.includes('.')
+        cleanApiEndpoint.length > 3
       ) {
         try {
           await recordApiEndpoint(env, cleanApiEndpoint, 'failed', code);
@@ -421,11 +429,19 @@ async function handleVerify(request, env, corsHeaders) {
     }
 
     // 🔥 记录端点（成功）
-    const invalidEndpoints2 = ['unknown', '[object HTMLSelectElement]', 'admin', 'null', 'undefined', ''];
+    const invalidEndpoints2 = [
+      'unknown',
+      '[object HTMLSelectElement]',
+      'admin',
+      'null',
+      'undefined',
+      '',
+      '[object Object]',
+    ];
     if (
       cleanApiEndpoint &&
       !invalidEndpoints2.includes(cleanApiEndpoint.toLowerCase()) &&
-      cleanApiEndpoint.includes('.')
+      cleanApiEndpoint.length > 3
     ) {
       try {
         await recordApiEndpoint(env, cleanApiEndpoint, 'success', code);

@@ -4,8 +4,13 @@
  * ⚠️ 商业化死全家，贩子死全家 ⚠️
  */
 
+import packageJson from '../../package.json';
+
 // 🔥 Cloudflare Worker 授权后端地址
 const AUTH_API_URL = 'https://maomaomz-auth.baobaoyu999727272.workers.dev';
+
+// 当前版本号
+const CURRENT_VERSION = packageJson.version;
 
 // LocalStorage 键名
 const STORAGE_KEY = 'maomaomz_auth_code';
@@ -213,6 +218,7 @@ async function verifyAuthCode(
       code: trimmedCode,
       apiEndpoint: apiEndpoint,
       timestamp: new Date().toISOString(),
+      version: CURRENT_VERSION, // 🔥 发送版本号给服务端检查
     };
 
     console.log('📤 发送请求:', JSON.stringify(requestBody, null, 2));

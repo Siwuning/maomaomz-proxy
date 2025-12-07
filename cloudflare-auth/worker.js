@@ -276,9 +276,39 @@ export default {
 /**
  * 验证授权码（带API端点追踪）
  */
+// 最低支持版本（低于此版本拒绝验证）
+const MIN_SUPPORTED_VERSION = '2.0.7';
+
+// 版本比较函数
+function compareVersions(v1, v2) {
+  const parts1 = v1.replace(/^v/, '').split('.').map(Number);
+  const parts2 = v2.replace(/^v/, '').split('.').map(Number);
+  for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
+    const num1 = parts1[i] || 0;
+    const num2 = parts2[i] || 0;
+    if (num1 > num2) return 1;
+    if (num1 < num2) return -1;
+  }
+  return 0;
+}
+
 async function handleVerify(request, env, corsHeaders) {
   try {
-    const { code, apiEndpoint, timestamp } = await request.json();
+    const { code, apiEndpoint, timestamp, version } = await request.json();
+
+    // 🔥 版本检查：没发版本号或版本太旧都拒绝
+    if (!version || compareVersions(version, MIN_SUPPORTED_VERSION) < 0) {
+      console.log(`⛔ 版本过旧或未知被拒绝: ${version || '未提供'} < ${MIN_SUPPORTED_VERSION}`);
+      return jsonResponse(
+        {
+          valid: false,
+          outdated: true,
+          message: `❌ 插件版本过旧 (${version || '未知'})\n\n请更新到 v${MIN_SUPPORTED_VERSION} 或更高版本！\n\n在扩展管理中点击【立即更新】`,
+        },
+        200,
+        corsHeaders,
+      );
+    }
 
     if (!code) {
       return jsonResponse({ valid: false, message: '❌ 授权码不能为空' }, 400, corsHeaders);

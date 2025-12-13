@@ -1,14 +1,14 @@
 <template>
   <div
     class="memory-panel-container"
-    style="display: flex; flex-direction: column; height: 100%; background: #0d0d1a; color: #e0e0e0"
+    style="display: flex; flex-direction: column; height: 100%; background: #1a2332; color: #e0e0e0"
   >
     <!-- 面板头部 -->
     <div
       class="panel-header"
       style="
         padding: 16px 24px;
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        background: linear-gradient(135deg, #2a3a4a 0%, #3a4a5a 100%);
         border-bottom: 1px solid rgba(84, 107, 131, 0.3);
         display: flex;
         justify-content: space-between;
@@ -159,7 +159,7 @@
       class="panel-tabs"
       style="
         display: flex;
-        background: #0f0f1f;
+        background: #1e2d3d;
         border-bottom: 1px solid rgba(84, 107, 131, 0.2);
         flex-shrink: 0;
         overflow-x: auto;

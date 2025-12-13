@@ -1,5 +1,5 @@
 <template>
-  <div class="settings-tab" style="padding: 25px !important; background: #0d0d1a !important">
+  <div class="settings-tab" style="padding: 25px !important; background: #1a2332 !important">
     <!-- API 配置 -->
     <div
       class="config-section"
@@ -13,7 +13,7 @@
           align-items: center;
           justify-content: space-between;
           padding: 18px 24px;
-          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+          background: linear-gradient(135deg, #2a3a4a 0%, #3a4a5a 100%);
           border-radius: 12px;
           margin-bottom: 16px;
           border: 1px solid rgba(84, 107, 131, 0.3);
@@ -647,7 +647,7 @@
           align-items: center;
           justify-content: space-between;
           padding: 18px 24px;
-          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+          background: linear-gradient(135deg, #2a3a4a 0%, #3a4a5a 100%);
           border-radius: 12px;
           margin-bottom: 16px;
           border: 1px solid rgba(84, 107, 131, 0.3);
@@ -861,7 +861,7 @@
           align-items: center;
           justify-content: space-between;
           padding: 18px 24px;
-          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+          background: linear-gradient(135deg, #2a3a4a 0%, #3a4a5a 100%);
           border-radius: 12px;
           margin-bottom: 16px;
           border: 1px solid rgba(84, 107, 131, 0.3);
@@ -1012,7 +1012,7 @@
           align-items: center;
           justify-content: space-between;
           padding: 18px 24px;
-          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+          background: linear-gradient(135deg, #2a3a4a 0%, #3a4a5a 100%);
           border-radius: 12px;
           margin-bottom: 16px;
           border: 1px solid rgba(84, 107, 131, 0.3);
@@ -1307,7 +1307,7 @@
           align-items: center;
           justify-content: space-between;
           padding: 18px 24px;
-          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+          background: linear-gradient(135deg, #2a3a4a 0%, #3a4a5a 100%);
           border-radius: 12px;
           margin-bottom: 16px;
           border: 1px solid rgba(84, 107, 131, 0.3);

@@ -8,13 +8,13 @@
       class="panel-header"
       style="
         padding: 16px 24px;
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-        border-bottom: 1px solid rgba(138, 43, 226, 0.2);
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        border-bottom: 1px solid rgba(59, 130, 246, 0.2);
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-shrink: 0;
-        box-shadow: 0 4px 20px rgba(138, 43, 226, 0.15);
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);
       "
     >
       <div class="header-left" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
@@ -29,14 +29,14 @@
             style="
               font-size: 16px;
               font-weight: 600;
-              background: linear-gradient(90deg, #a855f7, #ec4899);
+              background: linear-gradient(90deg, #3b82f6, #06b6d4);
               -webkit-background-clip: text;
               -webkit-text-fill-color: transparent;
               letter-spacing: 0.5px;
             "
             >猫猫的小破烂</span
           >
-          <span style="font-size: 11px; color: #f472b6; font-weight: 500; letter-spacing: 0.5px; opacity: 0.8"
+          <span style="font-size: 11px; color: #60a5fa; font-weight: 500; letter-spacing: 0.5px; opacity: 0.8"
             >⚠️ 禁止商业化 | 禁止倒卖 ⚠️</span
           >
         </div>
@@ -51,9 +51,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(138, 43, 226, 0.3);
-            background: rgba(138, 43, 226, 0.1);
-            color: #a855f7;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -72,9 +72,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(138, 43, 226, 0.3);
-            background: rgba(138, 43, 226, 0.1);
-            color: #a855f7;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -160,7 +160,7 @@
       style="
         display: flex;
         background: #0f0f1f;
-        border-bottom: 1px solid rgba(138, 43, 226, 0.15);
+        border-bottom: 1px solid rgba(59, 130, 246, 0.15);
         flex-shrink: 0;
         overflow-x: auto;
         scrollbar-width: none;
@@ -184,9 +184,9 @@
           justifyContent: 'center',
           gap: '6px',
           position: 'relative',
-          background: activeTab === tab.key ? 'rgba(138, 43, 226, 0.15)' : 'transparent',
-          color: activeTab === tab.key ? '#a855f7' : '#6b7280',
-          borderBottom: activeTab === tab.key ? '2px solid #a855f7' : '2px solid transparent',
+          background: activeTab === tab.key ? 'rgba(59, 130, 246, 0.15)' : 'transparent',
+          color: activeTab === tab.key ? '#3b82f6' : '#6b7280',
+          borderBottom: activeTab === tab.key ? '2px solid #3b82f6' : '2px solid transparent',
           fontSize: '12px',
           fontWeight: '500',
         }"

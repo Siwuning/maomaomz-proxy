@@ -1,7 +1,7 @@
 <template>
   <div
     class="greetings-tab"
-    style="display: flex; flex-direction: column; height: 100%; background: #1a1a1a !important"
+    style="display: flex; flex-direction: column; height: 100%; background: #1a2332 !important"
   >
     <!-- 标题区域 -->
     <div
@@ -11,7 +11,7 @@
         justify-content: space-between;
         align-items: center;
         padding: 20px 25px !important;
-        border-bottom: 1px solid #3a3a3a;
+        border-bottom: 1px solid rgba(84, 107, 131, 0.3);
       "
     >
       <h3
@@ -25,14 +25,14 @@
           gap: 8px;
         "
       >
-        <i class="fa-solid fa-comments" style="color: #667eea"></i>
+        <i class="fa-solid fa-comments" style="color: #6b8299"></i>
         开场白管理器
       </h3>
       <div class="header-actions" style="display: flex; align-items: center; gap: 10px">
         <span
           v-if="greetings.length > 0"
           class="count-badge"
-          style="background: #667eea; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px"
+          style="background: #546b83; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px"
         >
           {{ greetings.length }} 个开场白
         </span>
@@ -51,7 +51,10 @@
             align-items: center;
             gap: 6px;
           "
-          :style="{ color: showHelp ? '#667eea' : '#e0e0e0', borderColor: showHelp ? '#667eea' : '#3a3a3a' }"
+          :style="{
+            color: showHelp ? '#667eea' : '#e0e0e0',
+            borderColor: showHelp ? '#546B83' : 'rgba(84, 107, 131, 0.3)',
+          }"
           @click="showHelp = !showHelp"
         >
           <i class="fa-solid fa-circle-question"></i> {{ showHelp ? '隐藏帮助' : '显示帮助' }}
@@ -177,7 +180,7 @@
           style="background: #2a2a2a; border: 1px solid #667eea; border-radius: 8px; padding: 20px; margin-bottom: 20px"
         >
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px">
-            <h4 style="color: #667eea; margin: 0; display: flex; align-items: center; gap: 8px">
+            <h4 style="color: #6b8299; margin: 0; display: flex; align-items: center; gap: 8px">
               <i class="fa-solid fa-circle-info"></i>
               使用说明
             </h4>
@@ -229,12 +232,12 @@
                 gap: 10px;
                 margin-bottom: 12px;
                 padding-bottom: 10px;
-                border-bottom: 1px solid #3a3a3a;
+                border-bottom: 1px solid rgba(84, 107, 131, 0.3);
               "
             >
               <span
                 style="
-                  background: #667eea;
+                  background: #546b83;
                   color: white;
                   padding: 4px 10px;
                   border-radius: 6px;
@@ -367,7 +370,7 @@
                 background: transparent;
                 border: 1px solid #667eea;
                 border-radius: 6px;
-                color: #667eea;
+                color: #6b8299;
                 font-size: 13px;
                 cursor: pointer;
                 transition: all 0.2s ease;
@@ -480,7 +483,7 @@
           style="
             padding: 15px 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-bottom: 1px solid #3a3a3a;
+            border-bottom: 1px solid rgba(84, 107, 131, 0.3);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -744,7 +747,7 @@
         <div
           style="
             padding: 20px;
-            border-bottom: 1px solid #3a3a3a;
+            border-bottom: 1px solid rgba(84, 107, 131, 0.3);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -785,7 +788,7 @@
               <li>复制下面的代码</li>
               <li>
                 在消息中输入占位符（如
-                <code style="background: #2a2a2a; padding: 2px 6px; border-radius: 4px; color: #667eea">【开场白】</code
+                <code style="background: #2a2a2a; padding: 2px 6px; border-radius: 4px; color: #6b8299">【开场白】</code
                 >）
               </li>
               <li>创建正则脚本，将占位符替换为此代码</li>
@@ -2219,7 +2222,7 @@ onMounted(() => {
   border: 1px solid #3a3a3a;
 
   h4 {
-    color: #667eea;
+    color: #6b8299;
   }
 
   p {
@@ -2255,7 +2258,7 @@ onMounted(() => {
   transition: all 0.3s;
 
   &:hover {
-    border-color: #667eea;
+    border-color: #6b8299;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
   }

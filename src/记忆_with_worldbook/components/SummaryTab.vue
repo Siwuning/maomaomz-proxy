@@ -1,5 +1,5 @@
 <template>
-  <div class="summary-tab" style="padding: 25px !important; background: #1a1a1a !important">
+  <div class="summary-tab" style="padding: 25px !important; background: #1a2332 !important">
     <div
       class="section-header"
       style="
@@ -7,7 +7,7 @@
         justify-content: space-between;
         align-items: center;
         padding: 20px 25px !important;
-        border-bottom: 1px solid #3a3a3a;
+        border-bottom: 1px solid rgba(84, 107, 131, 0.3);
         margin-bottom: 5px;
       "
     >
@@ -28,15 +28,15 @@
         <span
           v-if="summary_history.length > 0"
           class="count-badge"
-          style="background: #4a9eff; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px"
+          style="background: #546b83; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px"
           >{{ summary_history.length }} 条记录</span
         >
         <button
           class="mini-button refresh-button"
           style="
             padding: 6px 12px;
-            background: #2a2a2a;
-            border: 1px solid #3a3a3a;
+            background: #2a3a4a;
+            border: 1px solid rgba(84, 107, 131, 0.3);
             border-radius: 4px;
             color: #e0e0e0;
             cursor: pointer;
@@ -163,7 +163,7 @@
         :key="index"
         class="history-item"
         style="
-          background: #2a2a2a;
+          background: #2a3a4a;
           border: 1px solid #444;
           border-radius: 8px;
           padding: 15px;
@@ -196,7 +196,7 @@
         <div
           v-if="isExpanded(index)"
           class="history-content"
-          style="padding: 15px; background: #2a2a2a; border-radius: 0 0 6px 6px"
+          style="padding: 15px; background: #2a3a4a; border-radius: 0 0 6px 6px"
         >
           <div
             class="history-actions"
@@ -207,8 +207,8 @@
               style="
                 flex: 1;
                 padding: 6px 12px;
-                background: #2a2a2a;
-                border: 1px solid #3a3a3a;
+                background: #2a3a4a;
+                border: 1px solid rgba(84, 107, 131, 0.3);
                 border-radius: 4px;
                 color: #e0e0e0;
                 cursor: pointer;
@@ -228,7 +228,7 @@
               style="
                 flex: 1;
                 padding: 6px 12px;
-                background: #4a9eff;
+                background: #546b83;
                 border: 1px solid #5aaeff;
                 border-radius: 4px;
                 color: white;
@@ -567,7 +567,7 @@ const showManualCopyDialog = (text: string) => {
     // 创建主容器
     const container = parentDoc.createElement('div');
     container.style.cssText = `
-      background: #2a2a2a;
+      background: #2a3a4a;
       border: 2px solid #4a9eff;
       border-radius: 16px;
       padding: 25px;
@@ -633,7 +633,7 @@ const showManualCopyDialog = (text: string) => {
     const closeButton = parentDoc.createElement('button');
     closeButton.textContent = '关闭';
     closeButton.style.cssText = `
-      background: #4a9eff;
+      background: #546B83;
       color: white;
       border: none;
       padding: 12px 24px;
@@ -973,8 +973,8 @@ const promptForWorldbook = async (worldbookNames: string[]): Promise<string | nu
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background: #2a2a2a;
-        border: 1px solid #3a3a3a;
+        background: #2a3a4a;
+        border: 1px solid rgba(84, 107, 131, 0.3);
         border-radius: 8px;
         padding: 20px;
         z-index: 1000000;
@@ -1004,7 +1004,7 @@ const promptForWorldbook = async (worldbookNames: string[]): Promise<string | nu
             cursor: pointer;
           ">取消</button>
           <button id="confirmWorldbook" style="
-            background: #4a9eff;
+            background: #546B83;
             color: white;
             border: none;
             padding: 8px 16px;
@@ -1079,7 +1079,7 @@ const showDebugPanel = () => {
     // 创建主容器
     const container = parentDoc.createElement('div');
     container.style.cssText = `
-      background: #2a2a2a;
+      background: #2a3a4a;
       border: 2px solid #ffc107;
       border-radius: 16px;
       padding: 25px;
@@ -1345,7 +1345,7 @@ refreshSummaryHistory();
 }
 
 .summary-tab::-webkit-scrollbar-thumb {
-  background: #4a9eff;
+  background: #546b83;
   border-radius: 3px;
 }
 
@@ -1358,7 +1358,7 @@ refreshSummaryHistory();
   justify-content: space-between;
   align-items: center;
   padding: 20px 25px !important;
-  border-bottom: 1px solid #3a3a3a;
+  border-bottom: 1px solid rgba(84, 107, 131, 0.3);
   margin-bottom: 5px;
 }
 
@@ -1379,7 +1379,7 @@ refreshSummaryHistory();
 }
 
 .count-badge {
-  background: #4a9eff;
+  background: #546b83;
   color: white;
   padding: 4px 8px;
   border-radius: 12px;
@@ -1416,8 +1416,8 @@ refreshSummaryHistory();
 }
 
 .history-item {
-  background: #2a2a2a;
-  border: 1px solid #3a3a3a;
+  background: #2a3a4a;
+  border: 1px solid rgba(84, 107, 131, 0.3);
   border-radius: 6px;
   overflow: hidden;
   transition: border-color 0.2s;
@@ -1439,7 +1439,7 @@ refreshSummaryHistory();
 }
 
 .history-header:hover {
-  background: #2a2a2a;
+  background: #2a3a4a;
 }
 
 .history-info {
@@ -1466,7 +1466,7 @@ refreshSummaryHistory();
 
 .history-content {
   padding: 15px;
-  background: #2a2a2a;
+  background: #2a3a4a;
 }
 
 .history-actions {
@@ -1474,14 +1474,14 @@ refreshSummaryHistory();
   gap: 8px;
   margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 1px solid #3a3a3a;
+  border-bottom: 1px solid rgba(84, 107, 131, 0.3);
 }
 
 .mini-button {
   flex: 1;
   padding: 6px 12px;
-  background: #2a2a2a;
-  border: 1px solid #3a3a3a;
+  background: #2a3a4a;
+  border: 1px solid rgba(84, 107, 131, 0.3);
   border-radius: 4px;
   color: #e0e0e0;
   cursor: pointer;

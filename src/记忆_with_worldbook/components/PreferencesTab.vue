@@ -1,16 +1,16 @@
 <template>
-  <div class="preferences-tab" style="padding: 25px; background: #1a1a1a; min-height: 100%">
+  <div class="preferences-tab" style="padding: 25px; background: #1a2332; min-height: 100%">
     <!-- 标题 -->
     <div
       style="
-        background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(74, 158, 255, 0.1) 100%);
+        background: linear-gradient(135deg, #2a3a4a 0%, #3a4a5a 100%);
         padding: 20px;
-        border-radius: 16px;
+        border-radius: 12px;
         margin-bottom: 20px;
-        border: 1px solid rgba(139, 92, 246, 0.2);
+        border: 1px solid rgba(84, 107, 131, 0.3);
       "
     >
-      <h3 style="color: #8b5cf6; margin: 0 0 10px 0; font-size: 20px; font-weight: 600">
+      <h3 style="color: #7a9bb8; margin: 0 0 10px 0; font-size: 18px; font-weight: 600">
         <i class="fa-solid fa-sliders" style="margin-right: 8px"></i>
         偏好设置
       </h3>
@@ -19,10 +19,16 @@
 
     <!-- 界面设置 -->
     <div
-      style="background: #2a2a2a; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #3a3a3a"
+      style="
+        background: linear-gradient(135deg, #2a3a4a 0%, #3a4a5a 100%);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(84, 107, 131, 0.3);
+      "
     >
       <h4 style="color: #fff; margin: 0 0 15px 0; font-size: 16px; display: flex; align-items: center; gap: 8px">
-        <i class="fa-solid fa-desktop" style="color: #4a9eff"></i>
+        <i class="fa-solid fa-desktop" style="color: #6b8299"></i>
         界面设置
       </h4>
 
@@ -108,7 +114,13 @@
 
     <!-- 通知设置 -->
     <div
-      style="background: #2a2a2a; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #3a3a3a"
+      style="
+        background: linear-gradient(135deg, #2a3a4a 0%, #3a4a5a 100%);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(84, 107, 131, 0.3);
+      "
     >
       <h4 style="color: #fff; margin: 0 0 15px 0; font-size: 16px; display: flex; align-items: center; gap: 8px">
         <i class="fa-solid fa-bell" style="color: #10b981"></i>

@@ -1,9 +1,9 @@
 <template>
-  <div class="help-tab" style="padding: 25px !important; background: #1a1a1a !important">
+  <div class="help-tab" style="padding: 25px !important; background: #1a2332 !important">
     <!-- 版本信息 -->
     <div
       style="
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #3a4a5a 0%, #4a5a6a 100%);
         padding: 35px 30px;
         border-radius: 20px;
         margin-bottom: 25px;

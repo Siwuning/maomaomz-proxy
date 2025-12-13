@@ -26,14 +26,14 @@
         <div style="display: flex; flex-direction: column; gap: 4px">
           <span
             class="panel-title"
-            style="
-              font-size: 16px;
-              font-weight: 600;
-              background: linear-gradient(90deg, #546b83, #7a9bb8);
-              -webkit-background-clip: text;
-              -webkit-text-fill-color: transparent;
-              letter-spacing: 0.5px;
-            "
+            :style="{
+              fontSize: '16px',
+              fontWeight: '600',
+              background: `linear-gradient(90deg, var(--maomaomz-theme-color, #546b83), color-mix(in srgb, var(--maomaomz-theme-color, #546b83) 60%, #fff))`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              letterSpacing: '0.5px',
+            }"
             >猫猫的小破烂</span
           >
           <span style="font-size: 11px; color: #7a9bb8; font-weight: 500; letter-spacing: 0.5px; opacity: 0.8"
@@ -184,9 +184,13 @@
           justifyContent: 'center',
           gap: '6px',
           position: 'relative',
-          background: activeTab === tab.key ? 'rgba(84, 107, 131, 0.2)' : 'transparent',
-          color: activeTab === tab.key ? '#546B83' : '#6b7280',
-          borderBottom: activeTab === tab.key ? '2px solid #546B83' : '2px solid transparent',
+          background:
+            activeTab === tab.key
+              ? 'color-mix(in srgb, var(--maomaomz-theme-color, #546B83) 20%, transparent)'
+              : 'transparent',
+          color: activeTab === tab.key ? 'var(--maomaomz-theme-color, #546B83)' : '#6b7280',
+          borderBottom:
+            activeTab === tab.key ? '2px solid var(--maomaomz-theme-color, #546B83)' : '2px solid transparent',
           fontSize: '12px',
           fontWeight: '500',
         }"
@@ -438,10 +442,10 @@ const closePanel = () => {
   }
 
   .mobile-tab-btn-active {
-    background: #1e293b;
-    border-color: #475569;
-    color: #e2e8f0;
-    box-shadow: none;
+    background: color-mix(in srgb, var(--maomaomz-theme-color, #4a9eff) 20%, #1e293b);
+    border-color: var(--maomaomz-theme-color, #4a9eff);
+    color: var(--maomaomz-theme-color, #e2e8f0);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--maomaomz-theme-color, #4a9eff) 30%, transparent);
   }
 
   .mobile-tab-icon {

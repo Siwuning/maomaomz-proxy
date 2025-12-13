@@ -197,145 +197,124 @@ export function showUpdateDialog(
       left: 0;
       right: 0;
       bottom: 0;
-      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
-      backdrop-filter: blur(12px);
+      background: rgba(10, 10, 20, 0.95);
+      backdrop-filter: blur(8px);
       z-index: 9999998 !important;
       display: flex;
       align-items: center;
       justify-content: center;
-      animation: fadeIn 0.4s ease-out;
+      animation: fadeIn 0.3s ease-out;
     ">
       <div id="maomaomz-update-dialog" style="
-        background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
-        border: 1px solid rgba(99, 102, 241, 0.3);
-        border-radius: 24px;
-        padding: 48px;
-        max-width: 480px;
+        background: #12121a;
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 420px;
         width: 90%;
-        box-shadow: 0 25px 80px rgba(99, 102, 241, 0.25), 0 0 0 1px rgba(255,255,255,0.05) inset;
+        box-shadow: 0 0 60px rgba(139, 92, 246, 0.15);
         z-index: 9999999 !important;
-        animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        animation: slideUp 0.4s ease-out;
       ">
-        <!-- 顶部装饰 -->
-        <div style="text-align: center; margin-bottom: 32px;">
+        <!-- 顶部 Logo -->
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 28px;">
+          <div style="font-size: 32px;">🐱</div>
+          <div>
+            <div style="color: #fff; font-size: 18px; font-weight: 600;">猫猫的小破烂</div>
+            <div style="color: #10b981; font-size: 12px;">● 有新版本</div>
+          </div>
+        </div>
+
+        <!-- 版本卡片 -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
           <div style="
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            border-radius: 20px;
+            background: linear-gradient(135deg, #1e1e2e 0%, #16161f 100%);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+          ">
+            <div style="color: #666; font-size: 11px; margin-bottom: 8px;">当前版本</div>
+            <div style="color: #fff; font-size: 28px; font-weight: 700;">${updateInfo.currentVersion}</div>
+          </div>
+          <div style="
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(168, 85, 247, 0.1) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+          ">
+            <div style="color: #a78bfa; font-size: 11px; margin-bottom: 8px;">最新版本</div>
+            <div style="color: #c4b5fd; font-size: 28px; font-weight: 700;">${updateInfo.latestVersion}</div>
+          </div>
+        </div>
+
+        <!-- 警告条 -->
+        <div style="
+          background: linear-gradient(90deg, rgba(239, 68, 68, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+          border-left: 3px solid #ef4444;
+          border-radius: 0 8px 8px 0;
+          padding: 12px 16px;
+          margin-bottom: 24px;
+        ">
+          <div style="color: #fca5a5; font-size: 12px; font-weight: 500;">
+            ⚠️ 商业化死全家，贩子死全家 · 本插件免费禁止倒卖
+          </div>
+        </div>
+
+        <!-- 按钮组 -->
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <button id="maomaomz-update-now" style="
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
-            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.4);
-          ">
-            <span style="font-size: 40px;">🐱</span>
-          </div>
-          <h2 style="color: #f1f5f9; font-size: 24px; margin: 0 0 8px 0; font-weight: 700; letter-spacing: -0.5px;">
-            发现新版本
-          </h2>
-          <p style="color: #94a3b8; font-size: 14px; margin: 0;">
-            猫猫的小破烂有更新啦~
-          </p>
-        </div>
-
-        <!-- 版本信息 -->
-        <div style="
-          background: rgba(99, 102, 241, 0.1);
-          border: 1px solid rgba(99, 102, 241, 0.2);
-          border-radius: 16px;
-          padding: 20px;
-          margin-bottom: 24px;
-        ">
-          <div style="display: flex; align-items: center; justify-content: center; gap: 24px;">
-            <div style="text-align: center;">
-              <div style="color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">当前</div>
-              <div style="color: #e2e8f0; font-size: 24px; font-weight: 700;">v${updateInfo.currentVersion}</div>
-            </div>
-            <div style="
-              width: 40px;
-              height: 40px;
-              background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-              border-radius: 50%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-            ">
-              <span style="color: #fff; font-size: 18px;">→</span>
-            </div>
-            <div style="text-align: center;">
-              <div style="color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">最新</div>
-              <div style="color: #a5b4fc; font-size: 24px; font-weight: 700;">v${updateInfo.latestVersion}</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 警告 -->
-        <div style="
-          background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(185, 28, 28, 0.15) 100%);
-          border: 1px solid rgba(239, 68, 68, 0.3);
-          border-radius: 12px;
-          padding: 14px;
-          margin-bottom: 24px;
-          text-align: center;
-        ">
-          <div style="color: #fca5a5; font-size: 13px; font-weight: 600;">
-            ⚠️ 商业化死全家，贩子死全家
-          </div>
-          <div style="color: #f87171; font-size: 11px; margin-top: 4px;">本插件免费，禁止倒卖！</div>
-        </div>
-
-        <!-- 按钮 -->
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          <button id="maomaomz-update-now" style="
-            width: 100%;
-            padding: 16px 24px;
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            border: none;
-            border-radius: 14px;
-            color: #fff;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
-          " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 30px rgba(99, 102, 241, 0.5)';" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 20px rgba(99, 102, 241, 0.4)';">
-            🚀 立即更新
+            gap: 8px;
+          " onmouseover="this.style.opacity='0.9'; this.style.transform='translateY(-1px)';" onmouseout="this.style.opacity='1'; this.style.transform='';">
+            <span style="font-size: 16px;">🚀</span> 立即更新
           </button>
           <button id="maomaomz-refresh-only" style="
             width: 100%;
-            padding: 14px 24px;
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            border-radius: 12px;
-            color: #a5b4fc;
-            font-size: 14px;
+            padding: 12px 20px;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 10px;
+            color: #a78bfa;
+            font-size: 13px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
-          " onmouseover="this.style.background='rgba(99, 102, 241, 0.2)';" onmouseout="this.style.background='rgba(99, 102, 241, 0.1)';">
+            transition: all 0.2s;
+          " onmouseover="this.style.background='rgba(139, 92, 246, 0.15)';" onmouseout="this.style.background='rgba(139, 92, 246, 0.1)';">
             🔄 已手动更新？刷新页面
           </button>
           ${
             !forceUpdate
               ? `<button id="maomaomz-skip-update" style="
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             background: transparent;
-            border: 1px solid rgba(100, 116, 139, 0.3);
-            border-radius: 10px;
-            color: #64748b;
-            font-size: 13px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #666;
+            font-size: 12px;
             cursor: pointer;
-            transition: all 0.3s;
-          " onmouseover="this.style.borderColor='rgba(100, 116, 139, 0.5)';" onmouseout="this.style.borderColor='rgba(100, 116, 139, 0.3)';">
+            transition: all 0.2s;
+          " onmouseover="this.style.borderColor='rgba(255,255,255,0.2)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';">
             ⏰ 稍后提醒
           </button>`
               : ''
           }
         </div>
-        ${forceUpdate ? '<p style="color: #f87171; font-size: 12px; text-align: center; margin-top: 16px; font-weight: 500;">🚫 必须更新才能继续使用</p>' : ''}
+        ${forceUpdate ? '<p style="color: #ef4444; font-size: 11px; text-align: center; margin-top: 14px;">🚫 必须更新才能继续使用</p>' : ''}
       </div>
     </div>
 
@@ -413,32 +392,29 @@ export function showUpdateDialog(
         }
       }
 
-      // 方法2: 直接调用 SillyTavern API（尝试不同参数格式）
+      // 方法2: 直接调用 SillyTavern API（尝试多种格式）
       if (!updateSuccess) {
-        const extensionNames = ['maomaomz', 'third-party/maomaomz'];
-        for (const name of extensionNames) {
+        const apiEndpoints = [
+          { url: '/api/extensions/update', body: { name: 'maomaomz' } },
+          { url: '/api/extensions/update', body: { extensionName: 'maomaomz' } },
+          { url: '/api/extensions/update', body: { name: 'third-party/maomaomz' } },
+          { url: '/api/extensions/install', body: { url: 'https://github.com/mzrodyu/maomaomz' } },
+        ];
+        for (const api of apiEndpoints) {
           if (updateSuccess) break;
           try {
-            console.log(`🔄 尝试更新: ${name}`);
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30秒超时
-            const response = await fetch('/api/extensions/update', {
+            console.log(`🔄 尝试: ${api.url}`, api.body);
+            const response = await fetch(api.url, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ extensionName: name }),
-              signal: controller.signal,
+              body: JSON.stringify(api.body),
             });
-            clearTimeout(timeoutId);
             if (response.ok) {
               updateSuccess = true;
-              console.log(`✅ 更新成功: ${name}`);
+              console.log(`✅ 成功: ${api.url}`);
             }
-          } catch (e: any) {
-            if (e.name === 'AbortError') {
-              console.warn(`更新超时 (${name})`);
-            } else {
-              console.warn(`更新失败 (${name}):`, e);
-            }
+          } catch (e) {
+            console.warn(`失败: ${api.url}`, e);
           }
         }
       }

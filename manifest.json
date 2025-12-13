@@ -5,10 +5,11 @@
   "optional": [],
   "js": "dist/index.js",
   "author": "猫猫 (mzrodyu)",
-  "version": "2.0.24",
+  "version": "2.0.25",
   "homePage": "https://github.com/mzrodyu/maomaomz",
   "auto_update": true,
   "changelog": {
+    "2.0.25": "🐛 修复无限循环更新弹窗问题",
     "2.0.24": "🎨 修复偏好设置主题色选择器样式",
     "2.0.23": "🎨 修复 MvuBetaTab 输入框背景太亮",
     "2.0.22": "🐛 修复 TableTab 导入错误",

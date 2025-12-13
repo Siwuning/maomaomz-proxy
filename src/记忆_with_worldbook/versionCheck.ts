@@ -208,13 +208,22 @@ export function showUpdateDialog(
   },
   forceUpdate: boolean = false,
 ): void {
-  // 强制更新模式不检查跳过时间
-  if (!forceUpdate) {
-    const skipUntil = localStorage.getItem('maomaomz_skip_update_until');
-    if (skipUntil && Date.now() < parseInt(skipUntil, 10)) {
-      console.log('⏰ 在跳过时间内，不显示更新提示');
-      return;
+  // 防止无限循环：检查是否刚刚尝试过更新
+  const lastUpdateAttempt = localStorage.getItem('maomaomz_last_update_attempt');
+  if (lastUpdateAttempt) {
+    const timeSinceLastAttempt = Date.now() - parseInt(lastUpdateAttempt, 10);
+    // 5分钟内不再强制弹窗，避免无限循环
+    if (timeSinceLastAttempt < 5 * 60 * 1000) {
+      console.log('⏰ 刚刚尝试过更新，跳过强制弹窗');
+      forceUpdate = false; // 降级为非强制模式
     }
+  }
+
+  // 检查跳过时间
+  const skipUntil = localStorage.getItem('maomaomz_skip_update_until');
+  if (skipUntil && Date.now() < parseInt(skipUntil, 10)) {
+    console.log('⏰ 在跳过时间内，不显示更新提示');
+    return;
   }
 
   const dialogHtml = `
@@ -394,6 +403,9 @@ export function showUpdateDialog(
   document.getElementById('maomaomz-update-now')?.addEventListener('click', async () => {
     const TH = (window as any).TavernHelper;
     const updateButton = document.getElementById('maomaomz-update-now') as HTMLButtonElement;
+
+    // 🔒 记录更新尝试时间，防止无限循环
+    localStorage.setItem('maomaomz_last_update_attempt', Date.now().toString());
 
     // 更新按钮状态
     if (updateButton) {

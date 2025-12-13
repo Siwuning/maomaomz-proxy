@@ -2618,10 +2618,25 @@ function loadTemplate(templateKey: 'simple' | 'abo') {
   }
 }
 
+// 字段数量上限
+const MAX_FIELDS = 50;
+
 // AI 生成
 async function generateWithAI() {
   if (!aiPrompt.value.trim()) {
     window.toastr.error('请输入修改需求');
+    return;
+  }
+
+  // 检查字段数量
+  if (config.value.fields.length > MAX_FIELDS) {
+    window.toastr.error(
+      `字段数量过多（${config.value.fields.length}个），最多支持 ${MAX_FIELDS} 个字段`,
+      '请简化字段配置',
+      {
+        timeOut: 5000,
+      },
+    );
     return;
   }
 
@@ -2747,9 +2762,11 @@ ${config.value.fields.map((f, i) => `字段${i + 1}：${f.label} (变量名: ${f
 
 【⚠️ 重要】你的任务：
 1. HTML 中必须且只能包含上述 ${config.value.fields.length} 个字段
-2. 字段顺序必须严格按照：$1 = ${config.value.fields[0]?.label || '字段1'}, $2 = ${config.value.fields[1]?.label || '字段2'}${config.value.fields[2] ? `, $3 = ${config.value.fields[2].label}` : ''}${config.value.fields[3] ? `, $4 = ${config.value.fields[3].label}` : ''}${config.value.fields[4] ? `, $5 = ${config.value.fields[4].label}` : ''}
+2. 字段与占位符的对应关系（必须严格遵守）：
+${config.value.fields.map((f, i) => `   $${i + 1} = ${f.label}`).join('\n')}
 3. 禁止添加任何额外的字段（如"姓名"、"性别"、"年龄"等，除非它们在上面的字段列表中）
 4. 禁止使用 $${config.value.fields.length + 1} 及以上的占位符
+5. 每个占位符 $1 到 $${config.value.fields.length} 都必须在 HTML 中出现且只出现一次
 
 # 【重要说明】状态栏用途：
 这是**{{char}}（角色）的状态栏**，用于显示角色的状态信息（如时间、地点、着装、状态等），**不是{{user}}（用户）的状态**。

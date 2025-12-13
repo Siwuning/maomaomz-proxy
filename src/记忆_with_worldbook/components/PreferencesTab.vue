@@ -422,14 +422,17 @@ onMounted(() => {
 
 /* 主题色选择器 */
 .color-picker-item {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: var(--picker-color);
-  cursor: pointer;
-  border: 3px solid transparent;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  border-radius: 10px !important;
+  background: var(--picker-color) !important;
+  cursor: pointer !important;
+  border: 3px solid transparent !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+  display: inline-block !important;
 }
 
 .color-picker-item:hover {

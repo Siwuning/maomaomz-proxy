@@ -5,10 +5,11 @@
   "optional": [],
   "js": "dist/index.js",
   "author": "猫猫 (mzrodyu)",
-  "version": "2.0.21",
+  "version": "2.0.22",
   "homePage": "https://github.com/mzrodyu/maomaomz",
   "auto_update": true,
   "changelog": {
+    "2.0.22": "🐛 修复 TableTab 导入错误",
     "2.0.21": "✨ UI美化：全界面花青灰主题 + 实时版本检测",
     "2.0.20": "✨ UI美化：花青灰主题 #546B83",
     "2.0.19": "✨ UI美化：深色背景 + 蓝色渐变主题",

@@ -206,7 +206,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { getChatIdSafe } from '../utils';
+import { getChatIdSafe, getScriptIdSafe } from '../utils';
 
 // 响应式数据
 const table_history = ref<Array<{ start_id: number; end_id: number; headers: string[]; data: string[][] }>>([]);

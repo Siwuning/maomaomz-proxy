@@ -405,27 +405,29 @@ $(() => {
                   try {
                     // 🔧 保留最近几层作为上文，让AI知道之前的对话内容
                     const keepRecent = currentSettings.keep_recent_messages || 5;
-                    const totalMessages = end_id - start_id + 1;
 
-                    // 计算实际隐藏的结束楼层（保留最后 keepRecent 层）
-                    const hideEndId = Math.max(start_id, end_id - keepRecent);
-                    const actualHideCount = hideEndId - start_id + 1;
+                    // 计算隐藏范围：
+                    // - 隐藏起始：上次保留的上文起点（start_id - keepRecent，但不小于0）
+                    // - 隐藏结束：当前总结结束 - 保留数（end_id - keepRecent）
+                    // 这样下次总结时，上次保留的上文也会被隐藏
+                    const hideStartId = Math.max(0, start_id - keepRecent);
+                    const hideEndId = Math.max(hideStartId, end_id - keepRecent);
+                    const actualHideCount = hideEndId - hideStartId + 1;
 
-                    // 如果保留数量大于等于总消息数，就不隐藏
-                    if (actualHideCount <= 0) {
-                      console.log(`ℹ️ 保留上文数(${keepRecent})大于等于总结楼层数(${totalMessages})，跳过隐藏`);
-                      window.toastr.info(`ℹ️ 保留上文数大于总结楼层数，不隐藏`);
+                    // 如果没有要隐藏的，就跳过
+                    if (actualHideCount <= 0 || hideEndId < hideStartId) {
+                      console.log(`ℹ️ 没有需要隐藏的楼层，跳过隐藏`);
                     } else {
                       console.log(
-                        `🙈 执行自动隐藏: 楼层 ${start_id}-${hideEndId}（保留最后 ${keepRecent} 层作为上文）`,
+                        `🙈 执行自动隐藏: 楼层 ${hideStartId}-${hideEndId}（保留 ${end_id - hideEndId} 层上文）`,
                       );
 
                       // 使用 TavernHelper.setChatMessages API（与手动隐藏相同的方式）
                       const TH = (window as any).TavernHelper;
                       if (TH && typeof TH.setChatMessages === 'function') {
-                        // 构建要隐藏的消息 ID 列表（保留最后几层）
+                        // 构建要隐藏的消息 ID 列表（包含上次保留的上文）
                         const messageIds: number[] = [];
-                        for (let i = start_id; i <= hideEndId; i++) {
+                        for (let i = hideStartId; i <= hideEndId; i++) {
                           messageIds.push(i);
                         }
 
@@ -438,12 +440,12 @@ $(() => {
                         );
 
                         window.toastr.info(
-                          `🙈 已隐藏楼层 ${start_id}-${hideEndId}（保留 ${end_id - hideEndId} 层上文）`,
+                          `🙈 已隐藏楼层 ${hideStartId}-${hideEndId}（保留 ${end_id - hideEndId} 层上文）`,
                         );
                         console.log('✅ 自动隐藏成功');
                       } else {
                         console.warn('⚠️ TavernHelper.setChatMessages 不可用');
-                        window.toastr.warning(`⚠️ 隐藏功能不可用，请手动执行: /hide ${start_id}-${hideEndId}`);
+                        window.toastr.warning(`⚠️ 隐藏功能不可用，请手动执行: /hide ${hideStartId}-${hideEndId}`);
                       }
                     }
                   } catch (hideError) {

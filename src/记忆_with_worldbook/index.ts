@@ -403,30 +403,48 @@ $(() => {
                 // 自动隐藏已总结的楼层
                 if (currentSettings.auto_hide_after_summary) {
                   try {
-                    console.log(`🙈 执行自动隐藏: 楼层 ${start_id}-${end_id}`);
+                    // 🔧 保留最近几层作为上文，让AI知道之前的对话内容
+                    const keepRecent = currentSettings.keep_recent_messages || 5;
+                    const totalMessages = end_id - start_id + 1;
 
-                    // 使用 TavernHelper.setChatMessages API（与手动隐藏相同的方式）
-                    const TH = (window as any).TavernHelper;
-                    if (TH && typeof TH.setChatMessages === 'function') {
-                      // 构建要隐藏的消息 ID 列表
-                      const messageIds: number[] = [];
-                      for (let i = start_id; i <= end_id; i++) {
-                        messageIds.push(i);
-                      }
+                    // 计算实际隐藏的结束楼层（保留最后 keepRecent 层）
+                    const hideEndId = Math.max(start_id, end_id - keepRecent);
+                    const actualHideCount = hideEndId - start_id + 1;
 
-                      console.log('🔄 使用 TavernHelper.setChatMessages 隐藏楼层:', messageIds);
-
-                      // 批量设置消息为隐藏状态
-                      await TH.setChatMessages(
-                        messageIds.map(message_id => ({ message_id, is_hidden: true })),
-                        { refresh: 'all' },
+                    // 如果保留数量大于等于总消息数，就不隐藏
+                    if (actualHideCount <= 0) {
+                      console.log(`ℹ️ 保留上文数(${keepRecent})大于等于总结楼层数(${totalMessages})，跳过隐藏`);
+                      window.toastr.info(`ℹ️ 保留上文数大于总结楼层数，不隐藏`);
+                    } else {
+                      console.log(
+                        `🙈 执行自动隐藏: 楼层 ${start_id}-${hideEndId}（保留最后 ${keepRecent} 层作为上文）`,
                       );
 
-                      window.toastr.info(`🙈 已隐藏楼层 ${start_id}-${end_id}`);
-                      console.log('✅ 自动隐藏成功');
-                    } else {
-                      console.warn('⚠️ TavernHelper.setChatMessages 不可用');
-                      window.toastr.warning(`⚠️ 隐藏功能不可用，请手动执行: /hide ${start_id}-${end_id}`);
+                      // 使用 TavernHelper.setChatMessages API（与手动隐藏相同的方式）
+                      const TH = (window as any).TavernHelper;
+                      if (TH && typeof TH.setChatMessages === 'function') {
+                        // 构建要隐藏的消息 ID 列表（保留最后几层）
+                        const messageIds: number[] = [];
+                        for (let i = start_id; i <= hideEndId; i++) {
+                          messageIds.push(i);
+                        }
+
+                        console.log('🔄 使用 TavernHelper.setChatMessages 隐藏楼层:', messageIds);
+
+                        // 批量设置消息为隐藏状态
+                        await TH.setChatMessages(
+                          messageIds.map(message_id => ({ message_id, is_hidden: true })),
+                          { refresh: 'all' },
+                        );
+
+                        window.toastr.info(
+                          `🙈 已隐藏楼层 ${start_id}-${hideEndId}（保留 ${end_id - hideEndId} 层上文）`,
+                        );
+                        console.log('✅ 自动隐藏成功');
+                      } else {
+                        console.warn('⚠️ TavernHelper.setChatMessages 不可用');
+                        window.toastr.warning(`⚠️ 隐藏功能不可用，请手动执行: /hide ${start_id}-${hideEndId}`);
+                      }
                     }
                   } catch (hideError) {
                     console.error('❌ 自动隐藏失败:', hideError);

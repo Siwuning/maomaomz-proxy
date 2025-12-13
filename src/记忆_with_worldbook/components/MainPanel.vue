@@ -39,6 +39,8 @@
         align-items: center;
         flex-shrink: 0;
         box-shadow: 0 4px 20px rgba(84, 107, 131, 0.2);
+        position: relative;
+        z-index: 1;
       "
     >
       <div class="header-left" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
@@ -189,6 +191,8 @@
         overflow-x: auto;
         scrollbar-width: none;
         -ms-overflow-style: none;
+        position: relative;
+        z-index: 1;
       "
     >
       <div
@@ -236,6 +240,8 @@
         min-height: 0;
         scrollbar-width: thin;
         scrollbar-color: var(--maomaomz-theme-color, #4a9eff) #2a2a2a;
+        position: relative;
+        z-index: 1;
       "
     >
       <component :is="currentComponent" :key="activeTab" v-bind="componentProps" />

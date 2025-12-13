@@ -96,20 +96,42 @@ async function fetchLatestCommit(): Promise<{ commit: string; message: string } 
 }
 
 /**
- * 获取远程 manifest.json 的版本号
+ * 从 GitHub API 获取远程 manifest.json 的版本号（无 CDN 缓存）
  */
 async function fetchRemoteVersion(): Promise<string | null> {
-  // 使用多个源，优先使用不缓存的源
-  const manifestUrls = [
-    // GitHub raw（无缓存）
+  // 优先使用 GitHub API（无缓存，实时获取）
+  const apiUrl = `${GITHUB_API_BASE}/repos/${GITHUB_REPO}/contents/manifest.json`;
+
+  try {
+    const response = await fetch(apiUrl, {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(8000),
+      headers: {
+        Accept: 'application/vnd.github.v3+json',
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      // GitHub API 返回 base64 编码的内容
+      if (data.content) {
+        const content = atob(data.content.replace(/\n/g, ''));
+        const manifest = JSON.parse(content);
+        console.log('📡 GitHub API 获取版本成功:', manifest.version);
+        return manifest.version || null;
+      }
+    }
+  } catch (e) {
+    console.warn('GitHub API 获取失败，尝试备用源:', e);
+  }
+
+  // 备用：使用 CDN（可能有缓存）
+  const fallbackUrls = [
     `https://raw.githubusercontent.com/${GITHUB_REPO}/main/manifest.json?_=${Date.now()}`,
-    // jsDelivr 强制刷新（@latest 而非 @main）
     `https://cdn.jsdelivr.net/gh/${GITHUB_REPO}@latest/manifest.json`,
-    // 备用：purge jsDelivr 缓存
-    `https://purge.jsdelivr.net/gh/${GITHUB_REPO}@main/manifest.json`,
   ];
 
-  for (const url of manifestUrls) {
+  for (const url of fallbackUrls) {
     try {
       const response = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(5000) });
       if (response.ok) {

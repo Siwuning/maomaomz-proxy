@@ -197,117 +197,145 @@ export function showUpdateDialog(
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(8px);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
+      backdrop-filter: blur(12px);
       z-index: 9999998 !important;
       display: flex;
       align-items: center;
       justify-content: center;
-      animation: fadeIn 0.3s ease-out;
+      animation: fadeIn 0.4s ease-out;
     ">
       <div id="maomaomz-update-dialog" style="
-        background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-        border: 3px solid #4a9eff;
-        border-radius: 20px;
-        padding: 40px;
-        max-width: 600px;
+        background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        border-radius: 24px;
+        padding: 48px;
+        max-width: 480px;
         width: 90%;
-        box-shadow: 0 20px 60px rgba(74, 158, 255, 0.3);
+        box-shadow: 0 25px 80px rgba(99, 102, 241, 0.25), 0 0 0 1px rgba(255,255,255,0.05) inset;
         z-index: 9999999 !important;
-        animation: slideUp 0.4s ease-out;
+        animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
       ">
+        <!-- 顶部装饰 -->
         <div style="text-align: center; margin-bottom: 32px;">
-          <div style="font-size: 64px; margin-bottom: 16px;">🎉</div>
-          <h2 style="color: #fff; font-size: 28px; margin-bottom: 12px; font-weight: 700;">
-            发现新版本！
+          <div style="
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.4);
+          ">
+            <span style="font-size: 40px;">🐱</span>
+          </div>
+          <h2 style="color: #f1f5f9; font-size: 24px; margin: 0 0 8px 0; font-weight: 700; letter-spacing: -0.5px;">
+            发现新版本
           </h2>
-          <p style="color: #ccc; font-size: 14px;">
-            是时候更新猫猫的小破烂了~
+          <p style="color: #94a3b8; font-size: 14px; margin: 0;">
+            猫猫的小破烂有更新啦~
           </p>
         </div>
 
-        <div style="background: rgba(74, 158, 255, 0.1); border-left: 4px solid #4a9eff; padding: 20px; border-radius: 12px; margin-bottom: 24px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
-            <div>
-              <div style="color: #888; font-size: 12px; margin-bottom: 4px;">当前版本</div>
-              <div style="color: #fff; font-size: 20px; font-weight: 600;">v${updateInfo.currentVersion}</div>
+        <!-- 版本信息 -->
+        <div style="
+          background: rgba(99, 102, 241, 0.1);
+          border: 1px solid rgba(99, 102, 241, 0.2);
+          border-radius: 16px;
+          padding: 20px;
+          margin-bottom: 24px;
+        ">
+          <div style="display: flex; align-items: center; justify-content: center; gap: 24px;">
+            <div style="text-align: center;">
+              <div style="color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">当前</div>
+              <div style="color: #e2e8f0; font-size: 24px; font-weight: 700;">v${updateInfo.currentVersion}</div>
             </div>
-            <div style="color: #4a9eff; font-size: 32px; align-self: center;">→</div>
-            <div>
-              <div style="color: #888; font-size: 12px; margin-bottom: 4px;">最新版本</div>
-              <div style="color: #4a9eff; font-size: 20px; font-weight: 600;">v${updateInfo.latestVersion}</div>
+            <div style="
+              width: 40px;
+              height: 40px;
+              background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            ">
+              <span style="color: #fff; font-size: 18px;">→</span>
             </div>
-          </div>
-
-          <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 16px;">
-            <div style="color: #ccc; font-size: 13px; margin-bottom: 8px; font-weight: 600;">📝 更新内容：</div>
-            <div style="color: #aaa; font-size: 12px; line-height: 1.6; max-height: 150px; overflow-y: auto; white-space: pre-wrap;">
-${updateInfo.notes}
+            <div style="text-align: center;">
+              <div style="color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">最新</div>
+              <div style="color: #a5b4fc; font-size: 24px; font-weight: 700;">v${updateInfo.latestVersion}</div>
             </div>
           </div>
         </div>
 
-        <div style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); padding: 16px; border-radius: 12px; margin-bottom: 24px; border: 2px solid #7f1d1d;">
-          <div style="color: #fff; font-size: 14px; font-weight: 600; text-align: center; letter-spacing: 1px;">
-            ⚠️ 商业化死全家，贩子死全家 ⚠️
+        <!-- 警告 -->
+        <div style="
+          background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(185, 28, 28, 0.15) 100%);
+          border: 1px solid rgba(239, 68, 68, 0.3);
+          border-radius: 12px;
+          padding: 14px;
+          margin-bottom: 24px;
+          text-align: center;
+        ">
+          <div style="color: #fca5a5; font-size: 13px; font-weight: 600;">
+            ⚠️ 商业化死全家，贩子死全家
           </div>
-          <div style="color: #fca5a5; font-size: 12px; text-align: center; margin-top: 8px;">
-            本插件完全免费，禁止倒卖！
-          </div>
+          <div style="color: #f87171; font-size: 11px; margin-top: 4px;">本插件免费，禁止倒卖！</div>
         </div>
 
-        <div style="text-align: center;">
+        <!-- 按钮 -->
+        <div style="display: flex; flex-direction: column; gap: 12px;">
           <button id="maomaomz-update-now" style="
             width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #4a9eff 0%, #3b82f6 100%);
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             color: #fff;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
-          " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(74, 158, 255, 0.4)';" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 12px rgba(74, 158, 255, 0.3)';">
-            🚀 立即更新（必须更新才能继续使用）
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+          " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 30px rgba(99, 102, 241, 0.5)';" onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 20px rgba(99, 102, 241, 0.4)';">
+            🚀 立即更新
           </button>
           <button id="maomaomz-refresh-only" style="
             width: 100%;
-            padding: 12px;
-            margin-top: 12px;
-            background: transparent;
-            border: 1px solid #4a9eff;
-            border-radius: 8px;
-            color: #4a9eff;
+            padding: 14px 24px;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            color: #a5b4fc;
             font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s;
-          " onmouseover="this.style.background='rgba(74, 158, 255, 0.1)';" onmouseout="this.style.background='transparent';">
-            🔄 已手动更新？点此刷新页面
+          " onmouseover="this.style.background='rgba(99, 102, 241, 0.2)';" onmouseout="this.style.background='rgba(99, 102, 241, 0.1)';">
+            🔄 已手动更新？刷新页面
           </button>
           ${
             !forceUpdate
               ? `<button id="maomaomz-skip-update" style="
             width: 100%;
-            padding: 10px;
-            margin-top: 8px;
+            padding: 12px;
             background: transparent;
-            border: 1px solid #666;
-            border-radius: 8px;
-            color: #888;
-            font-size: 12px;
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            border-radius: 10px;
+            color: #64748b;
+            font-size: 13px;
             cursor: pointer;
             transition: all 0.3s;
-          " onmouseover="this.style.borderColor='#888';" onmouseout="this.style.borderColor='#666';">
-            ⏰ 稍后提醒（跳过本次，1小时后再提示）
+          " onmouseover="this.style.borderColor='rgba(100, 116, 139, 0.5)';" onmouseout="this.style.borderColor='rgba(100, 116, 139, 0.3)';">
+            ⏰ 稍后提醒
           </button>`
               : ''
           }
-          <p style="color: ${forceUpdate ? '#ff6b6b' : '#888'}; font-size: 12px; margin-top: 12px; font-weight: ${forceUpdate ? '600' : 'normal'}">
-            ${forceUpdate ? '🚫 必须更新才能继续使用插件！' : '⚠️ 检测到新版本，建议尽快更新'}
-          </p>
         </div>
+        ${forceUpdate ? '<p style="color: #f87171; font-size: 12px; text-align: center; margin-top: 16px; font-weight: 500;">🚫 必须更新才能继续使用</p>' : ''}
       </div>
     </div>
 

@@ -1203,7 +1203,7 @@ function handleAdmin(env) {
     <div class="nav-section">日志</div>
     <div class="nav-item" data-page="logs">📝 验证日志</div>
     <div class="nav-item" data-page="models">🤖 模型记录</div>
-    <div class="nav-item" data-page="tracks">🔗 设备追踪</div>
+    <div class="nav-item" data-page="tracks">🔗 端点关联</div>
     <div class="nav-section">设置</div>
     <div class="nav-item" data-page="settings">⚙️ 系统设置</div>
     <div class="admin-key">
@@ -1395,12 +1395,12 @@ function handleAdmin(env) {
       <div id="models-list"></div>
     </div>
 
-    <!-- 设备追踪 -->
+    <!-- 端点关联 -->
     <div id="page-tracks" class="page">
-      <h1 class="page-title">🔗 设备追踪</h1>
-      <p style="color:#888;margin-bottom:16px">匿名追踪同一设备使用的不同API端点（用于识别换站行为）</p>
+      <h1 class="page-title">🔗 端点关联</h1>
+      <p style="color:#888;margin-bottom:16px">查看同一用户使用的不同API端点（用于识别换站行为）</p>
       <div class="search-box">
-        <input type="text" id="track-search" placeholder="搜索设备ID或端点..." oninput="filterTracks()">
+        <input type="text" id="track-search" placeholder="搜索端点..." oninput="filterTracks()">
         <button class="btn btn-secondary" onclick="loadDeviceTracks()">刷新</button>
       </div>
       <div id="tracks-list"></div>
@@ -2076,14 +2076,15 @@ async function loadDeviceTracks() {
 
 function renderTracks() {
   const search = (document.getElementById('track-search')?.value || '').toLowerCase();
-  const filtered = allTracks.filter(t => !search || t.id.toLowerCase().includes(search) || t.endpoints.some(e => e.url.toLowerCase().includes(search)));
+  const filtered = allTracks.filter(t => !search || t.name.toLowerCase().includes(search) || t.endpoints.some(e => e.url.toLowerCase().includes(search)));
 
-  const html = filtered.map(t => {
+  const html = filtered.map((t, idx) => {
     const endpointCount = t.endpoints.length;
     const totalCount = t.endpoints.reduce((sum, e) => sum + (e.count || 1), 0);
+    const name = t.name || ('maomao' + (idx + 1));
     return '<div class="card" style="margin-bottom:12px">' +
       '<div style="display:flex;justify-content:space-between;align-items:center">' +
-      '<div><span style="font-family:monospace;color:#4a9eff">' + t.id.substring(0, 8) + '...</span>' +
+      '<div><span style="color:#4a9eff;font-weight:600">' + name + '</span>' +
       '<span style="margin-left:12px;color:#888">' + endpointCount + ' 个端点 / ' + totalCount + ' 次访问</span></div>' +
       '<div style="color:#666;font-size:12px">首次: ' + new Date(t.firstSeen).toLocaleDateString('zh-CN') + ' | 最近: ' + new Date(t.lastSeen).toLocaleString('zh-CN') + '</div></div>' +
       '<div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px">' +
@@ -2093,7 +2094,7 @@ function renderTracks() {
       '</div></div>';
   }).join('');
 
-  document.getElementById('tracks-list').innerHTML = html || '<div class="empty">暂无追踪数据</div>';
+  document.getElementById('tracks-list').innerHTML = html || '<div class="empty">暂无数据</div>';
 }
 
 function filterTracks() {
@@ -4824,7 +4825,7 @@ async function handleGetDeviceTracks(request, env, corsHeaders) {
     const tracksStr = await redisGet('device_tracks');
     const tracks = tracksStr ? JSON.parse(tracksStr) : {};
 
-    // 转换为数组格式，按最后活跃时间排序
+    // 转换为数组格式，按最后活跃时间排序，分配友好名称
     const data = Object.entries(tracks)
       .map(([id, info]) => ({
         id,
@@ -4833,7 +4834,8 @@ async function handleGetDeviceTracks(request, env, corsHeaders) {
         endpoints: info.endpoints || [],
       }))
       .filter(t => t.endpoints.length > 1) // 只显示使用过多个端点的
-      .sort((a, b) => new Date(b.lastSeen).getTime() - new Date(a.lastSeen).getTime());
+      .sort((a, b) => new Date(b.lastSeen).getTime() - new Date(a.lastSeen).getTime())
+      .map((t, idx) => ({ ...t, name: 'maomao' + (idx + 1) })); // 分配友好名称
 
     return jsonResponse({ success: true, data }, 200, corsHeaders);
   } catch (error) {

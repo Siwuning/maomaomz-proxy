@@ -5,10 +5,11 @@
   "optional": [],
   "js": "dist/index.js",
   "author": "猫猫 (mzrodyu)",
-  "version": "2.0.26",
+  "version": "2.0.27",
   "homePage": "https://github.com/mzrodyu/maomaomz",
   "auto_update": true,
   "changelog": {
+    "2.0.27": "🐛 版本检测优化",
     "2.0.26": "🐛 修复 GitHub API 403 限流时的循环问题",
     "2.0.25": "🐛 修复无限循环更新弹窗问题",
     "2.0.24": "🎨 修复偏好设置主题色选择器样式",

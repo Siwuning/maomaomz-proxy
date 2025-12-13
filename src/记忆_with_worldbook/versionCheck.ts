@@ -99,9 +99,14 @@ async function fetchLatestCommit(): Promise<{ commit: string; message: string } 
  * 获取远程 manifest.json 的版本号
  */
 async function fetchRemoteVersion(): Promise<string | null> {
+  // 使用多个源，优先使用不缓存的源
   const manifestUrls = [
-    `https://raw.githubusercontent.com/${GITHUB_REPO}/main/manifest.json?t=${Date.now()}`,
-    `https://cdn.jsdelivr.net/gh/${GITHUB_REPO}@main/manifest.json?t=${Date.now()}`,
+    // GitHub raw（无缓存）
+    `https://raw.githubusercontent.com/${GITHUB_REPO}/main/manifest.json?_=${Date.now()}`,
+    // jsDelivr 强制刷新（@latest 而非 @main）
+    `https://cdn.jsdelivr.net/gh/${GITHUB_REPO}@latest/manifest.json`,
+    // 备用：purge jsDelivr 缓存
+    `https://purge.jsdelivr.net/gh/${GITHUB_REPO}@main/manifest.json`,
   ];
 
   for (const url of manifestUrls) {

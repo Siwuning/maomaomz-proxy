@@ -1,5 +1,48 @@
 <template>
   <div class="tools-tab" style="padding: 25px !important; background: #1a2332 !important">
+    <!-- 新手引导 -->
+    <div
+      v-if="showGuide"
+      style="
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.15));
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 20px;
+      "
+    >
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px">
+        <h4 style="color: #10b981; font-size: 15px; margin: 0; display: flex; align-items: center; gap: 8px">
+          <i class="fa-solid fa-rocket"></i>
+          3 步快速上手 MVU Beta
+        </h4>
+        <button
+          style="background: transparent; border: none; color: #888; cursor: pointer; font-size: 14px; padding: 4px 8px"
+          title="不再显示"
+          @click="hideGuide"
+        >
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap">
+        <div style="flex: 1; min-width: 140px">
+          <div style="color: #10b981; font-size: 20px; font-weight: bold; margin-bottom: 4px">①</div>
+          <div style="color: #e0e0e0; font-size: 13px; font-weight: 500">生成 InitVar</div>
+          <div style="color: #888; font-size: 11px">描述你的变量需求，AI 自动生成结构</div>
+        </div>
+        <div style="flex: 1; min-width: 140px">
+          <div style="color: #fbbf24; font-size: 20px; font-weight: bold; margin-bottom: 4px">②</div>
+          <div style="color: #e0e0e0; font-size: 13px; font-weight: 500">生成 COT 提示词</div>
+          <div style="color: #888; font-size: 11px">点击"生成 COT 提示词"按钮</div>
+        </div>
+        <div style="flex: 1; min-width: 140px">
+          <div style="color: #8b5cf6; font-size: 20px; font-weight: bold; margin-bottom: 4px">③</div>
+          <div style="color: #e0e0e0; font-size: 13px; font-weight: 500">复制到世界书</div>
+          <div style="color: #888; font-size: 11px">InitVar → 首消息，COT → 作者注</div>
+        </div>
+      </div>
+    </div>
+
     <!-- 变量结构生成器 -->
     <div class="tool-section">
       <div
@@ -326,7 +369,25 @@
         </button>
 
         <div v-if="generatedStructure" class="output-section">
-          <h4 style="color: #6b8299; font-size: 14px; margin-bottom: 10px">生成的 [InitVar] 结构：</h4>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px">
+            <h4 style="color: #6b8299; font-size: 14px; margin: 0">生成的 [InitVar] 结构：</h4>
+            <button
+              style="
+                padding: 6px 12px;
+                background: linear-gradient(135deg, rgba(74, 158, 255, 0.2), rgba(59, 130, 246, 0.3));
+                border: 1px solid rgba(74, 158, 255, 0.4);
+                border-radius: 6px;
+                color: #4a9eff;
+                font-size: 12px;
+                cursor: pointer;
+                transition: all 0.2s;
+              "
+              @click="validateJson"
+            >
+              <i class="fa-solid fa-check-circle" style="margin-right: 4px"></i>
+              验证 JSON
+            </button>
+          </div>
           <div class="code-output">
             <pre>{{ generatedStructure }}</pre>
             <button class="copy-btn-abs" @click="copyGenerated">
@@ -766,6 +827,15 @@ const expanded = ref({
   prompt: false,
 });
 
+// 新手引导
+const GUIDE_KEY = 'maomaomz_mvu_guide_hidden';
+const showGuide = ref(!localStorage.getItem(GUIDE_KEY));
+
+function hideGuide() {
+  showGuide.value = false;
+  localStorage.setItem(GUIDE_KEY, 'true');
+}
+
 function toggleExpanded(key: keyof typeof expanded.value) {
   expanded.value[key] = !expanded.value[key];
 }
@@ -846,6 +916,83 @@ function parseSubFields(): any {
 
 function copyGenerated() {
   copyToClipboard(generatedStructure.value);
+}
+
+// JSON 验证功能
+function validateJson() {
+  if (!generatedStructure.value.trim()) {
+    window.toastr.warning('没有可验证的 JSON');
+    return;
+  }
+
+  try {
+    const parsed = JSON.parse(generatedStructure.value);
+
+    // 检查基本结构
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    // 检查 $meta
+    if (!parsed.$meta) {
+      warnings.push('缺少 $meta 配置（建议添加）');
+    } else {
+      if (parsed.$meta.extensible === undefined) {
+        warnings.push('$meta 缺少 extensible 属性');
+      }
+      if (parsed.$meta.strictSet === undefined) {
+        warnings.push('$meta 缺少 strictSet 属性');
+      }
+    }
+
+    // 检查变量分组
+    const varGroups = Object.keys(parsed).filter(k => k !== '$meta');
+    if (varGroups.length === 0) {
+      errors.push('未定义任何变量分组');
+    }
+
+    // 检查每个变量格式
+    let fieldCount = 0;
+    for (const group of varGroups) {
+      const groupData = parsed[group];
+      if (typeof groupData !== 'object' || Array.isArray(groupData)) {
+        errors.push(`"${group}" 应该是对象类型`);
+        continue;
+      }
+
+      for (const field of Object.keys(groupData)) {
+        fieldCount++;
+        const value = groupData[field];
+
+        // 检查是否为 [值, 描述] 格式
+        if (!Array.isArray(value)) {
+          errors.push(`"${group}.${field}" 格式错误：应为 [值, "描述"] 数组`);
+        } else if (value.length !== 2) {
+          errors.push(`"${group}.${field}" 格式错误：数组应有 2 个元素 [值, "描述"]`);
+        } else if (typeof value[1] !== 'string') {
+          warnings.push(`"${group}.${field}" 的描述应为字符串`);
+        }
+      }
+    }
+
+    // 显示结果
+    if (errors.length > 0) {
+      window.toastr.error(`❌ 发现 ${errors.length} 个错误:\n${errors.slice(0, 3).join('\n')}`, 'JSON 验证失败', {
+        timeOut: 8000,
+      });
+    } else if (warnings.length > 0) {
+      window.toastr.warning(
+        `⚠️ JSON 有效，但有 ${warnings.length} 个警告:\n${warnings.slice(0, 2).join('\n')}`,
+        '验证通过（有警告）',
+        { timeOut: 5000 },
+      );
+    } else {
+      window.toastr.success(`✅ JSON 格式正确！\n${varGroups.length} 个分组，${fieldCount} 个字段`, '验证通过', {
+        timeOut: 3000,
+      });
+    }
+  } catch (e: any) {
+    window.toastr.error(`❌ JSON 解析失败:\n${e.message}`, '格式错误', { timeOut: 8000 });
+  }
 }
 
 // AI智能生成结构

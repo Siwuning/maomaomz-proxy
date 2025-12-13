@@ -84,11 +84,10 @@
       <div
         style="
           padding: 15px;
-          background: linear-gradient(135deg, rgba(30, 30, 30, 0.9) 0%, rgba(40, 40, 40, 0.9) 100%);
+          background: linear-gradient(135deg, #2a3a4a 0%, #3a4a5a 100%);
           border-radius: 10px;
           margin-top: 12px;
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(84, 107, 131, 0.3);
         "
       >
         <div style="color: #e0e0e0; font-size: 14px; font-weight: 500; margin-bottom: 12px">

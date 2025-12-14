@@ -5,11 +5,13 @@
       display: 'flex',
       flexDirection: 'column',
       height: '100%',
-      background: '#1a2332',
+      background: 'transparent',
       color: '#e0e0e0',
       position: 'relative',
     }"
   >
+    <!-- 底色层 -->
+    <div class="panel-base-layer"></div>
     <!-- 背景图片层 -->
     <div class="panel-bg-layer"></div>
     <!-- 面板头部 -->
@@ -385,6 +387,17 @@ const closePanel = () => {
 </script>
 
 <style>
+/* 底色层 */
+.panel-base-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #1a2332;
+  z-index: -1;
+}
+
 /* 背景图片层 - 非 scoped 以确保能读取 :root CSS 变量 */
 .panel-bg-layer {
   position: absolute;

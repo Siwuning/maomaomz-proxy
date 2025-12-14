@@ -5,10 +5,11 @@
   "optional": [],
   "js": "dist/index.js",
   "author": "猫猫 (mzrodyu)",
-  "version": "2.0.42",
+  "version": "2.0.43",
   "homePage": "https://github.com/mzrodyu/maomaomz",
   "auto_update": true,
   "changelog": {
+    "2.0.43": "🐛 修复背景图片不显示问题（容器背景透明化+底色层）",
     "2.0.42": "🐛 修复背景图片透明度滑块不生效的问题（改用 CSS 类应用）",
     "2.0.41": "🐛 修复背景图片透明度滑块不生效的问题",
     "2.0.40": "🐛 修复更新后插件消失的问题（5分钟内跳过弹窗时允许继续加载）",

@@ -5,10 +5,11 @@
   "optional": [],
   "js": "dist/index.js",
   "author": "猫猫 (mzrodyu)",
-  "version": "2.0.44",
+  "version": "2.0.45",
   "homePage": "https://github.com/mzrodyu/maomaomz",
   "auto_update": true,
   "changelog": {
+    "2.0.45": "🐛 修复毛玻璃效果层级问题，背景图片正确显示",
     "2.0.44": "✨ 添加毛玻璃效果，背景图片透明度控制整体透视程度",
     "2.0.43": "🐛 修复背景图片不显示问题（容器背景透明化+底色层）",
     "2.0.42": "🐛 修复背景图片透明度滑块不生效的问题（改用 CSS 类应用）",

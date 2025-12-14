@@ -384,7 +384,7 @@ const closePanel = () => {
 </script>
 
 <style>
-/* 背景图片层 - 铺满整个面板 */
+/* 背景图片层 - 铺满整个面板，透明度由用户控制 */
 .panel-bg-layer {
   position: absolute;
   top: 0;
@@ -394,27 +394,28 @@ const closePanel = () => {
   background-image: var(--maomaomz-bg-image, none);
   background-size: cover;
   background-position: center;
+  opacity: var(--maomaomz-bg-opacity, 0.3);
   pointer-events: none;
   z-index: 0;
 }
 
-/* 底色层 - 半透明遮罩，透明度由用户设置控制 */
+/* 底色层 - 纯色底层，在背景图片下面 */
 .panel-base-layer {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(26, 35, 50, calc(1 - var(--maomaomz-bg-opacity, 0.3)));
-  z-index: 1;
+  background: #1a2332;
+  z-index: -1;
   pointer-events: none;
 }
 
-/* 玻璃效果 - 半透明毛玻璃 */
+/* 玻璃效果 - 半透明毛玻璃，让背景透出来 */
 .glass-effect {
-  background: rgba(30, 45, 61, 0.75) !important;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(26, 35, 50, 0.6) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 </style>
 

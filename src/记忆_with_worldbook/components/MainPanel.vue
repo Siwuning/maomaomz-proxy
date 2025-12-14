@@ -306,9 +306,36 @@ const updateIsMobile = () => {
   isMobile.value = window.innerWidth <= 768;
 };
 
+// 初始化时加载并应用偏好设置（确保背景图片等设置在面板加载时就生效）
+const loadAndApplyPreferences = () => {
+  try {
+    const saved = localStorage.getItem('maomaomz_preferences');
+    if (saved) {
+      const preferences = JSON.parse(saved);
+      // 应用主题色
+      if (preferences.themeColor) {
+        document.documentElement.style.setProperty('--maomaomz-theme-color', preferences.themeColor);
+      }
+      // 应用背景图片
+      document.documentElement.style.setProperty(
+        '--maomaomz-bg-image',
+        preferences.backgroundImage ? `url(${preferences.backgroundImage})` : 'none',
+      );
+      // 应用背景透明度
+      const opacity = preferences.backgroundOpacity ?? 30;
+      document.documentElement.style.setProperty('--maomaomz-bg-opacity', (opacity / 100).toString());
+      console.log('🖼️ MainPanel: 背景设置已初始化, 透明度:', opacity + '%');
+    }
+  } catch (error) {
+    console.error('❌ MainPanel: 加载偏好设置失败:', error);
+  }
+};
+
 onMounted(() => {
   updateIsMobile();
   window.addEventListener('resize', updateIsMobile);
+  // 初始化偏好设置
+  loadAndApplyPreferences();
 });
 
 onUnmounted(() => {

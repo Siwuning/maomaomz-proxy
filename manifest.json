@@ -5,10 +5,11 @@
   "optional": [],
   "js": "dist/index.js",
   "author": "猫猫 (mzrodyu)",
-  "version": "2.0.40",
+  "version": "2.0.41",
   "homePage": "https://github.com/mzrodyu/maomaomz",
   "auto_update": true,
   "changelog": {
+    "2.0.41": "🐛 修复背景图片透明度滑块不生效的问题",
     "2.0.40": "🐛 修复更新后插件消失的问题（5分钟内跳过弹窗时允许继续加载）",
     "2.0.39": "🐛 修复背景图片不显示问题（各页面背景透明化）",
     "2.0.38": "🐛 修复背景图片透明度设置影响内容显示问题",

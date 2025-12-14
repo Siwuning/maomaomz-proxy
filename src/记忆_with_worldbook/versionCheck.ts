@@ -526,14 +526,17 @@ export async function autoCheckUpdates(): Promise<void> {
 
     if (result && result.hasUpdate && result.updateUrl && result.notes) {
       console.log(`✨ 发现新更新: ${result.currentCommit} → ${result.latestCommit}`);
-      showUpdateDialog({
-        latestVersion: result.latestVersion || CURRENT_VERSION,
-        latestCommit: result.latestCommit,
-        currentVersion: result.currentVersion,
-        currentCommit: result.currentCommit,
-        updateUrl: result.updateUrl,
-        notes: result.notes,
-      });
+      showUpdateDialog(
+        {
+          latestVersion: result.latestVersion || CURRENT_VERSION,
+          latestCommit: result.latestCommit,
+          currentVersion: result.currentVersion,
+          currentCommit: result.currentCommit,
+          updateUrl: result.updateUrl,
+          notes: result.notes,
+        },
+        true,
+      ); // 强制更新
     }
   } finally {
     isCheckingInProgress = false;
@@ -569,14 +572,17 @@ export async function manualCheckUpdates(): Promise<void> {
 
     if (result.hasUpdate && result.updateUrl && result.notes) {
       console.log(`✨ 发现新更新: ${result.currentCommit} → ${result.latestCommit}`);
-      showUpdateDialog({
-        latestVersion: result.latestVersion || CURRENT_VERSION,
-        latestCommit: result.latestCommit,
-        currentVersion: result.currentVersion,
-        currentCommit: result.currentCommit,
-        updateUrl: result.updateUrl,
-        notes: result.notes,
-      });
+      showUpdateDialog(
+        {
+          latestVersion: result.latestVersion || CURRENT_VERSION,
+          latestCommit: result.latestCommit,
+          currentVersion: result.currentVersion,
+          currentCommit: result.currentCommit,
+          updateUrl: result.updateUrl,
+          notes: result.notes,
+        },
+        true,
+      ); // 强制更新
     } else {
       console.log(`✅ 已是最新版本: ${result.currentCommit}`);
       (window as any).toastr?.success(

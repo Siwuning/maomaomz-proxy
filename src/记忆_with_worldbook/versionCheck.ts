@@ -437,29 +437,28 @@ export function showUpdateDialog(
         }
       }
 
-      // 方法2: 直接调用 SillyTavern API（尝试多种格式）
+      // 方法2: 直接调用 SillyTavern API
       if (!updateSuccess) {
-        const apiEndpoints = [
-          { url: '/api/extensions/update', body: { name: 'maomaomz' } },
-          { url: '/api/extensions/update', body: { extensionName: 'maomaomz' } },
-          { url: '/api/extensions/update', body: { name: 'third-party/maomaomz' } },
-          { url: '/api/extensions/install', body: { url: 'https://github.com/mzrodyu/maomaomz' } },
-        ];
-        for (const api of apiEndpoints) {
+        const extensionNames = ['maomaomz', 'third-party/maomaomz'];
+        for (const name of extensionNames) {
           if (updateSuccess) break;
           try {
-            console.log(`🔄 尝试: ${api.url}`, api.body);
-            const response = await fetch(api.url, {
+            console.log(`🔄 尝试更新: ${name}`);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000);
+            const response = await fetch('/api/extensions/update', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(api.body),
+              body: JSON.stringify({ extensionName: name }),
+              signal: controller.signal,
             });
+            clearTimeout(timeoutId);
             if (response.ok) {
               updateSuccess = true;
-              console.log(`✅ 成功: ${api.url}`);
+              console.log(`✅ 更新成功: ${name}`);
             }
           } catch (e) {
-            console.warn(`失败: ${api.url}`, e);
+            console.warn(`更新失败 (${name}):`, e);
           }
         }
       }

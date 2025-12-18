@@ -3607,26 +3607,42 @@ const handle_refresh_hidden = async (showToast: boolean = false) => {
     // 保存更新后的数据到酒馆变量
     saveHiddenMessages();
 
+    // 🔥 重新应用隐藏状态到酒馆（修复刷新后隐藏失效的问题）
+    if (validHiddenMessages.length > 0) {
+      try {
+        const setChatMessagesFn = (window as any).TavernHelper?.setChatMessages;
+        if (setChatMessagesFn) {
+          const messageIds = validHiddenMessages.map(msg => msg.message_id);
+          console.log(`🔄 重新应用 ${messageIds.length} 个楼层的隐藏状态...`);
+
+          // 分批处理，每批最多 500 个，避免一次性处理太多导致性能问题
+          const BATCH_SIZE = 500;
+          for (let i = 0; i < messageIds.length; i += BATCH_SIZE) {
+            const batch = messageIds.slice(i, i + BATCH_SIZE);
+            await setChatMessagesFn(
+              batch.map(message_id => ({ message_id, is_hidden: true })),
+              { refresh: i + BATCH_SIZE >= messageIds.length ? 'all' : 'none' }, // 最后一批才刷新UI
+            );
+            console.log(`✅ 已处理第 ${Math.floor(i / BATCH_SIZE) + 1} 批 (${batch.length} 个)`);
+          }
+          console.log('✅ 所有隐藏状态已重新应用');
+        }
+      } catch (e) {
+        console.error('重新应用隐藏状态失败:', e);
+      }
+    }
+
     if (showToast) {
       if (removedCount > 0) {
-        window.toastr.success(`刷新完成，移除了 ${removedCount} 个不存在的楼层`);
+        window.toastr.success(
+          `刷新完成，移除了 ${removedCount} 个不存在的楼层，已重新应用 ${validHiddenMessages.length} 个隐藏`,
+        );
       } else {
-        window.toastr.success('刷新完成，所有隐藏楼层仍然有效');
+        window.toastr.success(`刷新完成，已重新应用 ${validHiddenMessages.length} 个隐藏楼层`);
       }
     }
 
     console.log(`刷新完成：${validHiddenMessages.length} 个有效隐藏楼层，${removedCount} 个已移除`);
-
-    // 强制刷新酒馆消息列表 UI（修复可能的渲染问题）
-    try {
-      const st = (window as any).SillyTavern;
-      if (st && typeof st.printMessages === 'function') {
-        console.log('🔄 强制刷新酒馆消息列表...');
-        await st.printMessages();
-      }
-    } catch (e) {
-      console.warn('强制刷新消息列表失败:', e);
-    }
   } catch (error) {
     console.error('刷新隐藏楼层失败:', error);
     if (showToast) {

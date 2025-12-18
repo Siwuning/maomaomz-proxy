@@ -4915,7 +4915,24 @@ const handleAnalyzeRelation = async () => {
       result = await generateWithStreaming(requestPayload, relationProgress);
     }
 
-    relationOutput.value = cleanCharacterCardOutput(result);
+    // 🔥 添加调试日志，帮助诊断"弹窗显示完成但界面没反应"的问题
+    console.log('📊 关系分析原始结果长度:', result?.length || 0);
+    if (!result || result.trim() === '') {
+      console.warn('⚠️ AI 返回了空结果');
+      window.toastr.warning('AI 返回了空结果，请重试');
+      return;
+    }
+
+    const cleaned = cleanCharacterCardOutput(result);
+    console.log('📊 清理后结果长度:', cleaned?.length || 0);
+
+    if (!cleaned || cleaned.trim() === '') {
+      console.warn('⚠️ 清理后结果为空，使用原始结果');
+      relationOutput.value = result.trim(); // 回退到原始结果
+    } else {
+      relationOutput.value = cleaned;
+    }
+
     saveToolsDataImmediate();
     window.toastr.success('关系分析完成！');
   } catch (error) {

@@ -3585,7 +3585,16 @@ const handle_refresh_hidden = async (showToast: boolean = false) => {
     const validHiddenMessages = [];
     let removedCount = 0;
 
+    // 获取最新消息ID，用于判断楼层是否真正被删除
+    const lastMessageId = (window as any).TavernHelper?.getLastMessageId?.() ?? chatMessages.length - 1;
+
     for (const hiddenMsg of hidden_messages.value) {
+      // 如果 message_id 超过 lastMessageId，说明楼层已被删除
+      if (hiddenMsg.message_id > lastMessageId) {
+        removedCount++;
+        continue;
+      }
+
       const message = chatMessages.find(msg => msg.message_id === hiddenMsg.message_id);
       if (message) {
         // 更新消息内容（可能已经改变）
@@ -3596,8 +3605,9 @@ const handle_refresh_hidden = async (showToast: boolean = false) => {
           message: message.message || hiddenMsg.message,
         });
       } else {
-        // 楼层不存在了，从隐藏列表中移除
-        removedCount++;
+        // 在 chatMessages 中找不到，但 message_id <= lastMessageId
+        // 可能是 getChatMessages API 有返回数量限制，保留原有记录
+        validHiddenMessages.push(hiddenMsg);
       }
     }
 

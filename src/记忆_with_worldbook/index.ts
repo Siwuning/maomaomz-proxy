@@ -47,29 +47,16 @@ $(() => {
 
     console.log('✅ 授权验证通过，检查版本更新...');
 
-    // 🔄 强制检查更新（每次启动都检查）
-    const { checkForUpdates, showUpdateDialog, CURRENT_VERSION } = await import('./versionCheck');
-    const updateResult = await checkForUpdates(true); // 强制检查
+    // 🔄 版本检查（非阻塞，只提示不强制）
+    const { checkForUpdates, CURRENT_VERSION } = await import('./versionCheck');
+    const updateResult = await checkForUpdates(true);
 
     if (updateResult && updateResult.hasUpdate) {
-      console.log(`🚨 发现新版本，必须更新才能使用: ${updateResult.currentVersion} → ${updateResult.latestVersion}`);
-      // 🔥 强制更新模式：不允许跳过
-      const dialogShown = showUpdateDialog(
-        {
-          latestVersion: updateResult.latestVersion || CURRENT_VERSION,
-          latestCommit: updateResult.latestCommit || '',
-          currentVersion: updateResult.currentVersion,
-          currentCommit: updateResult.currentCommit,
-          updateUrl: updateResult.updateUrl || '',
-          notes: updateResult.notes || '',
-        },
-        true,
-      ); // 强制更新，不允许跳过
-      // 🚫 只有真正显示了弹窗才阻止加载，否则继续加载（5分钟内跳过弹窗时允许继续使用）
-      if (dialogShown) {
-        return;
-      }
-      console.log('⏰ 更新弹窗被跳过，继续加载插件...');
+      console.log(`📌 发现新版本: ${updateResult.currentVersion} → ${updateResult.latestVersion}`);
+      // 只提示，不阻塞
+      (window as any).toastr?.info(`发现新版本 v${updateResult.latestVersion}，请在扩展管理中更新`, '版本更新', {
+        timeOut: 8000,
+      });
     }
 
     console.log('✅ 版本已是最新，初始化插件功能...');

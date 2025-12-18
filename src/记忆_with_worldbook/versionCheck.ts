@@ -487,10 +487,23 @@ export function showUpdateDialog(
       }
 
       if (updateSuccess) {
-        (window as any).toastr?.success('✅ 更新成功！3秒后刷新页面...', '完成', { timeOut: 3000 });
-        // 3秒后刷新页面
-        setTimeout(() => {
-          window.location.reload();
+        (window as any).toastr?.success('✅ 更新成功！3秒后强制刷新页面...', '完成', { timeOut: 3000 });
+        // 3秒后强制刷新页面（清除缓存）
+        setTimeout(async () => {
+          // 🔥 清除 Service Worker 缓存
+          if ('caches' in window) {
+            try {
+              const cacheNames = await caches.keys();
+              await Promise.all(cacheNames.map(name => caches.delete(name)));
+              console.log('✅ 已清除所有缓存');
+            } catch (e) {
+              console.warn('清除缓存失败:', e);
+            }
+          }
+          // 🔥 使用时间戳强制刷新，避免浏览器缓存
+          const url = new URL(window.location.href);
+          url.searchParams.set('_t', Date.now().toString());
+          window.location.href = url.toString();
         }, 3000);
       } else {
         throw new Error('所有更新方法都失败了');

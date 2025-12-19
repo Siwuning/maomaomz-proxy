@@ -210,32 +210,19 @@ export function showUpdateDialog(
   },
   forceUpdate: boolean = false,
 ): boolean {
-  // 防止无限循环：检查是否刚刚尝试过更新
-  const lastUpdateAttempt = localStorage.getItem('maomaomz_last_update_attempt');
-  const forceRefreshCount = parseInt(localStorage.getItem('maomaomz_force_refresh_count') || '0', 10);
-
-  if (lastUpdateAttempt) {
-    const timeSinceLastAttempt = Date.now() - parseInt(lastUpdateAttempt, 10);
-    // 5分钟内检测到版本不匹配，说明浏览器缓存了旧代码
-    if (timeSinceLastAttempt < 5 * 60 * 1000) {
-      // 🔥 自动强制刷新（最多尝试2次，避免无限循环）
-      if (forceRefreshCount < 2) {
-        console.log(`🔄 检测到浏览器缓存旧代码，自动强制刷新... (尝试 ${forceRefreshCount + 1}/2)`);
-        localStorage.setItem('maomaomz_force_refresh_count', (forceRefreshCount + 1).toString());
-        // 强制刷新，跳过缓存
-        window.location.reload();
-        return false;
-      } else {
-        console.log('⏰ 已尝试2次强制刷新，跳过弹窗但允许继续加载');
-        // 重置计数器
-        localStorage.removeItem('maomaomz_force_refresh_count');
-        return false;
-      }
+  // 🔧 移除之前有问题的"自动刷新"逻辑
+  // 之前的逻辑会导致：用户点击更新 → 页面刷新 → 检测到 lastUpdateAttempt → 又刷新（不显示弹窗）
+  // 现在改为：只清理旧的标记，不自动刷新
+  try {
+    // 清理可能残留的旧标记
+    const forceRefreshCount = parseInt(localStorage.getItem('maomaomz_force_refresh_count') || '0', 10);
+    if (forceRefreshCount > 0) {
+      console.log('🧹 清理残留的刷新计数器');
+      localStorage.removeItem('maomaomz_force_refresh_count');
     }
+  } catch (e) {
+    console.warn('清理 localStorage 失败:', e);
   }
-
-  // 版本匹配或首次加载，重置强制刷新计数器
-  localStorage.removeItem('maomaomz_force_refresh_count');
 
   // 检查跳过时间
   const skipUntil = localStorage.getItem('maomaomz_skip_update_until');

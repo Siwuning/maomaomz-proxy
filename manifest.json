@@ -5,10 +5,11 @@
   "optional": [],
   "js": "dist/index.js?v=202412182022",
   "author": "猫猫 (mzrodyu)",
-  "version": "2.0.55",
+  "version": "2.0.56",
   "homePage": "https://github.com/mzrodyu/maomaomz",
   "auto_update": true,
   "changelog": {
+    "2.0.56": "修复更新弹窗不显示直接刷新的问题",
     "2.0.55": "移动端更新功能兼容性改进",
     "2.0.54": "修复自动总结重复条目、AI空结果提示、更新功能改进",
     "2.0.53": "状态栏生成器支持XML格式",

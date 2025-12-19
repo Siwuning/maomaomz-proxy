@@ -35,9 +35,9 @@
     </div>
 
     <!-- 主内容区 -->
-    <div class="main-content">
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; min-height: 500px">
       <!-- 左侧：需求输入区 -->
-      <div class="left-panel">
+      <div style="background: #2a2a2a; border-radius: 12px; padding: 16px; border: 1px solid #3a3a3a">
         <div class="input-section">
           <h4>
             <i class="fa-solid fa-sparkles" style="color: #f59e0b"></i>
@@ -70,7 +70,16 @@
       </div>
 
       <!-- 中间：代码编辑区 -->
-      <div class="middle-panel">
+      <div
+        style="
+          background: #2a2a2a;
+          border-radius: 12px;
+          padding: 16px;
+          border: 1px solid #3a3a3a;
+          display: flex;
+          flex-direction: column;
+        "
+      >
         <h4>
           <i class="fa-solid fa-file-code" style="color: #667eea"></i>
           生成的代码
@@ -83,7 +92,16 @@
       </div>
 
       <!-- 右侧：预览区 -->
-      <div class="right-panel">
+      <div
+        style="
+          background: #2a2a2a;
+          border-radius: 12px;
+          padding: 16px;
+          border: 1px solid #3a3a3a;
+          display: flex;
+          flex-direction: column;
+        "
+      >
         <div class="preview-header">
           <i class="fa-solid fa-eye"></i>
           <span>实时预览</span>

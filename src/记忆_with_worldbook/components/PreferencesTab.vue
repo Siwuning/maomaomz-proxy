@@ -138,8 +138,9 @@
               "
               @input="
                 preferences.themeColor = ($event.target as HTMLInputElement).value;
-                savePreferences();
+                applyPreferences();
               "
+              @change="savePreferencesQuiet()"
             />
             <input
               type="text"
@@ -411,6 +412,16 @@ const savePreferences = () => {
   } catch (error) {
     console.error('❌ 保存偏好设置失败:', error);
     (window as any).toastr?.error('保存失败');
+  }
+};
+
+// 静默保存偏好设置（不弹通知，用于滑动操作）
+const savePreferencesQuiet = () => {
+  try {
+    localStorage.setItem(PREFERENCES_KEY, JSON.stringify(preferences));
+    console.log('💾 偏好设置已静默保存');
+  } catch (error) {
+    console.error('❌ 保存偏好设置失败:', error);
   }
 };
 

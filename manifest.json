@@ -5,10 +5,11 @@
   "optional": [],
   "js": "dist/index.js?v=202412182022",
   "author": "猫猫 (mzrodyu)",
-  "version": "2.0.67",
+  "version": "2.0.68",
   "homePage": "https://github.com/mzrodyu/maomaomz",
   "auto_update": true,
   "changelog": {
+    "2.0.68": "修复颜色选择器滑动时疑狂弹通知",
     "2.0.67": "面板背景色跟随主题色变化",
     "2.0.66": "UI美化 - 深蓝色调确保文字可见",
     "2.0.65": "UI美化 - 浅天蓝底色+深蓝遮罩确保文字可见",

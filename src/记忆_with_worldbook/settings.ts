@@ -489,15 +489,12 @@ export const useSettingsStore = defineStore('settings', () => {
     let localSettings: any = {};
     try {
       const saved = localStorage.getItem('tavern_helper_settings');
+      console.log('🔍 localStorage 原始数据:', saved ? saved.substring(0, 200) + '...' : 'null');
       if (saved) {
         localSettings = JSON.parse(saved);
-        console.log('📦 从 localStorage 读取到的设置:', {
-          summary_style: localSettings.summary_style,
-          summarize_interval: localSettings.summarize_interval,
-          auto_summarize_enabled: localSettings.auto_summarize_enabled,
-        });
+        console.log('📦 从 localStorage 读取到的完整设置:', JSON.stringify(localSettings, null, 2));
       } else {
-        console.log('📦 localStorage 中没有保存的设置');
+        console.log('📦 localStorage 中没有保存的设置 (tavern_helper_settings 为空)');
       }
     } catch (e) {
       console.warn('从 localStorage 读取设置失败:', e);

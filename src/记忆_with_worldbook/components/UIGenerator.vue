@@ -615,7 +615,7 @@ watch(
 );
 </script>
 
-<style scoped>
+<style>
 .ui-generator {
   display: flex;
   flex-direction: column;

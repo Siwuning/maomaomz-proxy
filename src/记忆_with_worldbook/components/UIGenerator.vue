@@ -620,7 +620,7 @@ watch(
   display: flex;
   flex-direction: column;
   gap: 20px;
-  height: 100%;
+  min-height: 700px;
   padding: 20px;
   background: #1a1a1a;
   border-radius: 12px;
@@ -708,28 +708,10 @@ watch(
 
 .main-content {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 20px;
+  grid-template-columns: minmax(280px, 1fr) minmax(300px, 1.2fr) minmax(350px, 1.5fr);
+  gap: 16px;
   flex: 1;
-  min-height: 500px;
-}
-
-@media (max-width: 1200px) {
-  .main-content {
-    grid-template-columns: 1fr 1fr;
-  }
-  .right-panel {
-    grid-column: span 2;
-  }
-}
-
-@media (max-width: 800px) {
-  .main-content {
-    grid-template-columns: 1fr;
-  }
-  .right-panel {
-    grid-column: span 1;
-  }
+  min-height: 550px;
 }
 
 .left-panel,

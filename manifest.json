@@ -5,10 +5,11 @@
   "optional": [],
   "js": "dist/index.js?v=202412182022",
   "author": "猫猫 (mzrodyu)",
-  "version": "2.0.71",
+  "version": "2.0.72",
   "homePage": "https://github.com/mzrodyu/maomaomz",
   "auto_update": true,
   "changelog": {
+    "2.0.72": "前端界面生成器三列布局优化",
     "2.0.71": "修复前端界面生成器按钮样式和响应式布局",
     "2.0.70": "修复生成器页面背景透明问题",
     "2.0.69": "新功能 - DIY渐变色背景",

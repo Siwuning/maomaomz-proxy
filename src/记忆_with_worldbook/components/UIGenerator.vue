@@ -253,11 +253,20 @@
           <i class="fa-solid fa-eye"></i>
           <span>实时预览</span>
         </div>
-        <div style="flex: 1; background: #f8f9fa; border-radius: 12px; overflow: hidden; border: 2px solid #3a3a5a">
+        <div
+          style="
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid #3a3a5a;
+            min-height: 350px;
+          "
+        >
           <iframe
             v-if="generatedCode"
             :srcdoc="previewHTML"
-            class="preview-iframe"
+            style="width: 100%; height: 100%; min-height: 350px; border: none"
             sandbox="allow-scripts allow-same-origin"
           ></iframe>
           <div v-else class="preview-placeholder">

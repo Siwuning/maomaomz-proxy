@@ -5,10 +5,11 @@
   "optional": [],
   "js": "dist/index.js",
   "author": "猫猫 (mzrodyu)",
-  "version": "2.0.81",
+  "version": "2.0.82",
   "homePage": "https://github.com/mzrodyu/maomaomz",
   "auto_update": true,
   "changelog": {
+    "2.0.82": "前端界面生成器预览区高度修复",
     "2.0.81": "前端界面生成器输入框深色背景",
     "2.0.80": "前端界面生成器按钮样式强制应用",
     "2.0.79": "前端界面生成器布局适配优化",

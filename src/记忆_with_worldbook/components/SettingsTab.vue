@@ -61,6 +61,28 @@
       </div>
 
       <div v-show="expandedSections['api']">
+        <!-- 新手提示卡片 -->
+        <div
+          style="
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.1) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 18px;
+          "
+        >
+          <div style="color: #10b981; font-size: 13px; font-weight: 600; margin-bottom: 8px">
+            <i class="fa-solid fa-circle-info" style="margin-right: 6px"></i>这是什么？怎么配？
+          </div>
+          <div style="color: #94a3b8; font-size: 12px; line-height: 1.7">
+            本插件的<strong style="color: #fbbf24">总结功能</strong>需要调用 AI 接口。有两种方式：<br />
+            <span style="color: #10b981">① 推荐：</span>开启下方「使用酒馆 API」→ 直接用酒馆已配好的接口，<strong
+              >无需额外配置</strong
+            ><br />
+            <span style="color: #60a5fa">② 手动配：</span>关闭开关后手动填写 API 地址和密钥（适合想用不同接口的用户）
+          </div>
+        </div>
+
         <!-- 使用酒馆 API 开关 -->
         <div class="form-group" style="margin-bottom: 18px !important">
           <div

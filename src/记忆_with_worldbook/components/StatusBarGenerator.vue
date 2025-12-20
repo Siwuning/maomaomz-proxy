@@ -335,7 +335,6 @@
               style="
                 position: absolute;
                 top: 100%;
-                left: 0;
                 right: 0;
                 margin-top: 4px;
                 background: #2a2a2a;
@@ -344,6 +343,8 @@
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
                 z-index: 100;
                 overflow: hidden;
+                min-width: 120px;
+                white-space: nowrap;
               "
             >
               <div

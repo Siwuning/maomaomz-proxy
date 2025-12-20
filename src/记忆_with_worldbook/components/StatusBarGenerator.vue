@@ -151,7 +151,7 @@
           border: 1px solid #3a3a3a;
           display: flex;
           flex-direction: column;
-          overflow-y: auto;
+          overflow: visible;
         "
       >
         <h4

@@ -1276,6 +1276,27 @@ const exportRegex = () => {
     );
   });
 
+  // 解决多状态栏冲突：使用 $1 作为 radio name/id 的唯一后缀
+  // 参考 OMEGA 状态栏方案：每条消息的 $1 值不同，确保唯一性
+
+  // 1. 替换 radio input 的 name 和 id，添加 -$1 后缀
+  replaceString = replaceString.replace(
+    /<input\s+type="radio"\s+name="([^"]+)"\s+id="([^"]+)"/g,
+    '<input type="radio" name="$1-$$1" id="$2-$$1"',
+  );
+
+  // 2. 替换 label 的 for 属性，添加 -$1 后缀
+  replaceString = replaceString.replace(/for="(page\d+|tab-\d+|page-\d+)"/g, 'for="$1-$$1"');
+
+  // 3. 将 CSS 中的 #id:checked 选择器改为 input[id^="id-"]:checked
+  replaceString = replaceString.replace(/#(page\d+|tab-\d+|page-\d+):checked/g, 'input[id^="$1-"]:checked');
+
+  // 4. 将 CSS 中的 label[for="id"] 改为 label:nth-of-type(n)
+  replaceString = replaceString.replace(/label\[for="(page\d+|tab-\d+|page-\d+)"\]/g, (_match, id) => {
+    const num = parseInt(id.replace(/\D/g, ''));
+    return `label:nth-of-type(${num + 1})`;
+  });
+
   const uuid = `regex-pageable-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
   const regexData = {

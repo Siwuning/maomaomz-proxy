@@ -896,10 +896,14 @@ function showBannedDialog(message: string): void {
 
 /**
  * 显示授权输入对话框
+ * @param allowSkip 是否允许跳过（验证失败多次后允许用户选择禁用插件）
  */
-function showAuthDialog(): Promise<string | null> {
+function showAuthDialog(allowSkip: boolean = false): Promise<string | null> {
   return new Promise(resolve => {
-    // 创建遮罩层（最高优先级）
+    // 先移除旧的对话框
+    document.getElementById('maomaomz-auth-overlay')?.remove();
+
+    // 创建遮罩层（最高优先级，手机端兼容）
     const overlay = document.createElement('div');
     overlay.id = 'maomaomz-auth-overlay';
     overlay.style.cssText = `
@@ -908,13 +912,18 @@ function showAuthDialog(): Promise<string | null> {
       left: 0;
       right: 0;
       bottom: 0;
+      width: 100%;
+      height: 100%;
       background: rgba(0, 0, 0, 0.92);
       z-index: 9999999 !important;
       display: flex;
       align-items: center;
       justify-content: center;
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       animation: fadeIn 0.3s ease;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
     `;
 
     // 创建对话框

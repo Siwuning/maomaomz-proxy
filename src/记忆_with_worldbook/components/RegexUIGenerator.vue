@@ -1279,22 +1279,44 @@ const exportRegex = () => {
   // 解决多状态栏冲突：使用 $1 作为 radio name/id 的唯一后缀
   // 参考 OMEGA 状态栏方案：每条消息的 $1 值不同，确保唯一性
 
+  // 先提取所有 radio 的 id，用于后续匹配
+  const radioIdMatches = replaceString.match(/<input[^>]+type="radio"[^>]+id="([^"]+)"/g) || [];
+  const radioIds: string[] = [];
+  radioIdMatches.forEach(match => {
+    const idMatch = match.match(/id="([^"]+)"/);
+    if (idMatch) radioIds.push(idMatch[1]);
+  });
+
   // 1. 替换 radio input 的 name 和 id，添加 -$1 后缀
   replaceString = replaceString.replace(
-    /<input\s+type="radio"\s+name="([^"]+)"\s+id="([^"]+)"/g,
-    '<input type="radio" name="$1-$$1" id="$2-$$1"',
+    /<input([^>]*)type="radio"([^>]*)name="([^"]+)"([^>]*)id="([^"]+)"([^>]*)>/g,
+    '<input$1type="radio"$2name="$3-$$1"$4id="$5-$$1"$6>',
+  );
+  // 也处理 id 在 name 前面的情况
+  replaceString = replaceString.replace(
+    /<input([^>]*)type="radio"([^>]*)id="([^"]+)"([^>]*)name="([^"]+)"([^>]*)>/g,
+    '<input$1type="radio"$2id="$3-$$1"$4name="$5-$$1"$6>',
   );
 
-  // 2. 替换 label 的 for 属性，添加 -$1 后缀
-  replaceString = replaceString.replace(/for="(page\d+|tab-\d+|page-\d+)"/g, 'for="$1-$$1"');
+  // 2. 替换 label 的 for 属性，添加 -$1 后缀（基于提取的 radio id）
+  radioIds.forEach(id => {
+    const escapedId = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    replaceString = replaceString.replace(new RegExp(`for="${escapedId}"`, 'g'), `for="${id}-$1"`);
+  });
 
   // 3. 将 CSS 中的 #id:checked 选择器改为 input[id^="id-"]:checked
-  replaceString = replaceString.replace(/#(page\d+|tab-\d+|page-\d+):checked/g, 'input[id^="$1-"]:checked');
+  radioIds.forEach(id => {
+    const escapedId = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    replaceString = replaceString.replace(new RegExp(`#${escapedId}:checked`, 'g'), `input[id^="${id}-"]:checked`);
+  });
 
   // 4. 将 CSS 中的 label[for="id"] 改为 label:nth-of-type(n)
-  replaceString = replaceString.replace(/label\[for="(page\d+|tab-\d+|page-\d+)"\]/g, (_match, id) => {
-    const num = parseInt(id.replace(/\D/g, ''));
-    return `label:nth-of-type(${num + 1})`;
+  radioIds.forEach((id, index) => {
+    const escapedId = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    replaceString = replaceString.replace(
+      new RegExp(`label\\[for="${escapedId}"\\]`, 'g'),
+      `label:nth-of-type(${index + 1})`,
+    );
   });
 
   const uuid = `regex-pageable-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;

@@ -175,18 +175,94 @@
         </div>
 
         <!-- 字段列表 -->
-        <div class="field-list-container">
-          <div
-            v-for="(field, index) in config.fields"
-            :key="index"
-            style="padding: 10px; background: #1e1e1e; border-radius: 6px; border: 1px solid #3a3a3a"
+        <!-- 字段数量统计 -->
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 6px 10px;
+            background: rgba(74, 158, 255, 0.1);
+            border-radius: 6px;
+            border: 1px solid rgba(74, 158, 255, 0.2);
+          "
+        >
+          <span style="color: #4a9eff; font-size: 12px; font-weight: 600">
+            <i class="fa-solid fa-list-ol" style="margin-right: 6px"></i>共 {{ config.fields.length }} 个字段
+          </span>
+          <button
+            style="
+              padding: 4px 10px;
+              background: transparent;
+              border: 1px solid #4a9eff;
+              border-radius: 4px;
+              color: #4a9eff;
+              font-size: 11px;
+              cursor: pointer;
+            "
+            @click="fieldsCollapsed = !fieldsCollapsed"
           >
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px">
-              <span style="color: #4a9eff; font-size: 11px; font-weight: 600">字段 {{ index + 1 }}</span>
+            <i :class="fieldsCollapsed ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-up'"></i>
+            {{ fieldsCollapsed ? '展开' : '收起' }}
+          </button>
+        </div>
+
+        <div v-show="!fieldsCollapsed" class="field-list-container">
+          <div v-for="(field, index) in config.fields" :key="index" class="field-card-compact">
+            <!-- 紧凑单行布局 -->
+            <div style="display: flex; align-items: center; gap: 8px">
+              <span style="color: #4a9eff; font-size: 10px; font-weight: 700; min-width: 24px">#{{ index + 1 }}</span>
+              <input
+                v-model="field.name"
+                type="text"
+                placeholder="字段名"
+                style="
+                  flex: 1;
+                  padding: 5px 8px;
+                  background: #2a2a2a;
+                  border: 1px solid #3a3a3a;
+                  border-radius: 4px;
+                  color: #e0e0e0;
+                  font-size: 11px;
+                  min-width: 0;
+                "
+              />
+              <input
+                v-model="field.label"
+                type="text"
+                placeholder="显示名"
+                style="
+                  flex: 1;
+                  padding: 5px 8px;
+                  background: #2a2a2a;
+                  border: 1px solid #3a3a3a;
+                  border-radius: 4px;
+                  color: #e0e0e0;
+                  font-size: 11px;
+                  min-width: 0;
+                "
+              />
+              <button
+                style="
+                  padding: 5px 8px;
+                  background: #3a3a3a;
+                  border: 1px solid #4a4a4a;
+                  border-radius: 4px;
+                  color: #fff;
+                  font-size: 11px;
+                  cursor: pointer;
+                "
+                title="选择图标"
+                @click="showIconPicker(index)"
+              >
+                <i v-if="field.icon" :class="field.icon"></i>
+                <i v-else class="fa-solid fa-icons" style="opacity: 0.5"></i>
+              </button>
               <button
                 :disabled="config.fields.length <= 1"
                 :style="{
-                  padding: '4px 8px',
+                  padding: '5px 8px',
                   background: '#ef4444',
                   border: 'none',
                   borderRadius: '4px',
@@ -195,73 +271,10 @@
                   cursor: 'pointer',
                   opacity: config.fields.length <= 1 ? 0.4 : 1,
                 }"
+                title="删除字段"
                 @click="removeField(index)"
               >
-                删除
-              </button>
-            </div>
-            <input
-              v-model="field.name"
-              type="text"
-              placeholder="字段名称"
-              style="
-                width: 100%;
-                padding: 6px 10px;
-                background: #2a2a2a;
-                border: 1px solid #3a3a3a;
-                border-radius: 4px;
-                color: #e0e0e0;
-                font-size: 11px;
-                margin-bottom: 6px;
-              "
-            />
-            <input
-              v-model="field.label"
-              type="text"
-              placeholder="显示名称"
-              style="
-                width: 100%;
-                padding: 6px 10px;
-                background: #2a2a2a;
-                border: 1px solid #3a3a3a;
-                border-radius: 4px;
-                color: #e0e0e0;
-                font-size: 11px;
-                margin-bottom: 6px;
-              "
-            />
-            <div style="display: flex; gap: 6px; align-items: center">
-              <input
-                v-model="field.icon"
-                type="text"
-                placeholder="图标类名（可选，如：fa-solid fa-user）"
-                style="
-                  flex: 1;
-                  padding: 6px 10px;
-                  background: #2a2a2a;
-                  border: 1px solid #3a3a3a;
-                  border-radius: 4px;
-                  color: #e0e0e0;
-                  font-size: 11px;
-                  font-family: monospace;
-                "
-              />
-              <button
-                style="
-                  padding: 6px 10px;
-                  background: #3a3a3a;
-                  border: 1px solid #4a4a4a;
-                  border-radius: 4px;
-                  color: #fff;
-                  font-size: 12px;
-                  cursor: pointer;
-                  min-width: 36px;
-                "
-                title="选择图标"
-                @click="showIconPicker(index)"
-              >
-                <i v-if="field.icon" :class="field.icon"></i>
-                <i v-else class="fa-solid fa-icons"></i>
+                <i class="fa-solid fa-trash"></i>
               </button>
             </div>
           </div>
@@ -1372,6 +1385,9 @@ const isGeneratingFields = ref(false);
 // 下拉菜单状态
 const showTemplateMenu = ref(false);
 const showAiFieldMenu = ref(false);
+
+// 字段列表折叠状态
+const fieldsCollapsed = ref(false);
 
 // 点击外部关闭下拉菜单
 const closeDropdowns = (e: MouseEvent) => {
@@ -3514,11 +3530,25 @@ function getSafeMaxTokens(requested: number): number {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   margin-bottom: 15px;
   overflow-y: auto;
-  max-height: 400px;
+  max-height: 50vh;
   padding-right: 4px;
+}
+
+/* 紧凑字段卡片 */
+.field-card-compact {
+  padding: 8px 10px;
+  background: #1e1e1e;
+  border-radius: 6px;
+  border: 1px solid #3a3a3a;
+  transition: all 0.15s ease;
+}
+
+.field-card-compact:hover {
+  border-color: #4a9eff;
+  background: #252525;
 }
 
 /* 响应式布局 */

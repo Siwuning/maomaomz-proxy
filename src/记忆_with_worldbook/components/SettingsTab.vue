@@ -431,10 +431,10 @@
               <button
                 style="
                   padding: 8px 16px;
-                  background: linear-gradient(135deg, #4a9eff 0%, #357abd 100%);
-                  border: none;
-                  border-radius: 8px;
-                  color: white;
+                  background: rgba(30, 41, 59, 0.5);
+                  border: 1px solid #4a4a4a;
+                  border-radius: 6px;
+                  color: #e0e0e0;
                   font-size: 12px;
                   cursor: pointer;
                   transition: all 0.2s;
@@ -442,14 +442,8 @@
                   align-items: center;
                   gap: 6px;
                 "
-                onmouseover="
-                  this.style.transform = 'translateY(-2px)';
-                  this.style.boxShadow = '0 4px 12px rgba(74, 158, 255, 0.4)';
-                "
-                onmouseout="
-                  this.style.transform = 'translateY(0)';
-                  this.style.boxShadow = 'none';
-                "
+                @mouseenter="$event.target.style.background = 'rgba(40, 51, 69, 0.7)'"
+                @mouseleave="$event.target.style.background = 'rgba(30, 41, 59, 0.5)'"
                 @click="showSaveTemplateDialog = true"
               >
                 <i class="fa-solid fa-plus"></i>
@@ -992,18 +986,21 @@
             <button
               style="
                 padding: 10px 18px;
-                background: #3b82f6;
-                border: none;
+                background: rgba(30, 41, 59, 0.5);
+                border: 1px solid #4a4a4a;
                 border-radius: 6px;
-                color: white;
+                color: #e0e0e0;
                 font-size: 14px;
                 font-weight: 500;
                 cursor: pointer;
                 display: flex;
                 align-items: center;
                 gap: 6px;
+                transition: all 0.2s;
               "
               @click="handleSaveSettings"
+              @mouseenter="$event.target.style.background = 'rgba(40, 51, 69, 0.7)'"
+              @mouseleave="$event.target.style.background = 'rgba(30, 41, 59, 0.5)'"
             >
               <i class="fa-solid fa-floppy-disk"></i> 保存设置
             </button>
@@ -1223,18 +1220,21 @@
             :disabled="is_summarizing"
             style="
               padding: 10px 18px;
-              background: #3b82f6;
-              border: none;
+              background: rgba(30, 41, 59, 0.5);
+              border: 1px solid #4a4a4a;
               border-radius: 6px;
-              color: white;
+              color: #e0e0e0;
               font-size: 14px;
               font-weight: 500;
               cursor: pointer;
               display: flex;
               align-items: center;
               gap: 6px;
+              transition: all 0.2s;
             "
             @click="handle_summarize"
+            @mouseenter="$event.target.style.background = 'rgba(40, 51, 69, 0.7)'"
+            @mouseleave="$event.target.style.background = 'rgba(30, 41, 59, 0.5)'"
           >
             <i v-if="!is_summarizing" class="fa-solid fa-magic"></i>
             <i v-else class="fa-solid fa-spinner fa-spin"></i>
@@ -1546,18 +1546,21 @@
             :disabled="is_generating_table || !settings.api_key"
             style="
               padding: 10px 18px;
-              background: #3b82f6;
-              border: none;
+              background: rgba(30, 41, 59, 0.5);
+              border: 1px solid #4a4a4a;
               border-radius: 6px;
-              color: white;
+              color: #e0e0e0;
               font-size: 14px;
               font-weight: 500;
               cursor: pointer;
               display: flex;
               align-items: center;
               gap: 6px;
+              transition: all 0.2s;
             "
             @click="handle_generate_table"
+            @mouseenter="$event.target.style.background = 'rgba(40, 51, 69, 0.7)'"
+            @mouseleave="$event.target.style.background = 'rgba(30, 41, 59, 0.5)'"
           >
             <i v-if="!is_generating_table" class="fa-solid fa-robot"></i>
             <i v-else class="fa-solid fa-spinner fa-spin"></i>
@@ -1657,18 +1660,21 @@
           <button
             style="
               padding: 10px 18px;
-              background: #3b82f6;
-              border: none;
+              background: rgba(30, 41, 59, 0.5);
+              border: 1px solid #4a4a4a;
               border-radius: 6px;
-              color: white;
+              color: #e0e0e0;
               font-size: 14px;
               font-weight: 500;
               cursor: pointer;
               display: flex;
               align-items: center;
               gap: 6px;
+              transition: all 0.2s;
             "
             @click="handle_hide_messages"
+            @mouseenter="$event.target.style.background = 'rgba(40, 51, 69, 0.7)'"
+            @mouseleave="$event.target.style.background = 'rgba(30, 41, 59, 0.5)'"
           >
             <i class="fa-solid fa-eye-slash"></i> 隐藏楼层
           </button>

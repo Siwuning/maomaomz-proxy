@@ -1,6 +1,6 @@
 {
   "name": "maomaomz-sillytavern-tools",
-  "version": "2.0.124",
+  "version": "2.0.125",
   "scripts": {
     "build": "vite build",
     "watch": "vite build --watch --mode development",

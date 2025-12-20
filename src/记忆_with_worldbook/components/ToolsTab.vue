@@ -3753,16 +3753,18 @@
               :disabled="!batchInput.trim()"
               style="
                 padding: 10px 20px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                border: none;
+                background: rgba(30, 41, 59, 0.5);
+                border: 1px solid #4a4a4a;
                 border-radius: 6px;
-                color: white;
+                color: #e0e0e0;
                 font-size: 13px;
                 cursor: pointer;
-                opacity: 1;
+                transition: all 0.2s;
               "
               :style="{ opacity: !batchInput.trim() ? 0.5 : 1 }"
               @click="handleBatchGenerate"
+              @mouseenter="$event.target.style.background = 'rgba(40, 51, 69, 0.7)'"
+              @mouseleave="$event.target.style.background = 'rgba(30, 41, 59, 0.5)'"
             >
               <i class="fa-solid fa-magic" style="margin-right: 6px"></i>
               开始批量生成
@@ -3771,14 +3773,17 @@
               v-if="!isBatchGenerating && batchResults.length > 0"
               style="
                 padding: 10px 20px;
-                background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
-                border: none;
+                background: rgba(30, 41, 59, 0.5);
+                border: 1px solid #4a4a4a;
                 border-radius: 6px;
-                color: white;
+                color: #e0e0e0;
                 font-size: 13px;
                 cursor: pointer;
+                transition: all 0.2s;
               "
               @click="handleBatchInsert"
+              @mouseenter="$event.target.style.background = 'rgba(40, 51, 69, 0.7)'"
+              @mouseleave="$event.target.style.background = 'rgba(30, 41, 59, 0.5)'"
             >
               <i class="fa-solid fa-plus" style="margin-right: 6px"></i>
               全部插入到世界书
@@ -3787,14 +3792,17 @@
               v-if="!isBatchGenerating && batchResults.length > 0"
               style="
                 padding: 10px 20px;
-                background: #dc3545;
-                border: none;
+                background: rgba(30, 41, 59, 0.5);
+                border: 1px solid #4a4a4a;
                 border-radius: 6px;
-                color: white;
+                color: #e0e0e0;
                 font-size: 13px;
                 cursor: pointer;
+                transition: all 0.2s;
               "
               @click="clearBatchResults"
+              @mouseenter="$event.target.style.background = 'rgba(40, 51, 69, 0.7)'"
+              @mouseleave="$event.target.style.background = 'rgba(30, 41, 59, 0.5)'"
             >
               <i class="fa-solid fa-trash" style="margin-right: 6px"></i>
               清空
@@ -3803,14 +3811,17 @@
               v-if="isBatchGenerating"
               style="
                 padding: 10px 20px;
-                background: linear-gradient(135deg, #4a9eff 0%, #667eea 100%);
-                border: none;
+                background: rgba(30, 41, 59, 0.5);
+                border: 1px solid #4a4a4a;
                 border-radius: 6px;
-                color: white;
+                color: #e0e0e0;
                 font-size: 13px;
                 cursor: pointer;
+                transition: all 0.2s;
               "
               @click="minimizeBatchDialog"
+              @mouseenter="$event.target.style.background = 'rgba(40, 51, 69, 0.7)'"
+              @mouseleave="$event.target.style.background = 'rgba(30, 41, 59, 0.5)'"
             >
               <i class="fa-solid fa-window-minimize" style="margin-right: 6px"></i>
               后台运行
@@ -3819,14 +3830,17 @@
               v-if="!isBatchGenerating"
               style="
                 padding: 10px 20px;
-                background: #3a3a3a;
-                border: none;
+                background: rgba(30, 41, 59, 0.5);
+                border: 1px solid #4a4a4a;
                 border-radius: 6px;
-                color: #ccc;
+                color: #e0e0e0;
                 font-size: 13px;
                 cursor: pointer;
+                transition: all 0.2s;
               "
               @click="closeBatchDialog"
+              @mouseenter="$event.target.style.background = 'rgba(40, 51, 69, 0.7)'"
+              @mouseleave="$event.target.style.background = 'rgba(30, 41, 59, 0.5)'"
             >
               {{ batchResults.length > 0 ? '关闭' : '取消' }}
             </button>

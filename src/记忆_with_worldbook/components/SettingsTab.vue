@@ -325,6 +325,39 @@
                 >
                   💾 保存配置
                 </button>
+                <button
+                  :disabled="testingApi"
+                  class="test-button"
+                  style="
+                    flex: 1;
+                    min-width: 120px;
+                    padding: 12px 16px;
+                    border: none;
+                    border-radius: 12px;
+                    cursor: pointer;
+                    font-weight: 500;
+                    font-size: 13px;
+                    transition: all 0.2s;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 6px;
+                    background: #f59e0b;
+                    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+                    color: white;
+                  "
+                  onmouseover="
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.4)';
+                  "
+                  onmouseout="
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 2px 8px rgba(245, 158, 11, 0.3)';
+                  "
+                  @click="testApiConnection"
+                >
+                  {{ testingApi ? '测试中...' : '🔗 测试连接' }}
+                </button>
               </div>
             </div>
             <input
@@ -688,6 +721,48 @@
       </div>
 
       <div v-show="expandedSections['autoSummary']">
+        <!-- 总结状态显示 -->
+        <div
+          v-if="currentSummaryTask"
+          style="
+            margin-bottom: 18px;
+            padding: 14px 16px;
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 10px;
+          "
+        >
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px">
+            <i
+              :class="currentSummaryTask.status === 'running' ? 'fa-spinner fa-spin' : 'fa-check-circle'"
+              class="fa-solid"
+              :style="{
+                color: currentSummaryTask.status === 'running' ? '#fbbf24' : '#51cf66',
+                fontSize: '16px',
+              }"
+            ></i>
+            <span style="color: #fbbf24; font-size: 13px; font-weight: 600">
+              {{ currentSummaryTask.status === 'running' ? '正在总结...' : '总结完成' }}
+            </span>
+          </div>
+          <div style="color: #e0e0e0; font-size: 12px; line-height: 1.6">
+            <div>{{ currentSummaryTask.message }}</div>
+            <div v-if="currentSummaryTask.status === 'running'" style="margin-top: 8px">
+              <div style="height: 4px; background: rgba(251, 191, 36, 0.2); border-radius: 2px; overflow: hidden">
+                <div
+                  :style="{
+                    width: currentSummaryTask.progress + '%',
+                    height: '100%',
+                    background: 'linear-gradient(90deg, #fbbf24, #f59e0b)',
+                    borderRadius: '2px',
+                    transition: 'width 0.3s ease',
+                  }"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="form-group" style="margin-bottom: 18px !important">
           <label
             class="checkbox-label"
@@ -724,6 +799,52 @@
             选择不同风格会影响总结的详细程度和表达方式
           </small>
         </div>
+
+        <!-- 自定义提示词模板 -->
+        <div class="form-group" style="margin-bottom: 18px !important">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px">
+            <label style="color: #ccc; font-size: 13px">
+              自定义提示词模板
+              <span style="color: #888; font-size: 11px; margin-left: 6px">(可选)</span>
+            </label>
+            <button
+              v-if="settings.custom_summary_prompt"
+              style="
+                padding: 4px 10px;
+                background: rgba(239, 68, 68, 0.2);
+                border: 1px solid rgba(239, 68, 68, 0.4);
+                border-radius: 4px;
+                color: #ef4444;
+                font-size: 11px;
+                cursor: pointer;
+              "
+              @click="settings.custom_summary_prompt = ''"
+            >
+              清空
+            </button>
+          </div>
+          <textarea
+            v-model="settings.custom_summary_prompt"
+            placeholder="留空使用默认模板。可用变量：&#10;{{messages}} - 对话内容&#10;{{userName}} - 用户名&#10;{{charName}} - 角色名&#10;{{maxTokens}} - 最大字数"
+            style="
+              width: 100%;
+              min-height: 120px;
+              padding: 12px;
+              background: #2a2a2a;
+              border: 1px solid #3a3a3a;
+              border-radius: 6px;
+              color: #e0e0e0;
+              font-size: 12px;
+              font-family: monospace;
+              line-height: 1.5;
+              resize: vertical;
+            "
+          ></textarea>
+          <small style="color: #888; font-size: 11px; margin-top: 6px; display: block; line-height: 1.6">
+            💡 自定义总结提示词，留空使用内置模板。支持变量替换，AI 将按此格式生成总结。
+          </small>
+        </div>
+
         <div v-if="settings.auto_summarize_enabled" class="form-group" style="margin-bottom: 18px !important">
           <label style="display: block; margin-bottom: 6px; color: #ccc; font-size: 13px">每多少楼层总结一次</label>
           <input
@@ -1645,6 +1766,18 @@ watch(
 const summaryHistoryStore = useSummaryHistoryStore();
 const taskStore = useTaskStore();
 
+// 获取当前正在进行的总结任务
+const currentSummaryTask = computed(() => {
+  const tasks = taskStore.tasks;
+  // 找到最近的总结任务（正在运行或刚完成的）
+  const summaryTask = tasks.find(
+    t =>
+      t.type === 'summary' &&
+      (t.status === 'running' || (t.status === 'completed' && Date.now() - (t.endTime || 0) < 5000)),
+  );
+  return summaryTask || null;
+});
+
 // 检查 API 配置是否有效（本地端点或本地反代提供商不需要 API Key）
 const isApiConfigValid = () =>
   checkApiConfig(settings.value.api_endpoint, settings.value.api_key, settings.value.api_provider);
@@ -1699,6 +1832,94 @@ interface ApiTemplate {
 const apiTemplates = ref<ApiTemplate[]>([]);
 const showSaveTemplateDialog = ref(false);
 const newTemplateName = ref('');
+
+// API 测试相关
+const testingApi = ref(false);
+
+// 测试 API 连接
+const testApiConnection = async () => {
+  if (testingApi.value) return;
+
+  // 检查配置
+  if (!settings.value.use_tavern_api && !isApiConfigValid()) {
+    window.toastr.warning(getApiConfigError(settings.value.api_endpoint));
+    return;
+  }
+
+  testingApi.value = true;
+  window.toastr.info('🔗 正在测试 API 连接...');
+
+  try {
+    // 构建测试请求
+    let endpoint = '';
+    let apiKey = '';
+    let model = '';
+
+    if (settings.value.use_tavern_api) {
+      // 使用酒馆 API
+      const config = getTavernApiConfigForDisplay();
+      endpoint = config.url;
+      apiKey = config.key;
+      model = config.model || 'gpt-4o-mini';
+    } else {
+      // 使用独立配置
+      endpoint = settings.value.api_endpoint;
+      apiKey = settings.value.api_key;
+      model = settings.value.model || 'gpt-4o-mini';
+    }
+
+    // 标准化端点
+    if (!endpoint.endsWith('/chat/completions')) {
+      endpoint = endpoint.replace(/\/+$/, '') + '/chat/completions';
+    }
+
+    const startTime = Date.now();
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [{ role: 'user', content: '你好，这是一条测试消息，请回复"测试成功"' }],
+        max_tokens: 20,
+        temperature: 0.1,
+      }),
+    });
+
+    const elapsed = Date.now() - startTime;
+
+    if (response.ok) {
+      const data = await response.json();
+      const reply = data.choices?.[0]?.message?.content || '(无回复内容)';
+      window.toastr.success(`✅ API 连接成功！(${elapsed}ms)\n模型: ${model}\n回复: ${reply.substring(0, 50)}...`);
+      console.log('✅ API 测试成功:', { elapsed, model, reply });
+    } else {
+      const errorText = await response.text();
+      let errorMsg = `HTTP ${response.status}`;
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorMsg = errorJson.error?.message || errorJson.message || errorText.substring(0, 100);
+      } catch {
+        errorMsg = errorText.substring(0, 100);
+      }
+      window.toastr.error(`❌ API 连接失败: ${errorMsg}`);
+      console.error('❌ API 测试失败:', { status: response.status, error: errorText });
+    }
+  } catch (error) {
+    const errMsg = error instanceof Error ? error.message : String(error);
+    if (errMsg.includes('Failed to fetch') || errMsg.includes('NetworkError')) {
+      window.toastr.error('❌ 网络错误：无法连接到 API 端点\n请检查端点地址是否正确，或是否存在 CORS 问题');
+    } else {
+      window.toastr.error(`❌ 测试失败: ${errMsg}`);
+    }
+    console.error('❌ API 测试异常:', error);
+  } finally {
+    testingApi.value = false;
+  }
+};
 
 // 加载 API 模板列表
 const loadApiTemplates = () => {

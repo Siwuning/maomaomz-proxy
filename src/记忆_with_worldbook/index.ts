@@ -12,6 +12,7 @@ import { summarizeMessages } from './总结功能';
 // 导入 zod 并立即暴露到全局作用域，避免与其他插件（如 QuickReply）冲突
 // 这必须在其他插件初始化之前执行
 import { z } from 'zod';
+import { useTaskStore } from './taskStore';
 
 // 确保 zod 在全局作用域中可用，避免与其他插件（如 QuickReply）冲突
 // 在插件初始化之前就暴露，确保其他插件可以访问
@@ -293,6 +294,19 @@ $(() => {
             // 🔒 设置锁
             isSummarizing = true;
 
+            // 创建任务来跟踪进度
+            const taskStore = useTaskStore();
+            const taskId = taskStore.createTask('summary', `自动总结 楼层 ${start_id}-${end_id}`);
+            taskStore.updateTask(taskId, {
+              status: 'running',
+              progress: 10,
+              message: `正在总结楼层 ${start_id}-${end_id}...`,
+              details: [
+                `开始时间: ${new Date().toLocaleTimeString()}`,
+                `总结范围: 第 ${start_id} 层 ~ 第 ${end_id} 层`,
+              ],
+            });
+
             // 异步执行总结
             console.log(`🎯 触发自动总结: 楼层 ${start_id}-${end_id}`);
             window.toastr.info(`🔄 开始自动总结楼层 ${start_id}-${end_id}...`);
@@ -300,6 +314,16 @@ $(() => {
             summarizeMessages(start_id, end_id)
               .then(async summary => {
                 console.log(`✅ 自动总结完成: 楼层 ${start_id}-${end_id}`, summary);
+                taskStore.updateTask(taskId, {
+                  status: 'completed',
+                  progress: 100,
+                  message: `总结完成！`,
+                  details: [
+                    `完成时间: ${new Date().toLocaleTimeString()}`,
+                    `总结范围: 第 ${start_id} 层 ~ 第 ${end_id} 层`,
+                  ],
+                  result: summary.substring(0, 100) + '...',
+                });
 
                 // 添加到历史总结中
                 try {
@@ -489,6 +513,12 @@ $(() => {
               .catch(error => {
                 console.error('❌ 自动总结失败：', error);
                 window.toastr.error('❌ 自动总结失败：' + error.message);
+                taskStore.updateTask(taskId, {
+                  status: 'failed',
+                  progress: 0,
+                  message: `总结失败`,
+                  error: error.message,
+                });
               })
               .finally(() => {
                 // 🔒 释放锁

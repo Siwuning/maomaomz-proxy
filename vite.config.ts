@@ -94,6 +94,32 @@ export default defineConfig(({ mode }) => ({
         chunkFileNames: '[name].[hash].chunk.js',
         assetFileNames: '[name].[ext]',
         preserveModules: false,
+        manualChunks: id => {
+          // Vue 核心库单独打包
+          if (id.includes('node_modules/@vue/') || id.includes('node_modules/vue/')) {
+            return 'vue-vendor';
+          }
+          // Pinia 单独打包
+          if (id.includes('node_modules/pinia')) {
+            return 'pinia-vendor';
+          }
+          // VueUse 单独打包
+          if (id.includes('node_modules/@vueuse/')) {
+            return 'vueuse-vendor';
+          }
+          // Zod 验证库
+          if (id.includes('node_modules/zod')) {
+            return 'zod-vendor';
+          }
+          // vue-final-modal
+          if (id.includes('vue-final-modal')) {
+            return 'modal-vendor';
+          }
+          // klona
+          if (id.includes('node_modules/klona')) {
+            return 'utils-vendor';
+          }
+        },
       },
     },
 

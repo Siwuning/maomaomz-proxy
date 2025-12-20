@@ -456,6 +456,98 @@
       </div>
     </div>
 
+    <!-- 数据备份 -->
+    <div
+      style="
+        background: linear-gradient(135deg, #2a3a4a 0%, #3a4a5a 100%);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(84, 107, 131, 0.3);
+      "
+    >
+      <h4 style="color: #fff; margin: 0 0 15px 0; font-size: 16px; display: flex; align-items: center; gap: 8px">
+        <i class="fa-solid fa-database" style="color: #60a5fa"></i>
+        数据备份
+      </h4>
+
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 15px;
+          background: #1e1e1e;
+          border-radius: 8px;
+          margin-bottom: 12px;
+        "
+      >
+        <div style="flex: 1">
+          <div style="color: #e0e0e0; font-size: 14px; font-weight: 500; margin-bottom: 4px">导出数据</div>
+          <div style="color: #888; font-size: 12px">导出所有设置、总结历史和偏好配置到 JSON 文件</div>
+        </div>
+        <button
+          style="
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+          "
+          @click="exportData"
+        >
+          <i class="fa-solid fa-download"></i>
+          导出
+        </button>
+      </div>
+
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 15px;
+          background: #1e1e1e;
+          border-radius: 8px;
+          margin-bottom: 12px;
+        "
+      >
+        <div style="flex: 1">
+          <div style="color: #e0e0e0; font-size: 14px; font-weight: 500; margin-bottom: 4px">导入数据</div>
+          <div style="color: #888; font-size: 12px">从 JSON 文件恢复设置和数据（会覆盖现有配置）</div>
+        </div>
+        <label
+          style="
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+          "
+        >
+          <i class="fa-solid fa-upload"></i>
+          导入
+          <input type="file" accept=".json" style="display: none" @change="importData" />
+        </label>
+      </div>
+
+      <div style="color: #666; font-size: 11px; padding: 0 5px">
+        💡 提示：定期备份数据可以防止数据丢失。导入时会覆盖现有配置，请谨慎操作。
+      </div>
+    </div>
+
     <!-- 重置按钮 -->
     <div style="display: flex; justify-content: flex-end; gap: 10px">
       <button
@@ -719,6 +811,118 @@ const clearBackground = () => {
   preferences.backgroundImage = '';
   savePreferences();
   (window as any).toastr?.info('背景图片已清除');
+};
+
+// 导出数据
+const exportData = () => {
+  try {
+    const exportObj: Record<string, any> = {
+      exportTime: new Date().toISOString(),
+      version: '2.0',
+      data: {},
+    };
+
+    // 收集所有 maomaomz 相关的 localStorage 数据
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (key.includes('maomaomz') || key.includes('tavern_helper') || key.includes('maomao'))) {
+        try {
+          const value = localStorage.getItem(key);
+          if (value) {
+            // 尝试解析 JSON，如果失败则保存原始字符串
+            try {
+              exportObj.data[key] = JSON.parse(value);
+            } catch {
+              exportObj.data[key] = value;
+            }
+          }
+        } catch (e) {
+          console.warn(`跳过无法读取的键: ${key}`);
+        }
+      }
+    }
+
+    // 生成文件名
+    const date = new Date();
+    const fileName = `maomaomz_backup_${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}_${String(date.getHours()).padStart(2, '0')}${String(date.getMinutes()).padStart(2, '0')}.json`;
+
+    // 创建下载
+    const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    const keyCount = Object.keys(exportObj.data).length;
+    (window as any).toastr?.success(`✅ 数据导出成功！共 ${keyCount} 项配置`);
+  } catch (error) {
+    console.error('导出数据失败:', error);
+    (window as any).toastr?.error('❌ 导出失败: ' + (error as Error).message);
+  }
+};
+
+// 导入数据
+const importData = (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const content = e.target?.result as string;
+      const importObj = JSON.parse(content);
+
+      // 验证文件格式
+      if (!importObj.data || typeof importObj.data !== 'object') {
+        throw new Error('无效的备份文件格式');
+      }
+
+      // 确认导入
+      const keyCount = Object.keys(importObj.data).length;
+      const exportTime = importObj.exportTime ? new Date(importObj.exportTime).toLocaleString() : '未知';
+
+      if (
+        !confirm(`确定要导入此备份吗？\n\n备份时间: ${exportTime}\n配置项数: ${keyCount}\n\n⚠️ 导入将覆盖现有配置！`)
+      ) {
+        return;
+      }
+
+      // 导入数据
+      let successCount = 0;
+      for (const [key, value] of Object.entries(importObj.data)) {
+        try {
+          const valueStr = typeof value === 'string' ? value : JSON.stringify(value);
+          localStorage.setItem(key, valueStr);
+          successCount++;
+        } catch (e) {
+          console.warn(`导入键失败: ${key}`, e);
+        }
+      }
+
+      // 重新加载偏好设置
+      loadPreferences();
+
+      (window as any).toastr?.success(`✅ 数据导入成功！已恢复 ${successCount} 项配置\n请刷新页面以应用所有更改`);
+
+      // 提示刷新
+      setTimeout(() => {
+        if (confirm('是否立即刷新页面以应用所有更改？')) {
+          window.location.reload();
+        }
+      }, 500);
+    } catch (error) {
+      console.error('导入数据失败:', error);
+      (window as any).toastr?.error('❌ 导入失败: ' + (error as Error).message);
+    }
+  };
+
+  reader.readAsText(file);
+  input.value = ''; // 清空 input 以便再次选择
 };
 
 // 组件挂载时加载

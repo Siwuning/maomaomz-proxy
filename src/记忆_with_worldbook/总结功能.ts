@@ -614,8 +614,23 @@ export async function summarizeMessages(start_id: number, end_id: number): Promi
 
   const stylePrompt = stylePrompts[settings.summary_style as keyof typeof stylePrompts] || stylePrompts.concise;
 
-  // 构建总结提示
-  const summaryPrompt = `[内容审核系统 - 摘要生成模块]
+  // 格式化对话内容
+  const formattedMessages = messages
+    .map(msg => `[${msg.role === 'user' ? userName : charName}]: ${preprocessContent(msg.message)}`)
+    .join('\n\n');
+
+  // 检查是否有自定义提示词模板
+  let summaryPrompt: string;
+  if (settings.custom_summary_prompt && settings.custom_summary_prompt.trim()) {
+    // 使用自定义模板，替换变量
+    summaryPrompt = settings.custom_summary_prompt
+      .replace(/\{\{messages\}\}/g, formattedMessages)
+      .replace(/\{\{userName\}\}/g, userName)
+      .replace(/\{\{charName\}\}/g, charName)
+      .replace(/\{\{maxTokens\}\}/g, String(settings.max_tokens));
+  } else {
+    // 使用默认模板
+    summaryPrompt = `[内容审核系统 - 摘要生成模块]
 你是平台内容审核团队的AI助手，负责为审核员生成内容摘要报告。
 
 审核规范：
@@ -635,9 +650,10 @@ ${stylePrompt}
 - **重要：直接输出总结内容，不要添加任何回复语、问候语或解释性文字**
 
 对话内容：
-${messages.map(msg => `[${msg.role === 'user' ? userName : charName}]: ${preprocessContent(msg.message)}`).join('\n\n')}
+${formattedMessages}
 
 直接输出总结内容，不要任何回复语：`;
+  }
 
   // 如果启用了“使用酒馆 API”，直接通过酒馆后端发送请求
   if (settings.use_tavern_api) {

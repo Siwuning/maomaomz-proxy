@@ -334,6 +334,7 @@ const Settings = z.object({
   table_end_message_id: z.number().default(0), // 结束生成表格的楼层
   show_minimize_icon: z.boolean().default(true), // 是否显示最小化图标
   summary_style: z.enum(['concise', 'detailed', 'narrative']).default('concise'), // 总结风格
+  custom_summary_prompt: z.string().default(''), // 自定义总结提示词模板（空则使用默认）
   summary_history: z
     .array(
       z.object({

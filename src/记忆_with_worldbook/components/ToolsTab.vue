@@ -265,73 +265,45 @@
           </div>
         </div>
 
-        <div class="button-group" style="display: flex; gap: 12px; margin-bottom: 20px">
+        <div class="button-group" style="display: flex; gap: 10px; margin-bottom: 20px">
           <button
-            class="process-button"
             :disabled="isProcessingAntiCliche || !antiClicheInput.trim()"
             style="
-              padding: 12px 24px;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              padding: 10px 18px;
+              background: #3b82f6;
               border: none;
-              border-radius: 12px;
+              border-radius: 6px;
               color: white;
-              font-size: 13px;
-              font-weight: 600;
+              font-size: 14px;
+              font-weight: 500;
               cursor: pointer;
-              transition: all 0.3s ease;
-              box-shadow: 0 3px 12px rgba(102, 126, 234, 0.3);
-              position: relative;
-              overflow: hidden;
+              display: flex;
+              align-items: center;
+              gap: 6px;
             "
             @click="handleAntiClicheProcess"
           >
-            <div
-              style="
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-                transition: left 0.5s;
-              "
-              class="shimmer-effect"
-            ></div>
-            <i class="fa-solid fa-magic" style="font-size: 14px; margin-right: 6px"></i>
+            <i class="fa-solid fa-magic"></i>
             {{ isProcessingAntiCliche ? '处理中...' : '开始清理' }}
           </button>
 
           <button
-            class="clear-button"
             style="
-              padding: 12px 24px;
-              background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-              border: none;
-              border-radius: 12px;
-              color: white;
-              font-size: 13px;
-              font-weight: 600;
+              padding: 10px 18px;
+              background: rgba(30, 41, 59, 0.5);
+              border: 1px solid #4a4a4a;
+              border-radius: 6px;
+              color: #e0e0e0;
+              font-size: 14px;
+              font-weight: 500;
               cursor: pointer;
-              transition: all 0.3s ease;
-              box-shadow: 0 3px 12px rgba(255, 107, 107, 0.3);
-              position: relative;
-              overflow: hidden;
+              display: flex;
+              align-items: center;
+              gap: 6px;
             "
             @click="clearAntiClicheForm"
           >
-            <div
-              style="
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-                transition: left 0.5s;
-              "
-              class="shimmer-effect"
-            ></div>
-            <i class="fa-solid fa-trash" style="font-size: 14px; margin-right: 6px"></i>
+            <i class="fa-solid fa-trash"></i>
             清空
           </button>
         </div>

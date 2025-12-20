@@ -279,30 +279,20 @@
               />
               <button
                 style="
-                  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+                  background: #3b82f6;
                   border: none;
                   color: white;
-                  padding: 8px 16px;
+                  padding: 8px 14px;
                   border-radius: 6px;
                   cursor: pointer;
-                  transition: all 0.2s ease;
                   display: flex;
                   align-items: center;
                   gap: 6px;
                   font-size: 13px;
-                  font-weight: 600;
-                  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+                  font-weight: 500;
                 "
                 title="根据开场白内容自动生成描述"
                 @click="generateDescription(index)"
-                @mouseenter="
-                  ($event.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
-                  ($event.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(251, 191, 36, 0.5)';
-                "
-                @mouseleave="
-                  ($event.currentTarget as HTMLElement).style.transform = 'translateY(0)';
-                  ($event.currentTarget as HTMLElement).style.boxShadow = '0 2px 8px rgba(251, 191, 36, 0.3)';
-                "
               >
                 <i class="fa-solid fa-wand-magic-sparkles"></i>
                 <span>AI 生成描述</span>
@@ -310,30 +300,20 @@
               <button
                 v-if="greeting.description"
                 style="
-                  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-                  border: none;
-                  color: white;
-                  padding: 8px 16px;
+                  background: rgba(30, 41, 59, 0.5);
+                  border: 1px solid #4a4a4a;
+                  color: #e0e0e0;
+                  padding: 8px 14px;
                   border-radius: 6px;
                   cursor: pointer;
-                  transition: all 0.2s ease;
                   display: flex;
                   align-items: center;
                   gap: 6px;
                   font-size: 13px;
-                  font-weight: 600;
-                  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+                  font-weight: 500;
                 "
                 title="根据需求修改已有描述"
                 @click="editDescription(index)"
-                @mouseenter="
-                  ($event.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
-                  ($event.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.5)';
-                "
-                @mouseleave="
-                  ($event.currentTarget as HTMLElement).style.transform = 'translateY(0)';
-                  ($event.currentTarget as HTMLElement).style.boxShadow = '0 2px 8px rgba(59, 130, 246, 0.3)';
-                "
               >
                 <i class="fa-solid fa-edit"></i>
                 <span>AI 编辑描述</span>
@@ -405,60 +385,40 @@
         >
           <button
             style="
-              padding: 15px 35px;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              padding: 10px 18px;
+              background: #3b82f6;
               border: none;
-              border-radius: 10px;
+              border-radius: 6px;
               color: white;
-              font-size: 15px;
-              font-weight: 600;
+              font-size: 14px;
+              font-weight: 500;
               cursor: pointer;
-              transition: all 0.3s ease;
               display: flex;
               align-items: center;
-              gap: 10px;
-              box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+              gap: 6px;
             "
             @click="generateFrontendCode"
-            @mouseenter="
-              ($event.currentTarget as HTMLElement).style.transform = 'translateY(-3px)';
-              ($event.currentTarget as HTMLElement).style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.6)';
-            "
-            @mouseleave="
-              ($event.currentTarget as HTMLElement).style.transform = 'translateY(0)';
-              ($event.currentTarget as HTMLElement).style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
-            "
           >
-            <i class="fa-solid fa-code" style="font-size: 16px"></i>
+            <i class="fa-solid fa-code"></i>
             生成HTML代码
           </button>
           <button
             style="
-              padding: 15px 35px;
-              background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-              border: none;
-              border-radius: 10px;
-              color: white;
-              font-size: 15px;
-              font-weight: 600;
+              padding: 10px 18px;
+              background: rgba(30, 41, 59, 0.5);
+              border: 1px solid #4a4a4a;
+              border-radius: 6px;
+              color: #e0e0e0;
+              font-size: 14px;
+              font-weight: 500;
               cursor: pointer;
-              transition: all 0.3s ease;
               display: flex;
               align-items: center;
-              gap: 10px;
-              box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+              gap: 6px;
             "
             @click="downloadAsJson"
-            @mouseenter="
-              ($event.currentTarget as HTMLElement).style.transform = 'translateY(-3px)';
-              ($event.currentTarget as HTMLElement).style.boxShadow = '0 6px 20px rgba(16, 185, 129, 0.6)';
-            "
-            @mouseleave="
-              ($event.currentTarget as HTMLElement).style.transform = 'translateY(0)';
-              ($event.currentTarget as HTMLElement).style.boxShadow = '0 4px 15px rgba(16, 185, 129, 0.4)';
-            "
           >
-            <i class="fa-solid fa-download" style="font-size: 16px"></i>
+            <i class="fa-solid fa-download"></i>
             下载为STScript JSON
           </button>
         </div>
@@ -479,9 +439,9 @@
       >
         <div
           style="
-            padding: 15px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-bottom: 1px solid rgba(84, 107, 131, 0.3);
+            padding: 12px 16px;
+            background: rgba(30, 41, 59, 0.6);
+            border-bottom: 1px solid #3a3a3a;
             display: flex;
             justify-content: space-between;
             align-items: center;

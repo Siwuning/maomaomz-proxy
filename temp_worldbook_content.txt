@@ -1,0 +1,118 @@
+。
+
+=== 正则表达式 ===
+<state_bar>(?:[\s\S]*?<time>\s*([^<]+))?(?:[\s\S]*?<world>\s*([^<]+))?(?:[\s\S]*?<location>\s*([^<]+))?(?:[\s\S]*?<plot_line>\s*([^<]+))?(?:[\s\S]*?<progress>\s*([^<]+))?(?:[\s\S]*?<battle_log>\s*([^<]+))?(?:[\s\S]*?<level>\s*([^<]+))?(?:[\s\S]*?<age>\s*([^<]+))?(?:[\s\S]*?<identity>\s*([^<]+))?(?:[\s\S]*?<skill>\s*([^<]+))?(?:[\s\S]*?<outfit>\s*([^<]+))?(?:[\s\S]*?<armor>\s*([^<]+))?(?:[\s\S]*?<ability>\s*([^<]+))?(?:[\s\S]*?<thought>\s*([^<]+))?(?:[\s\S]*?<money>\s*([^<]+))?(?:[\s\S]*?<items>\s*([^<]+))?(?:[\s\S]*?<npc_name>\s*([^<]+))?(?:[\s\S]*?<npc_gender>\s*([^<]+))?(?:[\s\S]*?<npc_identity>\s*([^<]+))?(?:[\s\S]*?<npc_mood>\s*([^<]+))?(?:[\s\S]*?<npc_thought>\s*([^<]+))?(?:[\s\S]*?<npc_appearance>\s*([^<]+))?(?:[\s\S]*?<npc_level>\s*([^<]+))?(?:[\s\S]*?<npc_skill>\s*([^<]+))?(?:[\s\S]*?<npc_clothes>\s*([^<]+))?(?:[\s\S]*?<npc_personality>\s*([^<]+))?(?:[\s\S]*?<npc_race>\s*([^<]+))?(?:[\s\S]*?<npc_relation>\s*([^<]+))?(?:[\s\S]*?<options>\s*([^<]+))?[\s\S]*?<\/state_bar>
+
+=== 状态栏XML格式 ===
+<state_bar>
+<time>{{日期和时间}}
+<world>{{世界名称}}
+<location>{{场所}}
+<plot_line>{{核心情节线}}
+<progress>{{当前情节进度}}
+<battle_log>{{战斗日志吐槽}}
+<level>{{境界}}
+<age>{{年龄}}
+<identity>{{身份}}
+<skill>{{功法}}
+<outfit>{{服装衣着}}
+<armor>{{装甲护甲}}
+<ability>{{能力}}
+<thought>{{内心想法}}
+<money>{{货币}}
+<items>{{杂物}}
+<npc_name>{{配角姓名}}
+<npc_gender>{{配角性别}}
+<npc_identity>{{配角身份}}
+<npc_mood>{{配角情绪}}
+<npc_thought>{{配角内心想法}}
+<npc_appearance>{{配角外表}}
+<npc_level>{{配角境界}}
+<npc_skill>{{配角功法}}
+<npc_clothes>{{配角衣物}}
+<npc_personality>{{配角性格}}
+<npc_race>{{配角种族}}
+<npc_relation>{{关系网络}}
+<options>{{剧情分支选项}}
+</state_bar>
+
+=== 示例正文内容 ===
+<state_bar>
+<time>天启历1024年 (第 15 天)
+<world>苍穹界 - 离火神朝
+<location>青云宗后山禁地
+<plot_line>寻找失落的九转金丹
+<progress>主角成功潜入禁地核心，正与守护傀儡对峙
+<battle_log>这傀儡的防御力简直离谱，我的剑都快砍崩了！
+<level>筑基期大圆满
+<age>19岁
+<identity>青云宗外门弟子
+<skill>青莲剑诀、逍遥步
+<outfit>青色劲装
+<armor>玄铁护心镜
+<ability>破妄神瞳
+<thought>这傀儡的关节处似乎是弱点，得找机会突刺。
+<money>300下品灵石
+<items>回气丹*5、引雷符*2
+<npc_name>林仙儿
+<npc_gender>女
+<npc_identity>禁地守护者之女
+<npc_mood>惊讶与好奇
+<npc_thought>此人竟能避开所有机关，难道他有宗门秘钥？
+<npc_appearance>白衣胜雪，眸若星辰，身姿曼妙
+<npc_level>金丹初期
+<npc_skill>寒冰掌
+<npc_clothes>流光丝绸长裙
+<npc_personality>清冷、果断
+<npc_race>人族
+<npc_relation>中立（好感度：10）
+<options>A. 尝试交流 B. 强行突破 C. 撤退观察 D. 顺其自然
+</state_bar>
+
+=== HTML美化内容 ===
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    body { font-family: -apple-system, sans-serif; background-color: #0f0f0f; color: #d4d4d4; margin: 0; padding: 10px; }
+    .hud-card { background: #1e1e1e; border-radius: 12px; border: 1px solid #333; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
+    .hud-header { background: linear-gradient(135deg, #2d5a27, #1a3a16); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
+    .hud-header .loc { font-weight: bold; color: #fff; font-size: 14px; }
+    .hud-header .tm { font-size: 12px; color: #aaa; }
+    details { border-bottom: 1px solid #2a2a2a; }
+    summary { padding: 12px 15px; font-size: 14px; font-weight: bold; color: #4ec9b0; cursor: pointer; outline: none; list-style: none; display: flex; justify-content: space-between; }
+    summary::after { content: '⊕'; color: #666; }
+    details[open] summary::after { content: '⊖'; }
+    .inner { padding: 10px 15px; font-size: 13px; line-height: 1.6; background: #252526; }
+    .row { display: flex; margin-bottom: 4px; }
+    .lbl { color: #888; min-width: 70px; }
+    .val { color: #ce9178; flex: 1; }
+    .log-box { background: #000; color: #dcdcaa; padding: 8px; border-radius: 4px; font-family: monospace; margin-top: 5px; border-left: 3px solid #f44336; }
+    .thought-box { font-style: italic; color: #6a9955; margin-top: 8px; padding-left: 10px; border-left: 2px solid #6a9955; }
+    .opt-box { background: #2d2d2d; padding: 10px; border-radius: 8px; margin-top: 10px; border: 1px dashed #555; }
+    .npc-tag { display: inline-block; background: #3e3e42; padding: 2px 8px; border-radius: 10px; font-size: 11px; color: #9cdcfe; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<div class="hud-card">
+    <div class="hud-header">
+        <div class="loc">📍 $3</div>
+        <div class="tm">$1</div>
+    </div>
+    <details open>
+        <summary>📜 剧情进度</summary>
+        <div class="inner">
+            <div class="row"><span class="lbl">世界:</span><span class="val">$2</span></div>
+            <div class="row"><span class="lbl">目标:</span><span class="val">$4</span></div>
+            <div class="row"><span class="lbl">现状:</span><span class="val">$5</span></div>
+            <div class="log-box">💬 $6</div>
+        </div>
+    </details>
+    <details>
+        <summary>👤 主角状态</summary>
+        <div class="inner">
+            <div class="row"><span class="lbl">境界:</span><span class="val">$7 ($8岁)</span></div>
+            <div class="row"><span class="lbl">身份:</span><span class="val">$9</span></div>
+            <div class="row"><span class="lbl">功法:</span><sp

@@ -125,7 +125,7 @@
     </div>
 
     <!-- 主内容区：三列布局 -->
-    <div style="display: grid; grid-template-columns: 280px 1fr 500px; gap: 20px; min-height: 600px">
+    <div class="main-grid-layout">
       <!-- 左侧：字段配置 -->
       <div
         style="
@@ -175,7 +175,7 @@
         </div>
 
         <!-- 字段列表 -->
-        <div style="flex: 1; display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px">
+        <div class="field-list-container">
           <div
             v-for="(field, index) in config.fields"
             :key="index"
@@ -446,19 +446,23 @@
             </h4>
             <button
               style="
-                padding: 6px 12px;
-                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                padding: 8px 16px;
+                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
                 border: none;
-                border-radius: 6px;
+                border-radius: 8px;
                 color: white;
-                font-size: 12px;
-                font-weight: 600;
+                font-size: 13px;
+                font-weight: 700;
                 cursor: pointer;
+                box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+                transition: all 0.2s ease;
               "
               @click="copyWorldbook"
+              @mouseenter="$event.target.style.transform = 'scale(1.05)'"
+              @mouseleave="$event.target.style.transform = 'scale(1)'"
             >
-              <i class="fa-solid fa-copy" style="margin-right: 4px"></i>
-              复制
+              <i class="fa-solid fa-copy" style="margin-right: 6px"></i>
+              📋 复制世界书
             </button>
           </div>
           <div
@@ -3496,6 +3500,52 @@ function getSafeMaxTokens(requested: number): number {
   background: #1a1a1a;
 }
 
+/* 主三栏布局 */
+.main-grid-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr 420px;
+  gap: 20px;
+  min-height: 600px;
+  max-height: calc(100vh - 200px);
+}
+
+/* 字段列表容器 - 可滚动 */
+.field-list-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+  overflow-y: auto;
+  max-height: 400px;
+  padding-right: 4px;
+}
+
+/* 响应式布局 */
+@media (max-width: 1400px) {
+  .main-grid-layout {
+    grid-template-columns: 260px 1fr 380px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .main-grid-layout {
+    grid-template-columns: 240px 1fr 340px;
+    gap: 15px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .main-grid-layout {
+    grid-template-columns: 1fr;
+    max-height: none;
+  }
+
+  .field-list-container {
+    max-height: 300px;
+  }
+}
+
 /* 工具栏按钮 */
 .toolbar-buttons {
   display: flex;
@@ -3506,24 +3556,54 @@ function getSafeMaxTokens(requested: number): number {
 .toolbar-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
+  gap: 8px;
+  padding: 10px 18px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   color: white;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.toolbar-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
 }
 
 .toolbar-btn:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.toolbar-btn:hover::before {
+  left: 100%;
+}
+
+.toolbar-btn:active {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .toolbar-btn i {
-  font-size: 14px;
-  margin-right: 6px;
+  font-size: 15px;
+  margin-right: 4px;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
 }
 
 /* PC端显示完整文字，隐藏短文字 */
@@ -3554,22 +3634,24 @@ function getSafeMaxTokens(requested: number): number {
 
   .toolbar-btn {
     flex-direction: column;
-    padding: 14px 10px;
+    padding: 14px 12px;
     font-size: 12px;
-    gap: 6px;
+    gap: 8px;
     justify-content: center;
     text-align: center;
-    min-height: 60px;
+    min-height: 65px;
+    border-radius: 12px;
   }
 
   .toolbar-btn i {
-    font-size: 20px;
+    font-size: 22px;
     margin: 0;
   }
 
   .toolbar-btn span {
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
+    letter-spacing: 0.3px;
   }
 }
 

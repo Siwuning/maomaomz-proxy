@@ -93,18 +93,21 @@
           v-if="greetings.length > 0"
           style="
             padding: 8px 14px;
-            background: #3b82f6;
-            border: none;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #4a4a4a;
             border-radius: 6px;
-            color: white;
+            color: #e0e0e0;
             cursor: pointer;
             font-size: 13px;
             font-weight: 500;
             display: flex;
             align-items: center;
             gap: 6px;
+            transition: all 0.2s;
           "
           @click="showAiStyleDialog = true"
+          @mouseenter="$event.target.style.background = 'rgba(40, 51, 69, 0.7)'"
+          @mouseleave="$event.target.style.background = 'rgba(30, 41, 59, 0.5)'"
         >
           <i class="fa-solid fa-wand-magic-sparkles"></i> AI生成界面样式
         </button>
@@ -279,9 +282,9 @@
               />
               <button
                 style="
-                  background: #3b82f6;
-                  border: none;
-                  color: white;
+                  background: rgba(30, 41, 59, 0.5);
+                  border: 1px solid #4a4a4a;
+                  color: #e0e0e0;
                   padding: 8px 14px;
                   border-radius: 6px;
                   cursor: pointer;
@@ -290,9 +293,12 @@
                   gap: 6px;
                   font-size: 13px;
                   font-weight: 500;
+                  transition: all 0.2s;
                 "
                 title="根据开场白内容自动生成描述"
                 @click="generateDescription(index)"
+                @mouseenter="$event.target.style.background = 'rgba(40, 51, 69, 0.7)'"
+                @mouseleave="$event.target.style.background = 'rgba(30, 41, 59, 0.5)'"
               >
                 <i class="fa-solid fa-wand-magic-sparkles"></i>
                 <span>AI 生成描述</span>
@@ -386,18 +392,21 @@
           <button
             style="
               padding: 10px 18px;
-              background: #3b82f6;
-              border: none;
+              background: rgba(30, 41, 59, 0.5);
+              border: 1px solid #4a4a4a;
               border-radius: 6px;
-              color: white;
+              color: #e0e0e0;
               font-size: 14px;
               font-weight: 500;
               cursor: pointer;
               display: flex;
               align-items: center;
               gap: 6px;
+              transition: all 0.2s;
             "
             @click="generateFrontendCode"
+            @mouseenter="$event.target.style.background = 'rgba(40, 51, 69, 0.7)'"
+            @mouseleave="$event.target.style.background = 'rgba(30, 41, 59, 0.5)'"
           >
             <i class="fa-solid fa-code"></i>
             生成HTML代码

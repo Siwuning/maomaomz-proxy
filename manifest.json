@@ -5,10 +5,11 @@
   "optional": [],
   "js": "dist/index.js",
   "author": "猫猫 (mzrodyu)",
-  "version": "2.0.125",
+  "version": "2.0.126",
   "homePage": "https://github.com/mzrodyu/maomaomz",
   "auto_update": true,
   "changelog": {
+    "2.0.126": "更新",
     "2.0.125": "更新",
     "2.0.124": "更新",
     "2.0.123": "更新",

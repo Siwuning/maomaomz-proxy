@@ -75,11 +75,11 @@
             <i class="fa-solid fa-circle-info" style="margin-right: 6px"></i>这是什么？怎么配？
           </div>
           <div style="color: #94a3b8; font-size: 12px; line-height: 1.7">
-            本插件的<strong style="color: #fbbf24">总结功能</strong>需要调用 AI 接口。有两种方式：<br />
-            <span style="color: #10b981">① 推荐：</span>开启下方「使用酒馆 API」→ 直接用酒馆已配好的接口，<strong
-              >无需额外配置</strong
-            ><br />
-            <span style="color: #60a5fa">② 手动配：</span>关闭开关后手动填写 API 地址和密钥（适合想用不同接口的用户）
+            本插件的<strong style="color: #fbbf24">总结功能</strong>需要调用 AI 接口。<br />
+            <span style="color: #10b981">① 推荐：</span>在下方填写你的
+            <strong style="color: #fbbf24">API 地址</strong> 和
+            <strong style="color: #fbbf24">授权码</strong>（从服务商处获取）<br />
+            <span style="color: #888">② 备选：</span>开启「使用酒馆 API」可复用酒馆已配好的接口
           </div>
         </div>
 

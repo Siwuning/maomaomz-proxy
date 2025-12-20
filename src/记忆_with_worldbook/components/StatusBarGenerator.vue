@@ -314,71 +314,38 @@
           >
             <i class="fa-solid fa-plus"></i> 添加
           </button>
-          <!-- AI 生成下拉菜单 -->
-          <div class="dropdown-container" style="flex: 1; position: relative">
-            <button
-              style="
-                width: 100%;
-                padding: 8px;
-                background: rgba(30, 41, 59, 0.5);
-                border: 1px solid #4a4a4a;
-                border-radius: 6px;
-                color: #e0e0e0;
-                font-size: 12px;
-                font-weight: 500;
-                cursor: pointer;
-              "
-              @click="
-                showAiFieldMenu = !showAiFieldMenu;
-                showTemplateMenu = false;
-              "
-            >
-              <i class="fa-solid fa-wand-magic-sparkles"></i> AI生成
-              <i class="fa-solid fa-caret-down" style="margin-left: 2px; font-size: 9px"></i>
-            </button>
-            <div
-              v-if="showAiFieldMenu"
-              style="
-                position: absolute;
-                top: 100%;
-                left: 0;
-                margin-top: 4px;
-                background: #2a2a2a;
-                border: 1px solid #3a3a3a;
-                border-radius: 6px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-                z-index: 9999;
-                overflow: hidden;
-                min-width: 120px;
-                white-space: nowrap;
-              "
-            >
-              <div
-                style="padding: 8px 12px; cursor: pointer; color: #e0e0e0; font-size: 12px"
-                @click="
-                  showAiFieldGeneratorDialog();
-                  showAiFieldMenu = false;
-                "
-                @mouseenter="$event.target.style.background = '#3a3a3a'"
-                @mouseleave="$event.target.style.background = 'transparent'"
-              >
-                <i class="fa-solid fa-wand-magic-sparkles" style="margin-right: 6px; color: #10b981"></i>
-                描述生成
-              </div>
-              <div
-                style="padding: 8px 12px; cursor: pointer; color: #e0e0e0; font-size: 12px"
-                @click="
-                  showXmlParseDialog();
-                  showAiFieldMenu = false;
-                "
-                @mouseenter="$event.target.style.background = '#3a3a3a'"
-                @mouseleave="$event.target.style.background = 'transparent'"
-              >
-                <i class="fa-solid fa-code" style="margin-right: 6px; color: #f59e0b"></i>
-                解析 XML
-              </div>
-            </div>
-          </div>
+          <button
+            style="
+              flex: 1;
+              padding: 8px;
+              background: rgba(16, 185, 129, 0.2);
+              border: 1px solid #10b981;
+              border-radius: 6px;
+              color: #10b981;
+              font-size: 12px;
+              font-weight: 500;
+              cursor: pointer;
+            "
+            @click="showAiFieldGeneratorDialog()"
+          >
+            <i class="fa-solid fa-wand-magic-sparkles"></i> 描述生成
+          </button>
+          <button
+            style="
+              flex: 1;
+              padding: 8px;
+              background: rgba(245, 158, 11, 0.2);
+              border: 1px solid #f59e0b;
+              border-radius: 6px;
+              color: #f59e0b;
+              font-size: 12px;
+              font-weight: 500;
+              cursor: pointer;
+            "
+            @click="showXmlParseDialog()"
+          >
+            <i class="fa-solid fa-code"></i> 解析XML
+          </button>
         </div>
 
         <button

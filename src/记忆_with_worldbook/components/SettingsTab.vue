@@ -133,7 +133,7 @@
                 style="
                   width: 100%;
                   padding: 10px 12px;
-                  background: #2a2a2a;
+                  background: rgba(30, 41, 59, 0.5);
                   border: 1px solid #3a3a3a;
                   border-radius: 6px;
                   color: #e0e0e0;
@@ -190,7 +190,7 @@
               style="
                 width: 100%;
                 padding: 10px 12px;
-                background: #2a2a2a;
+                background: rgba(30, 41, 59, 0.5);
                 border: 1px solid #3a3a3a;
                 border-radius: 6px;
                 color: #e0e0e0;
@@ -219,7 +219,7 @@
               style="
                 width: 100%;
                 padding: 10px 12px;
-                background: #2a2a2a;
+                background: rgba(30, 41, 59, 0.5);
                 border: 1px solid #3a3a3a;
                 border-radius: 6px;
                 color: #e0e0e0;
@@ -263,7 +263,7 @@
               style="
                 width: 100%;
                 padding: 10px 12px;
-                background: #2a2a2a;
+                background: rgba(30, 41, 59, 0.5);
                 border: 1px solid #3a3a3a;
                 border-radius: 6px;
                 color: #e0e0e0;
@@ -390,7 +390,7 @@
               style="
                 width: 100%;
                 padding: 10px 12px;
-                background: #2a2a2a;
+                background: rgba(30, 41, 59, 0.5);
                 border: 1px solid #3a3a3a;
                 border-radius: 6px;
                 color: #e0e0e0;
@@ -405,7 +405,7 @@
               style="
                 width: 100%;
                 padding: 10px 12px;
-                background: #2a2a2a;
+                background: rgba(30, 41, 59, 0.5);
                 border: 1px solid #3a3a3a;
                 border-radius: 6px;
                 color: #e0e0e0;
@@ -480,7 +480,7 @@
                 :key="template.id"
                 style="
                   padding: 12px 16px;
-                  background: #2a2a2a;
+                  background: rgba(30, 41, 59, 0.5);
                   border: 1px solid #3a3a3a;
                   border-radius: 8px;
                   display: flex;
@@ -578,7 +578,7 @@
               style="
                 width: 100%;
                 padding: 10px 12px;
-                background: #2a2a2a;
+                background: rgba(30, 41, 59, 0.5);
                 border: 1px solid #3a3a3a;
                 border-radius: 6px;
                 color: #e0e0e0;
@@ -615,7 +615,7 @@
                   style="
                     width: 100%;
                     padding: 10px 12px;
-                    background: #2a2a2a;
+                    background: rgba(30, 41, 59, 0.5);
                     border: 1px solid #3a3a3a;
                     border-radius: 6px;
                     color: #e0e0e0;
@@ -640,7 +640,7 @@
                   style="
                     width: 100%;
                     padding: 10px 12px;
-                    background: #2a2a2a;
+                    background: rgba(30, 41, 59, 0.5);
                     border: 1px solid #3a3a3a;
                     border-radius: 6px;
                     color: #e0e0e0;
@@ -665,7 +665,7 @@
                   style="
                     width: 100%;
                     padding: 10px 12px;
-                    background: #2a2a2a;
+                    background: rgba(30, 41, 59, 0.5);
                     border: 1px solid #3a3a3a;
                     border-radius: 6px;
                     color: #e0e0e0;
@@ -690,7 +690,7 @@
                   style="
                     width: 100%;
                     padding: 10px 12px;
-                    background: #2a2a2a;
+                    background: rgba(30, 41, 59, 0.5);
                     border: 1px solid #3a3a3a;
                     border-radius: 6px;
                     color: #e0e0e0;
@@ -826,7 +826,7 @@
             style="
               width: 100%;
               padding: 10px 12px;
-              background: #2a2a2a;
+              background: rgba(30, 41, 59, 0.5);
               border: 1px solid #3a3a3a;
               border-radius: 6px;
               color: #e0e0e0;
@@ -932,7 +932,7 @@
                 width: 100%;
                 min-height: 100px;
                 padding: 12px;
-                background: #2a2a2a;
+                background: rgba(30, 41, 59, 0.5);
                 border: 1px solid #3a3a3a;
                 border-radius: 6px;
                 color: #e0e0e0;
@@ -962,7 +962,7 @@
             style="
               width: 100%;
               padding: 10px 12px;
-              background: #2a2a2a;
+              background: rgba(30, 41, 59, 0.5);
               border: 1px solid #3a3a3a;
               border-radius: 6px;
               color: #e0e0e0;
@@ -1026,7 +1026,7 @@
             <button
               style="
                 padding: 10px 18px;
-                background: #2a2a2a;
+                background: rgba(30, 41, 59, 0.5);
                 border: 1px solid #4a4a4a;
                 border-radius: 6px;
                 color: #e0e0e0;
@@ -1044,7 +1044,7 @@
             <button
               style="
                 padding: 10px 18px;
-                background: #2a2a2a;
+                background: rgba(30, 41, 59, 0.5);
                 border: 1px solid #4a4a4a;
                 border-radius: 6px;
                 color: #e0e0e0;
@@ -1188,7 +1188,7 @@
               style="
                 width: 100%;
                 padding: 10px 12px;
-                background: #2a2a2a;
+                background: rgba(30, 41, 59, 0.5);
                 border: 1px solid #3a3a3a;
                 border-radius: 6px;
                 color: #e0e0e0;
@@ -1206,7 +1206,7 @@
               style="
                 width: 100%;
                 padding: 10px 12px;
-                background: #2a2a2a;
+                background: rgba(30, 41, 59, 0.5);
                 border: 1px solid #3a3a3a;
                 border-radius: 6px;
                 color: #e0e0e0;
@@ -1397,7 +1397,7 @@
               style="
                 width: 100%;
                 padding: 10px 12px;
-                background: #2a2a2a;
+                background: rgba(30, 41, 59, 0.5);
                 border: 1px solid #3a3a3a;
                 border-radius: 6px;
                 color: #e0e0e0;
@@ -1415,7 +1415,7 @@
               style="
                 width: 100%;
                 padding: 10px 12px;
-                background: #2a2a2a;
+                background: rgba(30, 41, 59, 0.5);
                 border: 1px solid #3a3a3a;
                 border-radius: 6px;
                 color: #e0e0e0;
@@ -1432,7 +1432,7 @@
               style="
                 flex: 1;
                 padding: 8px 12px;
-                background: #2a2a2a;
+                background: rgba(30, 41, 59, 0.5);
                 border: 1px solid #3a3a3a;
                 border-radius: 6px;
                 color: #e0e0e0;
@@ -1469,7 +1469,7 @@
               style="
                 flex: 1;
                 padding: 8px 12px;
-                background: #2a2a2a;
+                background: rgba(30, 41, 59, 0.5);
                 border: 1px solid #3a3a3a;
                 border-radius: 6px;
                 color: #e0e0e0;
@@ -1483,7 +1483,7 @@
               style="
                 flex: 2;
                 padding: 8px 12px;
-                background: #2a2a2a;
+                background: rgba(30, 41, 59, 0.5);
                 border: 1px solid #3a3a3a;
                 border-radius: 6px;
                 color: #e0e0e0;
@@ -1685,7 +1685,7 @@
             style="
               width: 100%;
               padding: 10px 12px;
-              background: #2a2a2a;
+              background: rgba(30, 41, 59, 0.5);
               border: 1px solid #3a3a3a;
               border-radius: 6px;
               color: #e0e0e0;
@@ -1854,7 +1854,7 @@
   >
     <div
       style="
-        background: #2a2a2a;
+        background: rgba(30, 41, 59, 0.5);
         border-radius: 12px;
         padding: 24px;
         width: 90%;
@@ -4309,7 +4309,7 @@ const handle_unhide_single = async (messageId: number) => {
 .form-group select {
   width: 100%;
   padding: 10px 12px;
-  background: #2a2a2a;
+  background: rgba(30, 41, 59, 0.5);
   border: 1px solid #3a3a3a;
   border-radius: 6px;
   color: #e0e0e0;
@@ -4483,7 +4483,7 @@ const handle_unhide_single = async (messageId: number) => {
 }
 
 .hidden-message-item:hover {
-  background: #2a2a2a;
+  background: rgba(30, 41, 59, 0.5);
 }
 
 .message-info {
@@ -4568,7 +4568,7 @@ const handle_unhide_single = async (messageId: number) => {
 .empty-state {
   margin-top: 20px;
   padding: 20px;
-  background: #2a2a2a;
+  background: rgba(30, 41, 59, 0.5);
   border-radius: 6px;
   text-align: center;
   color: #888;

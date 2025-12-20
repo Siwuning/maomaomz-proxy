@@ -45,16 +45,15 @@
           >{{ summary_history.length }} 条记录</span
         >
         <button
-          class="mini-button refresh-button"
           style="
-            padding: 6px 12px;
-            background: #2a3a4a;
-            border: 1px solid rgba(84, 107, 131, 0.3);
-            border-radius: 4px;
+            padding: 8px 14px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #4a4a4a;
+            border-radius: 6px;
             color: #e0e0e0;
             cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -65,16 +64,15 @@
         </button>
         <button
           v-if="summary_history.length >= 2"
-          class="mini-button mega-summary-button"
           style="
-            padding: 6px 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 8px 14px;
+            background: #3b82f6;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             color: white;
             cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -86,16 +84,15 @@
           {{ isMegaSummarizing ? '生成中...' : '生成大总结' }}
         </button>
         <button
-          class="mini-button create-worldbook-button"
           style="
-            padding: 6px 12px;
-            background: #51cf66;
-            border: 1px solid #40c057;
-            border-radius: 4px;
-            color: white;
+            padding: 8px 14px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #4a4a4a;
+            border-radius: 6px;
+            color: #e0e0e0;
             cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -106,16 +103,15 @@
         </button>
         <button
           v-if="summary_history.length > 0"
-          class="mini-button export-button"
           style="
-            padding: 6px 12px;
-            background: #17a2b8;
-            border: 1px solid #138496;
-            border-radius: 4px;
-            color: white;
+            padding: 8px 14px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #4a4a4a;
+            border-radius: 6px;
+            color: #e0e0e0;
             cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -126,16 +122,15 @@
         </button>
         <button
           v-if="summary_history.length > 0"
-          class="mini-button clear-button"
           style="
-            padding: 6px 12px;
-            background: #dc3545;
-            border: 1px solid #c82333;
-            border-radius: 4px;
-            color: white;
+            padding: 8px 14px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #4a4a4a;
+            border-radius: 6px;
+            color: #e0e0e0;
             cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -145,16 +140,15 @@
           <i class="fa-solid fa-trash-can"></i> 清空全部
         </button>
         <button
-          class="mini-button debug-button"
           style="
-            padding: 6px 12px;
-            background: #ffc107;
-            border: 1px solid #ffb300;
-            border-radius: 4px;
-            color: #000;
+            padding: 8px 14px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #4a4a4a;
+            border-radius: 6px;
+            color: #e0e0e0;
             cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 6px;

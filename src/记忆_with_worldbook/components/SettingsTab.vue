@@ -1215,53 +1215,40 @@
             />
           </div>
         </div>
-        <div class="button-group" style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 5px">
+        <div class="button-group" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 5px">
           <button
-            class="action-button test-button"
             :disabled="is_summarizing"
             style="
-              flex: 1;
-              min-width: 120px;
-              padding: 12px 16px;
+              padding: 10px 18px;
+              background: rgba(30, 41, 59, 0.5);
               border: 1px solid #4a4a4a;
               border-radius: 6px;
-              cursor: pointer;
-              font-weight: 500;
+              color: #e0e0e0;
               font-size: 14px;
-              transition: all 0.2s;
+              font-weight: 500;
+              cursor: pointer;
               display: flex;
               align-items: center;
-              justify-content: center;
               gap: 6px;
-              background: #3a3a3a;
-              color: #e0e0e0;
             "
             @click="handle_test_connection"
           >
             <i class="fa-solid fa-plug"></i> 测试连接
           </button>
           <button
-            class="action-button summarize-button"
             :disabled="is_summarizing"
             style="
-              flex: 1;
-              min-width: 120px;
-              padding: 12px 16px;
-              border: 1px solid #5aaeff;
+              padding: 10px 18px;
+              background: #3b82f6;
+              border: none;
               border-radius: 6px;
-              cursor: pointer;
-              font-weight: 500;
+              color: white;
               font-size: 14px;
-              transition: all 0.2s;
+              font-weight: 500;
+              cursor: pointer;
               display: flex;
               align-items: center;
-              justify-content: center;
               gap: 6px;
-              background: linear-gradient(135deg, #4a9eff 0%, #3a8edf 100%);
-              box-shadow:
-                0 2px 8px rgba(74, 158, 255, 0.25),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
-              color: white;
             "
             @click="handle_summarize"
           >

@@ -53,107 +53,90 @@
         </span>
         <button
           v-if="greetings.length > 0"
-          class="mini-button"
           style="
-            padding: 6px 12px;
-            background: #2a2a2a;
-            border: 1px solid #3a3a3a;
-            border-radius: 4px;
+            padding: 8px 14px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #4a4a4a;
+            border-radius: 6px;
+            color: #e0e0e0;
             cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 6px;
           "
-          :style="{
-            color: showHelp ? '#667eea' : '#e0e0e0',
-            borderColor: showHelp ? '#546B83' : 'rgba(84, 107, 131, 0.3)',
-          }"
           @click="showHelp = !showHelp"
         >
           <i class="fa-solid fa-circle-question"></i> {{ showHelp ? '隐藏帮助' : '显示帮助' }}
         </button>
         <button
           v-if="greetings.length > 0"
-          class="mini-button"
           style="
-            padding: 6px 12px;
-            background: #dc2626;
-            border: none;
-            border-radius: 4px;
-            color: white;
+            padding: 8px 14px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #4a4a4a;
+            border-radius: 6px;
+            color: #e0e0e0;
             cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 6px;
           "
           @click="clearAllConfig"
-          @mouseenter="($event.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'"
-          @mouseleave="($event.currentTarget as HTMLElement).style.transform = 'translateY(0)'"
         >
           <i class="fa-solid fa-eraser"></i> 清空配置
         </button>
         <button
           v-if="greetings.length > 0"
-          class="mini-button"
           style="
-            padding: 6px 12px;
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            padding: 8px 14px;
+            background: #3b82f6;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             color: white;
             cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 6px;
           "
           @click="showAiStyleDialog = true"
-          @mouseenter="($event.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'"
-          @mouseleave="($event.currentTarget as HTMLElement).style.transform = 'translateY(0)'"
         >
           <i class="fa-solid fa-wand-magic-sparkles"></i> AI生成界面样式
         </button>
         <button
           v-if="greetings.length > 0"
-          class="mini-button"
           style="
-            padding: 6px 12px;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            border: none;
-            border-radius: 4px;
-            color: white;
+            padding: 8px 14px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #4a4a4a;
+            border-radius: 6px;
+            color: #e0e0e0;
             cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 6px;
           "
           @click="showAiGreetingDialog = true"
-          @mouseenter="($event.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'"
-          @mouseleave="($event.currentTarget as HTMLElement).style.transform = 'translateY(0)'"
         >
           <i class="fa-solid fa-comment-dots"></i> AI生成开场白
         </button>
         <button
-          class="mini-button refresh-button"
           style="
-            padding: 6px 12px;
-            background: #2a2a2a;
-            border: 1px solid #3a3a3a;
-            border-radius: 4px;
+            padding: 8px 14px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #4a4a4a;
+            border-radius: 6px;
             color: #e0e0e0;
             cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 6px;

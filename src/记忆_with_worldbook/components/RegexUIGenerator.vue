@@ -42,142 +42,139 @@
       </h3>
       <div style="display: flex; gap: 10px; flex-wrap: wrap; position: relative; z-index: 10">
         <button
-          class="action-button"
           style="
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            border: none;
-            border-radius: 8px;
-            color: white;
+            padding: 8px 14px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #4a4a4a;
+            border-radius: 6px;
+            color: #e0e0e0;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
-            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
           "
           @click.stop="loadExample"
         >
-          <i class="fa-solid fa-lightbulb" style="margin-right: 6px; pointer-events: none"></i>
+          <i class="fa-solid fa-lightbulb"></i>
           加载示例
         </button>
         <button
-          class="action-button"
           style="
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
-            border: none;
-            border-radius: 8px;
-            color: white;
+            padding: 8px 14px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #4a4a4a;
+            border-radius: 6px;
+            color: #e0e0e0;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
-            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
           "
           @click.stop="showTemplateLibrary"
         >
-          <i class="fa-solid fa-palette" style="margin-right: 6px; pointer-events: none"></i>
+          <i class="fa-solid fa-palette"></i>
           模板库
         </button>
         <button
-          class="action-button"
           style="
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            padding: 8px 14px;
+            background: #3b82f6;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             color: white;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
-            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
           "
           :disabled="isGenerating"
           @click.stop="generateWithAI"
         >
-          <i
-            :class="isGenerating ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-wand-magic-sparkles'"
-            style="margin-right: 6px; pointer-events: none"
-          ></i>
+          <i :class="isGenerating ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-wand-magic-sparkles'"></i>
           {{ isGenerating ? '生成中...' : 'AI 生成' }}
         </button>
         <button
-          class="action-button"
           style="
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
-            border: none;
-            border-radius: 8px;
-            color: white;
+            padding: 8px 14px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #4a4a4a;
+            border-radius: 6px;
+            color: #e0e0e0;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
-            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
           "
           :disabled="!generatedHTML"
           @click.stop="exportRegex"
         >
-          <i class="fa-solid fa-download" style="margin-right: 6px; pointer-events: none"></i>
+          <i class="fa-solid fa-download"></i>
           导出正则
         </button>
         <button
-          class="action-button"
           style="
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
-            border: none;
-            border-radius: 8px;
-            color: white;
+            padding: 8px 14px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #4a4a4a;
+            border-radius: 6px;
+            color: #e0e0e0;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
-            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
           "
           :disabled="!generatedHTML"
           @click.stop="showWorldbookGuide"
         >
-          <i class="fa-solid fa-question-circle" style="margin-right: 6px; pointer-events: none"></i>
+          <i class="fa-solid fa-question-circle"></i>
           使用说明
         </button>
         <button
-          class="action-button"
           style="
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            border: none;
-            border-radius: 8px;
-            color: white;
+            padding: 8px 14px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #4a4a4a;
+            border-radius: 6px;
+            color: #e0e0e0;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
-            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
           "
           @click.stop="restoreFromBackup"
         >
-          <i class="fa-solid fa-clock-rotate-left" style="margin-right: 6px; pointer-events: none"></i>
+          <i class="fa-solid fa-clock-rotate-left"></i>
           恢复备份
         </button>
         <button
-          class="action-button"
           style="
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            border: none;
-            border-radius: 8px;
-            color: white;
+            padding: 8px 14px;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid #4a4a4a;
+            border-radius: 6px;
+            color: #e0e0e0;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
-            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
           "
           @click.stop="clearAll"
         >
-          <i class="fa-solid fa-trash" style="margin-right: 6px; pointer-events: none"></i>
+          <i class="fa-solid fa-trash"></i>
           清空
         </button>
       </div>

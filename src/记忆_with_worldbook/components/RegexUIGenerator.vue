@@ -1319,6 +1319,45 @@ const exportRegex = () => {
     );
   });
 
+  // 5. 注入唯一化脚本，确保每个状态栏有真正唯一的 radio ID
+  // 因为 $1 的值可能在多条消息中重复（如同一角色的名字）
+  const uniqueScript = `<script>
+(function(){
+  var c = document.currentScript.parentElement;
+  var uid = Math.random().toString(36).substr(2,9);
+  var radios = c.querySelectorAll('input[type="radio"]');
+  var labels = c.querySelectorAll('label[for]');
+  var style = c.querySelector('style');
+  var idMap = {};
+  radios.forEach(function(r){
+    var oldId = r.id, oldName = r.getAttribute('name');
+    var newId = oldId + '_' + uid;
+    var newName = oldName + '_' + uid;
+    idMap[oldId] = newId;
+    r.id = newId;
+    r.setAttribute('name', newName);
+  });
+  labels.forEach(function(l){
+    var f = l.getAttribute('for');
+    if(idMap[f]) l.setAttribute('for', idMap[f]);
+  });
+  if(style){
+    var css = style.textContent;
+    for(var old in idMap){
+      css = css.split(old).join(idMap[old]);
+    }
+    style.textContent = css;
+  }
+})();
+<\\/script>`;
+
+  // 在 </details> 或 </div> 前插入脚本
+  if (replaceString.includes('</details>')) {
+    replaceString = replaceString.replace(/<\/details>\s*$/, uniqueScript + '</details>');
+  } else {
+    replaceString = replaceString + uniqueScript;
+  }
+
   const uuid = `regex-pageable-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
   const regexData = {

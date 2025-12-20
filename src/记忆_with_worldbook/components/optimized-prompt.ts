@@ -77,10 +77,10 @@ input[id^="tp2-"]:checked ~ .page-content .page-2 { display: block; }
 
   <div class="page-content">
     <div class="page page-0">
+      <div class="field-row"><span class="field-label">时间</span><span class="field-value">{{时间}}</span></div>
       <div class="field-row"><span class="field-label">姓名</span><span class="field-value">{{姓名}}</span></div>
       <div class="field-row"><span class="field-label">年龄</span><span class="field-value">{{年龄}}</span></div>
       <div class="field-row"><span class="field-label">性别</span><span class="field-value">{{性别}}</span></div>
-      <div class="field-row"><span class="field-label">职业</span><span class="field-value">{{职业}}</span></div>
     </div>
     <div class="page page-1">
       <div class="field-row"><span class="field-label">生命值</span><span class="field-value">{{生命值}}</span></div>
@@ -110,8 +110,9 @@ input[id^="tp2-"]:checked ~ .page-content .page-2 { display: block; }
    - 这样每个状态栏的 radio name 唯一，不会冲突
 
 2. **字段占位符**:
-   - 使用 {{字段名}} 格式，例如：{{姓名}}、{{年龄}}、{{HP}}
-   - **第一个字段会被 regex 捕获为 $1，用作唯一标识**
+   - 使用 {{字段名}} 格式，例如：{{时间}}、{{姓名}}、{{年龄}}
+   - **🚨 第一个字段必须是 {{时间}}！** 因为 $1 用作唯一标识，时间天然唯一
+   - 第一页第一个字段固定为时间，格式如：2025年7月2日 下午 14:35
    - 合理分布在 3 个页面
    - 字段名简洁专业，不使用 emoji
 

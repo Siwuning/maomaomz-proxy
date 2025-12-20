@@ -1787,32 +1787,19 @@
             :disabled="isGeneratingWorldbook || !worldbookDescription.trim()"
             style="
               padding: 12px 24px;
-              background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-              border: none;
-              border-radius: 12px;
-              color: white;
+              background: rgba(30, 41, 59, 0.5);
+              border: 1px solid #4a4a4a;
+              border-radius: 6px;
+              color: #e0e0e0;
               font-size: 13px;
-              font-weight: 600;
+              font-weight: 500;
               cursor: pointer;
-              transition: all 0.3s ease;
-              box-shadow: 0 3px 12px rgba(255, 193, 7, 0.3);
-              position: relative;
-              overflow: hidden;
+              transition: all 0.2s ease;
             "
             @click="handleGenerateWorldbookEntry"
+            @mouseenter="$event.target.style.background = 'rgba(40, 51, 69, 0.7)'"
+            @mouseleave="$event.target.style.background = 'rgba(30, 41, 59, 0.5)'"
           >
-            <div
-              style="
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-                transition: left 0.5s;
-              "
-              class="shimmer-effect"
-            ></div>
             <i class="fa-solid fa-magic" style="font-size: 14px; margin-right: 6px"></i>
             {{ isGeneratingWorldbook ? '生成中...' : '生成条目' }}
           </button>
@@ -1822,17 +1809,18 @@
             :disabled="isBatchGenerating"
             style="
               padding: 12px 24px;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              border: none;
-              border-radius: 12px;
-              color: white;
+              background: rgba(30, 41, 59, 0.5);
+              border: 1px solid #4a4a4a;
+              border-radius: 6px;
+              color: #e0e0e0;
               font-size: 13px;
-              font-weight: 600;
+              font-weight: 500;
               cursor: pointer;
-              transition: all 0.3s ease;
-              box-shadow: 0 3px 12px rgba(102, 126, 234, 0.3);
+              transition: all 0.2s ease;
             "
             @click="showBatchDialog = true"
+            @mouseenter="$event.target.style.background = 'rgba(40, 51, 69, 0.7)'"
+            @mouseleave="$event.target.style.background = 'rgba(30, 41, 59, 0.5)'"
           >
             <i class="fa-solid fa-layer-group" style="font-size: 14px; margin-right: 6px"></i>
             批量生成
@@ -1842,32 +1830,19 @@
             class="clear-button"
             style="
               padding: 12px 24px;
-              background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-              border: none;
-              border-radius: 12px;
-              color: white;
+              background: rgba(30, 41, 59, 0.5);
+              border: 1px solid #4a4a4a;
+              border-radius: 6px;
+              color: #e0e0e0;
               font-size: 13px;
-              font-weight: 600;
+              font-weight: 500;
               cursor: pointer;
-              transition: all 0.3s ease;
-              box-shadow: 0 3px 12px rgba(255, 107, 107, 0.3);
-              position: relative;
-              overflow: hidden;
+              transition: all 0.2s ease;
             "
             @click="clearWorldbookForm"
+            @mouseenter="$event.target.style.background = 'rgba(40, 51, 69, 0.7)'"
+            @mouseleave="$event.target.style.background = 'rgba(30, 41, 59, 0.5)'"
           >
-            <div
-              style="
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-                transition: left 0.5s;
-              "
-              class="shimmer-effect"
-            ></div>
             <i class="fa-solid fa-trash" style="font-size: 14px; margin-right: 6px"></i>
             清空
           </button>
@@ -2026,32 +2001,19 @@
                 :disabled="isModifyingWorldbook || !worldbookModifyRequest.trim()"
                 style="
                   padding: 12px 24px;
-                  background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
-                  border: none;
-                  border-radius: 12px;
-                  color: white;
+                  background: rgba(30, 41, 59, 0.5);
+                  border: 1px solid #4a4a4a;
+                  border-radius: 6px;
+                  color: #e0e0e0;
                   font-size: 13px;
-                  font-weight: 600;
+                  font-weight: 500;
                   cursor: pointer;
-                  transition: all 0.3s ease;
-                  box-shadow: 0 3px 12px rgba(255, 165, 0, 0.3);
-                  position: relative;
-                  overflow: hidden;
+                  transition: all 0.2s ease;
                 "
                 @click="handleModifyWorldbookEntry"
+                @mouseenter="$event.target.style.background = 'rgba(40, 51, 69, 0.7)'"
+                @mouseleave="$event.target.style.background = 'rgba(30, 41, 59, 0.5)'"
               >
-                <div
-                  style="
-                    position: absolute;
-                    top: 0;
-                    left: -100%;
-                    width: 100%;
-                    height: 100%;
-                    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-                    transition: left 0.5s;
-                  "
-                  class="shimmer-effect"
-                ></div>
                 <i class="fa-solid fa-wand-magic-sparkles" style="font-size: 14px; margin-right: 6px"></i>
                 {{ isModifyingWorldbook ? '修改中...' : 'AI修改' }}
               </button>
@@ -2060,32 +2022,19 @@
                 class="clear-modify-button"
                 style="
                   padding: 12px 24px;
-                  background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
-                  border: none;
-                  border-radius: 12px;
-                  color: white;
+                  background: rgba(30, 41, 59, 0.5);
+                  border: 1px solid #4a4a4a;
+                  border-radius: 6px;
+                  color: #e0e0e0;
                   font-size: 13px;
-                  font-weight: 600;
+                  font-weight: 500;
                   cursor: pointer;
-                  transition: all 0.3s ease;
-                  box-shadow: 0 3px 12px rgba(108, 117, 125, 0.3);
-                  position: relative;
-                  overflow: hidden;
+                  transition: all 0.2s ease;
                 "
                 @click="clearWorldbookModifyRequest"
+                @mouseenter="$event.target.style.background = 'rgba(40, 51, 69, 0.7)'"
+                @mouseleave="$event.target.style.background = 'rgba(30, 41, 59, 0.5)'"
               >
-                <div
-                  style="
-                    position: absolute;
-                    top: 0;
-                    left: -100%;
-                    width: 100%;
-                    height: 100%;
-                    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-                    transition: left 0.5s;
-                  "
-                  class="shimmer-effect"
-                ></div>
                 <i class="fa-solid fa-eraser" style="font-size: 14px; margin-right: 6px"></i>
                 清空修改需求
               </button>

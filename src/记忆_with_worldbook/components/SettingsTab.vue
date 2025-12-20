@@ -306,7 +306,9 @@
                   onmouseout="this.style.background = 'rgba(30, 41, 59, 0.5)'"
                   @click="handle_fetch_models"
                 >
-                  {{ loading_models ? '拉取中...' : '🔍 拉取模型列表' }}
+                  <i v-if="loading_models" class="fa-solid fa-spinner fa-spin"></i>
+                  <i v-else class="fa-solid fa-list-check"></i>
+                  {{ loading_models ? '拉取中...' : '拉取模型列表' }}
                 </button>
                 <button
                   class="save-button"
@@ -331,7 +333,8 @@
                   onmouseout="this.style.background = 'rgba(30, 41, 59, 0.5)'"
                   @click="handleSaveApiConfig"
                 >
-                  💾 保存配置
+                  <i class="fa-solid fa-floppy-disk"></i>
+                  保存配置
                 </button>
                 <button
                   :disabled="testingApi"
@@ -357,7 +360,9 @@
                   onmouseout="this.style.background = 'rgba(30, 41, 59, 0.5)'"
                   @click="testApiConnection"
                 >
-                  {{ testingApi ? '测试中...' : '🔗 测试连接' }}
+                  <i v-if="testingApi" class="fa-solid fa-spinner fa-spin"></i>
+                  <i v-else class="fa-solid fa-plug"></i>
+                  {{ testingApi ? '测试中...' : '测试连接' }}
                 </button>
               </div>
             </div>

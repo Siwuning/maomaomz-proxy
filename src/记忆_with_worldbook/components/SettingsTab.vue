@@ -800,49 +800,68 @@
           </small>
         </div>
 
-        <!-- 自定义提示词模板 -->
+        <!-- 自定义提示词模板（高级选项，默认折叠） -->
         <div class="form-group" style="margin-bottom: 18px !important">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px">
-            <label style="color: #ccc; font-size: 13px">
-              自定义提示词模板
-              <span style="color: #888; font-size: 11px; margin-left: 6px">(可选)</span>
-            </label>
-            <button
+          <div
+            style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 0"
+            @click="showCustomPromptEditor = !showCustomPromptEditor"
+          >
+            <i
+              :class="showCustomPromptEditor ? 'fa-chevron-down' : 'fa-chevron-right'"
+              class="fa-solid"
+              style="color: #888; font-size: 10px; width: 12px"
+            ></i>
+            <span style="color: #888; font-size: 12px">高级：自定义提示词模板</span>
+            <span
               v-if="settings.custom_summary_prompt"
-              style="
-                padding: 4px 10px;
-                background: rgba(239, 68, 68, 0.2);
-                border: 1px solid rgba(239, 68, 68, 0.4);
-                border-radius: 4px;
-                color: #ef4444;
-                font-size: 11px;
-                cursor: pointer;
-              "
-              @click="settings.custom_summary_prompt = ''"
+              style="background: #10b981; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px"
             >
-              清空
-            </button>
+              已设置
+            </span>
           </div>
-          <textarea
-            v-model="settings.custom_summary_prompt"
-            placeholder="留空使用默认模板。可用变量：&#10;{{messages}} - 对话内容&#10;{{userName}} - 用户名&#10;{{charName}} - 角色名&#10;{{maxTokens}} - 最大字数"
-            style="
-              width: 100%;
-              min-height: 120px;
-              padding: 12px;
-              background: #2a2a2a;
-              border: 1px solid #3a3a3a;
-              border-radius: 6px;
-              color: #e0e0e0;
-              font-size: 12px;
-              font-family: monospace;
-              line-height: 1.5;
-              resize: vertical;
-            "
-          ></textarea>
-          <small style="color: #888; font-size: 11px; margin-top: 6px; display: block; line-height: 1.6">
-            💡 自定义总结提示词，留空使用内置模板。支持变量替换，AI 将按此格式生成总结。
-          </small>
+          <div v-if="showCustomPromptEditor" style="margin-top: 8px">
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 6px">
+              <button
+                v-if="settings.custom_summary_prompt"
+                style="
+                  padding: 4px 10px;
+                  background: rgba(239, 68, 68, 0.2);
+                  border: 1px solid rgba(239, 68, 68, 0.4);
+                  border-radius: 4px;
+                  color: #ef4444;
+                  font-size: 11px;
+                  cursor: pointer;
+                "
+                @click="settings.custom_summary_prompt = ''"
+              >
+                清空
+              </button>
+            </div>
+            <textarea
+              v-model="settings.custom_summary_prompt"
+              placeholder="在此输入自定义提示词模板..."
+              style="
+                width: 100%;
+                min-height: 120px;
+                padding: 12px;
+                background: #2a2a2a;
+                border: 1px solid #3a3a3a;
+                border-radius: 6px;
+                color: #e0e0e0;
+                font-size: 12px;
+                font-family: monospace;
+                line-height: 1.5;
+                resize: vertical;
+              "
+            ></textarea>
+            <small style="color: #888; font-size: 11px; margin-top: 6px; display: block; line-height: 1.8">
+              可用变量：<code style="background: #333; padding: 1px 4px; border-radius: 3px">{{ messages }}</code>
+              对话内容、
+              <code style="background: #333; padding: 1px 4px; border-radius: 3px">{{ userName }}</code> 用户名、
+              <code style="background: #333; padding: 1px 4px; border-radius: 3px">{{ charName }}</code> 角色名、
+              <code style="background: #333; padding: 1px 4px; border-radius: 3px">{{ maxTokens }}</code> 最大字数
+            </small>
+          </div>
         </div>
 
         <div v-if="settings.auto_summarize_enabled" class="form-group" style="margin-bottom: 18px !important">
@@ -1718,6 +1737,8 @@ const tavernApiKey = ref<string>('');
 const tavernPresets = ref<Array<{ name: string; value: string }>>([]);
 // 当前选中的预设
 const selectedTavernPreset = ref<string>('');
+// 是否显示自定义提示词编辑器
+const showCustomPromptEditor = ref(false);
 
 // 刷新酒馆信息（预设列表和当前配置）
 const refreshTavernInfo = () => {

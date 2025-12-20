@@ -21,6 +21,13 @@ if (typeof window !== 'undefined' && typeof (window as any).z === 'undefined') {
 }
 
 $(() => {
+  // 🔒 防止重复加载：检查全局标记
+  if ((window as any).__MAOMAOMZ_LOADED__) {
+    console.log('⚠️ 插件已加载，跳过重复初始化');
+    return;
+  }
+  (window as any).__MAOMAOMZ_LOADED__ = true;
+
   setTimeout(async () => {
     console.log('🐱 猫猫的记忆管理工具开始初始化');
 

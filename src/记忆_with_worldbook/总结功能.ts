@@ -116,23 +116,44 @@ async function smartFetch(url: string, options: RequestInit = {}): Promise<Respo
   const endpointType = detectEndpointType(url);
   const isLocalEndpoint = endpointType === 'local' || endpointType === 'reverse-proxy';
 
-  // 对于本地端点（包括本地反代），先尝试直接请求
-  if (isLocalEndpoint) {
+  // 🔥 添加超时机制（3分钟）
+  const FETCH_TIMEOUT = 3 * 60 * 1000;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+  const fetchOptions = { ...options, signal: controller.signal };
+
+  try {
+    // 对于本地端点（包括本地反代），先尝试直接请求
+    if (isLocalEndpoint) {
+      try {
+        const response = await fetch(url, fetchOptions);
+        clearTimeout(timeoutId);
+        return response;
+      } catch (directError) {
+        if ((directError as Error).name === 'AbortError') {
+          throw new Error('API 请求超时（3分钟），请检查网络连接或 API 服务状态');
+        }
+        // 本地直接请求失败，尝试酒馆后端代理
+        clearTimeout(timeoutId);
+        return await tavernProxyFetch(url, options);
+      }
+    }
+
+    // 对于远程端点，先尝试直接请求，如果失败（可能是 CORS）则使用代理
     try {
-      const response = await fetch(url, options);
+      const response = await fetch(url, fetchOptions);
+      clearTimeout(timeoutId);
       return response;
     } catch (directError) {
-      // 本地直接请求失败，尝试酒馆后端代理
+      if ((directError as Error).name === 'AbortError') {
+        throw new Error('API 请求超时（3分钟），请检查网络连接或 API 服务状态');
+      }
+      clearTimeout(timeoutId);
       return await tavernProxyFetch(url, options);
     }
-  }
-
-  // 对于远程端点，先尝试直接请求，如果失败（可能是 CORS）则使用代理
-  try {
-    const response = await fetch(url, options);
-    return response;
-  } catch (directError) {
-    return await tavernProxyFetch(url, options);
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw error;
   }
 }
 
@@ -663,7 +684,16 @@ ${formattedMessages}
 
     try {
       const generateFn = SillyTavern.generateQuietPrompt();
-      const result = await generateFn(summaryPrompt, false, true, undefined, undefined, settings.max_tokens);
+      // 🔥 添加超时机制（5分钟）
+      const TAVERN_API_TIMEOUT = 5 * 60 * 1000;
+      const resultPromise = generateFn(summaryPrompt, false, true, undefined, undefined, settings.max_tokens);
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(
+          () => reject(new Error('酒馆 API 请求超时（5分钟），请检查 API 连接或稍后重试')),
+          TAVERN_API_TIMEOUT,
+        );
+      });
+      const result = await Promise.race([resultPromise, timeoutPromise]);
 
       if (!result || result.trim() === '') {
         throw new Error('酒馆 API 返回了空结果');
@@ -854,7 +884,16 @@ export async function summarizeText(prompt: string): Promise<string> {
 
     try {
       const generateFn = SillyTavern.generateQuietPrompt();
-      const result = await generateFn(prompt, false, true, undefined, undefined, settings.max_tokens || 4000);
+      // 🔥 添加超时机制（5分钟）
+      const TAVERN_API_TIMEOUT = 5 * 60 * 1000;
+      const resultPromise = generateFn(prompt, false, true, undefined, undefined, settings.max_tokens || 4000);
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(
+          () => reject(new Error('酒馆 API 请求超时（5分钟），请检查 API 连接或稍后重试')),
+          TAVERN_API_TIMEOUT,
+        );
+      });
+      const result = await Promise.race([resultPromise, timeoutPromise]);
 
       if (!result || result.trim() === '') {
         throw new Error('酒馆 API 返回了空结果');

@@ -1139,10 +1139,10 @@ export async function checkAuthorization(): Promise<boolean> {
       return false;
     }
 
-    // 🔥 网络错误
+    // 🔥 网络错误 - 显示明确的对话框而不是只靠 toastr
     if (result.networkError) {
       console.error('❌ 网络错误，需要重新验证');
-      (window as any).toastr?.error('❌ 无法连接授权服务器\n请检查网络后刷新页面', '网络错误', { timeOut: 0 });
+      showNetworkRequiredDialog();
       return false;
     }
 

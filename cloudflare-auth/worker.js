@@ -407,10 +407,29 @@ function isFakeUrl(url) {
   return false;
 }
 
-// 🚨 检测 URL 是否看起来像真实的 API 端点
+// 🚨 检测 URL 是否看起来像真实的 API 端点（放宽验证）
 function looksLikeRealApiEndpoint(url) {
   if (!url || url === 'unknown') return false;
   const lowerUrl = url.toLowerCase();
+
+  // 🔥 排除明显的假 URL
+  const fakePatterns = ['localhost', '127.0.0.1', '0.0.0.0', 'example.com', 'test.com', '[object', 'undefined', 'null'];
+  for (const fake of fakePatterns) {
+    if (lowerUrl.includes(fake)) {
+      return false;
+    }
+  }
+
+  // 🔥 只要看起来像个正常的 URL 就行（包含协议和域名）
+  // 放宽验证：只要是 https:// 开头且包含 . 的都算真实端点
+  if (lowerUrl.startsWith('https://') && lowerUrl.includes('.')) {
+    return true;
+  }
+
+  // http:// 开头的也行（某些自建服务）
+  if (lowerUrl.startsWith('http://') && lowerUrl.includes('.') && !lowerUrl.includes('localhost')) {
+    return true;
+  }
 
   // 应该包含常见的 API 特征
   const apiPatterns = [
@@ -773,7 +792,7 @@ async function handleVerify(request, env, corsHeaders) {
     if (!isValid) {
       // 记录失败的详细日志（不记录IP）
       await logVerification(env, {
-        code: code.substring(0, 8) + '****', // 脱敏
+        code: code, // 显示完整授权码，方便排查
         isValid: false,
         apiEndpoint: cleanApiEndpoint,
         model: model || 'unknown',
@@ -2562,14 +2581,16 @@ async function recordDeviceTrack(deviceId, apiEndpoint) {
     // 限制每个设备最多记录 20 个端点
     if (tracks[deviceId].endpoints.length > 20) {
       tracks[deviceId].endpoints = tracks[deviceId].endpoints
-        .sort((a, b) => new Date(b.lastUsed) - new Date(a.lastUsed))
+        .sort((a, b) => new Date(b.lastUsed).getTime() - new Date(a.lastUsed).getTime())
         .slice(0, 20);
     }
 
     // 限制总设备数（保留最近活跃的 500 个）
     const deviceIds = Object.keys(tracks);
     if (deviceIds.length > 500) {
-      const sorted = deviceIds.sort((a, b) => new Date(tracks[b].lastSeen) - new Date(tracks[a].lastSeen));
+      const sorted = deviceIds.sort(
+        (a, b) => new Date(tracks[b].lastSeen).getTime() - new Date(tracks[a].lastSeen).getTime(),
+      );
       const toKeep = sorted.slice(0, 500);
       const newTracks = {};
       for (const id of toKeep) {

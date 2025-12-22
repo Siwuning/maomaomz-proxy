@@ -34,6 +34,7 @@
     "*.d.ts",
     "@types/**/*.d.ts",
     "src/**/*.ts",
+    "src/**/*.d.ts",
     "../../../../**/*.js" // for intelligence
   ],
   "exclude": ["**/node_modules/**", "**/dist/**", "supabase/**"]

@@ -944,18 +944,44 @@ export async function summarizeText(prompt: string): Promise<string> {
 
   const data = await response.json();
 
-  // 提取返回内容
+  // 提取返回内容（支持多种格式）
   let content: string | null = null;
+  // 格式 1: OpenAI 标准格式
   if (data.choices?.[0]?.message?.content) {
     content = data.choices[0].message.content;
-  } else if (typeof data.content === 'string') {
+  }
+  // 格式 2: 直接返回文本
+  else if (typeof data.content === 'string') {
     content = data.content;
-  } else if (typeof data === 'string') {
+  }
+  // 格式 3: 直接返回字符串
+  else if (typeof data === 'string') {
     content = data;
+  }
+  // 格式 4: { result: "..." }
+  else if (typeof data.result === 'string') {
+    content = data.result;
+  }
+  // 格式 5: { text: "..." }
+  else if (typeof data.text === 'string') {
+    content = data.text;
+  }
+  // 格式 6: { response: "..." }
+  else if (typeof data.response === 'string') {
+    content = data.response;
+  }
+  // 格式 7: Gemini 原生格式 { candidates: [{ content: { parts: [{ text: "..." }] } }] }
+  else if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+    content = data.candidates[0].content.parts[0].text;
   }
 
   if (!content) {
-    throw new Error('API 返回数据格式不符合预期');
+    throw new Error(
+      `API 返回数据格式不符合预期。\n\n` +
+        `期望格式: { choices: [{ message: { content: "..." } }] }\n\n` +
+        `实际返回: ${JSON.stringify(data).substring(0, 500)}...\n\n` +
+        `请检查您的 API 端点是否为 OpenAI 兼容格式。`,
+    );
   }
 
   return content;

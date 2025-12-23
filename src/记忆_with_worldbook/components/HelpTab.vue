@@ -172,6 +172,7 @@
         v-show="expandedSections.usageGuide"
         style="color: #e0e0e0; font-size: 14px; line-height: 1.8; animation: fadeIn 0.3s ease-in"
       >
+        <!-- eslint-disable-next-line vue/no-v-html -->
         <div
           style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
           class="markdown-content"
@@ -217,6 +218,7 @@
         v-show="expandedSections.changelog"
         style="color: #e0e0e0; font-size: 14px; line-height: 1.8; animation: fadeIn 0.3s ease-in"
       >
+        <!-- eslint-disable-next-line vue/no-v-html -->
         <div
           style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
           class="markdown-content"

@@ -1030,18 +1030,26 @@ function createMinimizeIcon() {
     }
   });
 
-  // 使图标可以拖动
-  icon.draggable({
-    containment: 'window',
-    scroll: false,
-    start: function () {
-      $(this).css('transition', 'none');
-      quickMenu.hide(); // 拖动时隐藏菜单
-    },
-    stop: function () {
-      $(this).css('transition', 'all 0.3s ease');
-    },
-  });
+  // 使图标可以拖动（需要 jQuery UI，加 try-catch 防止报错）
+  try {
+    if (typeof (icon as any).draggable === 'function') {
+      icon.draggable({
+        containment: 'window',
+        scroll: false,
+        start: function () {
+          $(this).css('transition', 'none');
+          quickMenu.hide(); // 拖动时隐藏菜单
+        },
+        stop: function () {
+          $(this).css('transition', 'all 0.3s ease');
+        },
+      });
+    } else {
+      console.warn('⚠️ jQuery UI draggable 不可用，图标将无法拖动');
+    }
+  } catch (e) {
+    console.warn('⚠️ 设置图标拖动失败，图标将无法拖动:', e);
+  }
 
   $('body').append(quickMenu);
   $('body').append(icon);

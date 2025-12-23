@@ -29,6 +29,25 @@ $(() => {
   }
   (window as any).__MAOMAOMZ_LOADED__ = true;
 
+  // 🔥 暴露调试命令（即使授权失败也可用）
+  (window as any).maomaomz = (window as any).maomaomz || {};
+  (window as any).maomaomz.status = () => {
+    console.log('🔍 插件状态:');
+    console.log('  - 已加载:', !!(window as any).__MAOMAOMZ_LOADED__);
+    console.log('  - 已授权:', !!(window as any).__MAOMAOMZ_AUTHORIZED__);
+    console.log('  - UI已加载:', !!(window as any).__MAOMAOMZ_UI_LOADED__);
+    console.log('  - 面板存在:', $('#memoryManagementPanel').length > 0);
+    console.log('  - 图标存在:', $('#memoryPanelMinimizeIcon').length > 0);
+    return {
+      loaded: !!(window as any).__MAOMAOMZ_LOADED__,
+      authorized: !!(window as any).__MAOMAOMZ_AUTHORIZED__,
+      uiLoaded: !!(window as any).__MAOMAOMZ_UI_LOADED__,
+      panelExists: $('#memoryManagementPanel').length > 0,
+      iconExists: $('#memoryPanelMinimizeIcon').length > 0,
+    };
+  };
+  console.log('💡 调试命令已就绪: maomaomz.status()');
+
   setTimeout(async () => {
     console.log('🐱 猫猫的记忆管理工具开始初始化');
 
@@ -38,6 +57,7 @@ $(() => {
 
     if (!authorized) {
       console.error('❌ 授权验证失败，插件功能已被禁用');
+      (window as any).__MAOMAOMZ_AUTHORIZED__ = false;
 
       // 显示错误提示
       setTimeout(() => {
@@ -53,6 +73,7 @@ $(() => {
       return;
     }
 
+    (window as any).__MAOMAOMZ_AUTHORIZED__ = true;
     console.log('✅ 授权验证通过，检查版本更新...');
 
     // 🔄 版本检查（非阻塞，只提示不强制）
@@ -72,7 +93,15 @@ $(() => {
     // 🔐 授权通过且版本最新后才加载 UI 模块
     await import('./浮动面板');
     await import('./添加导航按钮');
+    (window as any).__MAOMAOMZ_UI_LOADED__ = true;
     console.log('✅ UI 模块已加载');
+
+    // 🎉 显示加载成功提示
+    setTimeout(() => {
+      if ((window as any).toastr) {
+        (window as any).toastr.success('🐱 猫猫插件已加载！右上角有图标', '加载成功', { timeOut: 3000 });
+      }
+    }, 500);
 
     // 延迟一下确保UI完全加载
     setTimeout(() => {

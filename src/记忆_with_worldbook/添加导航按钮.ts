@@ -106,57 +106,6 @@ $(() => {
       setTimeout(addExtensionSettingsEntry, 300);
     });
 
-    // 🔥 移动端专用：添加固定底部悬浮按钮
-    const addMobileFloatingButton = () => {
-      const isMobile = window.innerWidth <= 768;
-      if (!isMobile) return;
-
-      if ($('#maomaomz-mobile-btn').length > 0) return;
-
-      const mobileBtn = $(`
-        <div id="maomaomz-mobile-btn" style="
-          position: fixed !important;
-          bottom: 80px !important;
-          left: 10px !important;
-          width: 50px !important;
-          height: 50px !important;
-          background: linear-gradient(135deg, #4a9eff 0%, #2d7fd3 100%) !important;
-          border: 2px solid #fff !important;
-          border-radius: 50% !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          cursor: pointer !important;
-          z-index: 2147483647 !important;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
-          font-size: 24px !important;
-          visibility: visible !important;
-          opacity: 1 !important;
-        ">🐱</div>
-      `);
-
-      mobileBtn.on('click', () => {
-        const panel = $('#memoryManagementPanel');
-        if (panel.length > 0) {
-          panel.fadeIn(200);
-          (window as any).toastr?.success('🐱 面板已打开！', '', { timeOut: 2000 });
-        } else {
-          (window as any).toastr?.error('面板未加载，请刷新页面', '错误');
-        }
-      });
-
-      $('body').append(mobileBtn);
-      console.log('✅ 移动端悬浮按钮已添加');
-    };
-
-    // 延迟添加移动端按钮
-    setTimeout(addMobileFloatingButton, 2000);
-
-    // 窗口大小变化时检查
-    $(window).on('resize', () => {
-      setTimeout(addMobileFloatingButton, 500);
-    });
-
     const addNavButton = () => {
       // 防止重复添加
       if (isAdding) {

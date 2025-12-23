@@ -51,6 +51,13 @@ $(() => {
   setTimeout(async () => {
     console.log('🐱 猫猫的记忆管理工具开始初始化');
 
+    // 🔥 立即显示加载提示（在授权之前）
+    setTimeout(() => {
+      if ((window as any).toastr) {
+        (window as any).toastr.info('🐱 猫猫插件加载中...', '', { timeOut: 3000 });
+      }
+    }, 100);
+
     // 🔐 UI加载后进行授权验证
     console.log('🔐 开始授权验证...');
     const authorized = await checkAuthorization();

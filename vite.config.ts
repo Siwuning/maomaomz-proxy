@@ -31,6 +31,9 @@ const relative_sillytavern_path = path.relative(
 );
 
 export default defineConfig(({ mode }) => ({
+  // 🔥 关键：使用相对路径，让 chunk 从插件 dist 目录加载
+  base: './',
+
   plugins: [
     vue({
       features: {

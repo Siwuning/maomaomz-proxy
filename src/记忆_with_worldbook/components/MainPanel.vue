@@ -228,7 +228,9 @@
         z-index: 1;
       "
     >
-      <component :is="currentComponent" :key="activeTab" v-bind="componentProps" />
+      <ErrorBoundary :key="activeTab + '-boundary'">
+        <component :is="currentComponent" :key="activeTab" v-bind="componentProps" />
+      </ErrorBoundary>
     </div>
   </div>
 </template>

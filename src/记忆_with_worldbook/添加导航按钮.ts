@@ -3,6 +3,92 @@ $(() => {
   setTimeout(() => {
     let isAdding = false;
 
+    // 🔥 在扩展设置页面添加备用入口
+    const addExtensionSettingsEntry = () => {
+      // 查找扩展设置区域
+      const extensionsSettings = $('#extensions_settings, #extensions_settings2');
+      if (extensionsSettings.length === 0) {
+        console.log('扩展设置区域未找到，稍后重试...');
+        setTimeout(addExtensionSettingsEntry, 1000);
+        return;
+      }
+
+      // 检查是否已添加
+      if ($('#maomaomz-extension-entry').length > 0) {
+        return;
+      }
+
+      // 创建入口卡片
+      const entryCard = $(`
+        <div id="maomaomz-extension-entry" class="extension_container" style="
+          background: linear-gradient(135deg, rgba(74, 158, 255, 0.1) 0%, rgba(42, 42, 42, 0.8) 100%);
+          border: 1px solid #4a9eff;
+          border-radius: 8px;
+          padding: 12px 15px;
+          margin: 10px 0;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+        ">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 24px;">🐱</span>
+            <div>
+              <div style="font-weight: bold; color: #4a9eff;">猫猫的记忆管理工具</div>
+              <div style="font-size: 12px; color: #888;">点击按钮打开插件面板</div>
+            </div>
+          </div>
+          <button id="maomaomz-open-panel-btn" class="menu_button" style="
+            background: #4a9eff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+          ">
+            打开面板
+          </button>
+        </div>
+      `);
+
+      // 添加到扩展设置区域的最前面
+      extensionsSettings.first().prepend(entryCard);
+
+      // 按钮点击事件
+      $('#maomaomz-open-panel-btn').on('click', function () {
+        const panel = $('#memoryManagementPanel');
+        if (panel.length > 0) {
+          panel.fadeIn(200);
+          // 关闭设置面板
+          $('#drawer-content').removeClass('openDrawer');
+          (window as any).toastr?.success('🐱 面板已打开！', '', { timeOut: 2000 });
+        } else {
+          (window as any).toastr?.error('面板未加载，请刷新页面重试', '错误');
+        }
+      });
+
+      // 按钮悬停效果
+      $('#maomaomz-open-panel-btn')
+        .on('mouseenter', function () {
+          $(this).css({ background: '#5ab0ff', transform: 'scale(1.05)' });
+        })
+        .on('mouseleave', function () {
+          $(this).css({ background: '#4a9eff', transform: 'scale(1)' });
+        });
+
+      console.log('✅ 扩展设置入口已添加');
+    };
+
+    // 添加扩展设置入口
+    addExtensionSettingsEntry();
+
+    // 监听抽屉打开事件，确保入口存在
+    $(document).on('click', '#extensionsMenuButton, [data-tab="extensions"]', () => {
+      setTimeout(addExtensionSettingsEntry, 300);
+    });
+
     const addNavButton = () => {
       // 防止重复添加
       if (isAdding) {

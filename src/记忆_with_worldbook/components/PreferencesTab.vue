@@ -12,9 +12,9 @@
     >
       <h3 style="color: #7a9bb8; margin: 0 0 10px 0; font-size: 18px; font-weight: 600">
         <i class="fa-solid fa-sliders" style="margin-right: 8px"></i>
-        偏好设置
+        {{ t('pref_title') }}
       </h3>
-      <p style="color: #888; margin: 0; font-size: 14px; line-height: 1.6">自定义你的使用体验</p>
+      <p style="color: #888; margin: 0; font-size: 14px; line-height: 1.6">{{ t('pref_subtitle') }}</p>
     </div>
 
     <!-- 界面设置 -->
@@ -29,14 +29,76 @@
     >
       <h4 style="color: #fff; margin: 0 0 15px 0; font-size: 16px; display: flex; align-items: center; gap: 8px">
         <i class="fa-solid fa-desktop" style="color: #6b8299"></i>
-        界面设置
+        {{ t('pref_interface') }}
       </h4>
+
+      <!-- 🌐 语言切换 -->
+      <div
+        class="setting-item"
+        style="
+          margin-bottom: 15px;
+          background: linear-gradient(135deg, rgba(74, 158, 255, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+          border: 1px solid rgba(74, 158, 255, 0.3);
+          border-radius: 10px;
+          padding: 15px;
+        "
+      >
+        <div style="flex: 1">
+          <div
+            style="
+              color: #4a9eff;
+              font-size: 14px;
+              font-weight: 600;
+              margin-bottom: 4px;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            "
+          >
+            <i class="fa-solid fa-globe"></i>
+            Language / 语言
+          </div>
+          <div style="color: #888; font-size: 12px">Switch between Chinese and English interface</div>
+        </div>
+        <div style="display: flex; gap: 8px">
+          <button
+            v-for="option in languageOptions"
+            :key="option.value"
+            style="
+              padding: 8px 16px;
+              border-radius: 8px;
+              border: none;
+              cursor: pointer;
+              font-size: 13px;
+              font-weight: 500;
+              transition: all 0.2s ease;
+              display: flex;
+              align-items: center;
+              gap: 6px;
+            "
+            :style="{
+              background:
+                preferences.language === option.value
+                  ? 'linear-gradient(135deg, #4a9eff 0%, #8b5cf6 100%)'
+                  : 'rgba(30, 41, 59, 0.5)',
+              color: preferences.language === option.value ? '#fff' : '#888',
+              border: preferences.language === option.value ? 'none' : '1px solid #3a3a3a',
+            }"
+            @click="handleLanguageChange(option.value as SupportedLanguage)"
+          >
+            <span>{{ option.flag }}</span>
+            {{ option.label }}
+          </button>
+        </div>
+      </div>
 
       <!-- 自动弹出面板 -->
       <div class="setting-item">
         <div style="flex: 1">
-          <div style="color: #e0e0e0; font-size: 14px; font-weight: 500; margin-bottom: 4px">刷新时自动弹出面板</div>
-          <div style="color: #888; font-size: 12px">页面刷新后自动显示猫猫的小破烂面板</div>
+          <div style="color: #e0e0e0; font-size: 14px; font-weight: 500; margin-bottom: 4px">
+            {{ t('pref_auto_show_panel') }}
+          </div>
+          <div style="color: #888; font-size: 12px">{{ t('pref_auto_show_panel_desc') }}</div>
         </div>
         <label class="maomaomz-toggle-switch">
           <input v-model="preferences.autoShowPanel" type="checkbox" @change="savePreferences" />
@@ -47,8 +109,10 @@
       <!-- 显示任务中心 -->
       <div class="setting-item">
         <div style="flex: 1">
-          <div style="color: #e0e0e0; font-size: 14px; font-weight: 500; margin-bottom: 4px">显示任务中心</div>
-          <div style="color: #888; font-size: 12px">在界面右下角显示任务进度和状态</div>
+          <div style="color: #e0e0e0; font-size: 14px; font-weight: 500; margin-bottom: 4px">
+            {{ t('pref_show_task_manager') }}
+          </div>
+          <div style="color: #888; font-size: 12px">{{ t('pref_show_task_manager_desc') }}</div>
         </div>
         <label class="maomaomz-toggle-switch">
           <input v-model="preferences.showTaskManager" type="checkbox" @change="savePreferences" />
@@ -59,8 +123,10 @@
       <!-- 显示最小化图标 -->
       <div class="setting-item">
         <div style="flex: 1">
-          <div style="color: #e0e0e0; font-size: 14px; font-weight: 500; margin-bottom: 4px">显示最小化图标</div>
-          <div style="color: #888; font-size: 12px">在页面右上角显示猫猫头快捷图标</div>
+          <div style="color: #e0e0e0; font-size: 14px; font-weight: 500; margin-bottom: 4px">
+            {{ t('pref_show_minimize_icon') }}
+          </div>
+          <div style="color: #888; font-size: 12px">{{ t('pref_show_minimize_icon_desc') }}</div>
         </div>
         <label class="maomaomz-toggle-switch">
           <input v-model="preferences.showMinimizeIcon" type="checkbox" @change="savePreferences" />
@@ -71,8 +137,10 @@
       <!-- 设置区块默认展开 -->
       <div class="setting-item" style="margin-bottom: 0">
         <div style="flex: 1">
-          <div style="color: #e0e0e0; font-size: 14px; font-weight: 500; margin-bottom: 4px">设置区块默认展开</div>
-          <div style="color: #888; font-size: 12px">打开设置页面时，各功能区块默认展开还是折叠</div>
+          <div style="color: #e0e0e0; font-size: 14px; font-weight: 500; margin-bottom: 4px">
+            {{ t('pref_sections_expanded') }}
+          </div>
+          <div style="color: #888; font-size: 12px">{{ t('pref_sections_expanded_desc') }}</div>
         </div>
         <label class="maomaomz-toggle-switch">
           <input v-model="preferences.defaultSectionsExpanded" type="checkbox" @change="savePreferences" />
@@ -575,6 +643,10 @@
 
 <script setup lang="ts">
 import { onMounted, reactive } from 'vue';
+import { setLanguage, useI18n, type SupportedLanguage } from '../i18n';
+
+// 国际化
+const { t, currentLanguage, isEnglish } = useI18n();
 
 // 偏好设置接口
 interface Preferences {
@@ -590,6 +662,7 @@ interface Preferences {
   defaultSectionsExpanded: boolean; // 设置页面折叠区块默认展开
   backgroundImage: string; // 背景图片 (base64 或 URL)
   backgroundOpacity: number; // 背景透明度 0-100
+  language: SupportedLanguage; // 界面语言
 }
 
 // 主题色预设
@@ -618,6 +691,16 @@ const defaultPreferences: Preferences = {
   defaultSectionsExpanded: true, // 默认展开
   backgroundImage: '', // 默认无背景
   backgroundOpacity: 30, // 默认 30% 透明度
+  language: 'zh', // 默认中文
+};
+
+// 切换语言
+const handleLanguageChange = (lang: SupportedLanguage) => {
+  preferences.language = lang;
+  setLanguage(lang);
+  savePreferences();
+  // 刷新页面以应用语言变更（简单方案）
+  // window.location.reload();
 };
 
 // 偏好设置状态

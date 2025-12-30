@@ -12,6 +12,7 @@ import { summarizeMessages } from './总结功能';
 // 导入 zod 并立即暴露到全局作用域，避免与其他插件（如 QuickReply）冲突
 // 这必须在其他插件初始化之前执行
 import { z } from 'zod';
+import { loadTranslations } from './i18n';
 import { useTaskStore } from './taskStore';
 
 // 确保 zod 在全局作用域中可用，避免与其他插件（如 QuickReply）冲突
@@ -105,6 +106,9 @@ $(() => {
     }
 
     console.log('✅ 版本已是最新，初始化插件功能...');
+
+    // 🌐 加载语言包
+    await loadTranslations();
 
     // 🔐 授权通过且版本最新后才加载 UI 模块
     await import('./浮动面板');

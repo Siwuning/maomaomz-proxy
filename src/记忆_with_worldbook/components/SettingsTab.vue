@@ -4204,10 +4204,8 @@ const handle_refresh_hidden = async (showToast: boolean = false) => {
           }
           console.log('✅ 所有隐藏状态已重新应用');
         } else {
-          // 🔧 即使没有隐藏列表，也强制刷新 UI（修复 SillyTavern 显示 bug）
-          console.log('🔄 没有隐藏列表，强制刷新 SillyTavern UI...');
-          await setChatMessagesFn([], { refresh: 'all' });
-          console.log('✅ UI 已刷新');
+          // 🔧 没有隐藏列表，只打印日志，不调用 setChatMessages 避免任何副作用
+          console.log('ℹ️ 没有隐藏列表，无需刷新操作');
         }
       }
     } catch (e) {

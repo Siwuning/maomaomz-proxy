@@ -956,7 +956,7 @@
                 "
               >
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px">
-                  <span style="color: #ffc107; font-size: 12px; font-weight: 600">NPC {{ idx + 1 }}</span>
+                  <span style="color: #ffc107; font-size: 12px; font-weight: 600">NPC {{ Number(idx) + 1 }}</span>
                   <button
                     style="
                       padding: 4px 8px;
@@ -967,7 +967,7 @@
                       font-size: 11px;
                       cursor: pointer;
                     "
-                    @click="copyToClipboard(npc, `NPC ${idx + 1} 已复制`)"
+                    @click="copyToClipboard(npc, `NPC ${Number(idx) + 1} 已复制`)"
                   >
                     <i class="fa-solid fa-copy"></i>
                   </button>
@@ -1697,7 +1697,7 @@
             >
               <option value="">选择用户人设条目...</option>
               <option v-for="(entry, idx) in greetingPersonaEntries" :key="idx" :value="idx">
-                {{ entry.name || entry.comment || entry.strategy?.keys?.join(', ') || `条目 ${idx + 1}` }}
+                {{ entry.name || entry.comment || entry.strategy?.keys?.join(', ') || `条目 ${Number(idx) + 1}` }}
               </option>
             </select>
           </div>

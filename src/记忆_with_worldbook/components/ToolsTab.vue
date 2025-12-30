@@ -2136,6 +2136,89 @@
           </button>
         </div>
 
+        <!-- 🆕 从世界书加载已有条目 -->
+        <div
+          class="load-existing-section"
+          style="margin: 20px 0; padding: 15px; background: #1e1e1e; border: 1px dashed #ffc107; border-radius: 8px"
+        >
+          <h5 style="margin: 0 0 12px 0; color: #ffc107; font-size: 14px; font-weight: 600">
+            <i class="fa-solid fa-folder-open" style="margin-right: 6px"></i>
+            从世界书加载已有条目
+          </h5>
+          <p style="margin: 0 0 12px 0; color: #888; font-size: 12px">
+            💡 选择世界书中的已有条目，直接加载并进行 AI 修改
+          </p>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end">
+            <div style="flex: 1; min-width: 150px">
+              <label style="display: block; margin-bottom: 4px; color: #ccc; font-size: 11px">选择世界书：</label>
+              <select
+                v-model="loadExistingWorldbook"
+                style="
+                  width: 100%;
+                  padding: 8px 10px;
+                  background: #2a2a2a;
+                  border: 1px solid #3a3a3a;
+                  border-radius: 4px;
+                  color: #e0e0e0;
+                  font-size: 12px;
+                "
+                @change="loadExistingEntriesList"
+              >
+                <option value="">请选择...</option>
+                <option v-for="wb in availableWorldbooks" :key="wb" :value="wb">{{ wb }}</option>
+              </select>
+            </div>
+            <div style="flex: 2; min-width: 200px">
+              <label style="display: block; margin-bottom: 4px; color: #ccc; font-size: 11px">选择条目：</label>
+              <select
+                v-model="loadExistingEntryUid"
+                :disabled="!loadExistingWorldbook || loadExistingEntries.length === 0"
+                style="
+                  width: 100%;
+                  padding: 8px 10px;
+                  background: #2a2a2a;
+                  border: 1px solid #3a3a3a;
+                  border-radius: 4px;
+                  color: #e0e0e0;
+                  font-size: 12px;
+                "
+              >
+                <option value="">
+                  {{
+                    loadExistingWorldbook
+                      ? loadExistingEntries.length > 0
+                        ? '请选择条目...'
+                        : '该世界书没有条目'
+                      : '请先选择世界书'
+                  }}
+                </option>
+                <option v-for="entry in loadExistingEntries" :key="entry.uid" :value="entry.uid">
+                  {{ entry.comment || entry.key?.join(', ') || '(无名称)' }}
+                </option>
+              </select>
+            </div>
+            <button
+              :disabled="!loadExistingEntryUid"
+              style="
+                padding: 8px 16px;
+                background: rgba(255, 193, 7, 0.15);
+                border: 1px solid #ffc107;
+                border-radius: 4px;
+                color: #ffc107;
+                font-size: 12px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s;
+              "
+              :style="{ opacity: loadExistingEntryUid ? 1 : 0.5 }"
+              @click="loadExistingEntryToEdit"
+            >
+              <i class="fa-solid fa-download" style="margin-right: 4px"></i>
+              加载
+            </button>
+          </div>
+        </div>
+
         <!-- 输出区域 -->
         <div v-if="worldbookEntryOutput" class="output-section">
           <h5 style="margin: 0 0 12px 0; color: #fff; font-size: 14px; font-weight: 600">
@@ -4293,6 +4376,11 @@ const isModifyingWorldbook = ref(false);
 const enableWorldbookStreaming = ref(false); // 世界书条目生成是否启用流式传输
 const worldbookProgressPercent = ref(0); // 世界书条目生成进度
 
+// 🆕 加载已有条目相关
+const loadExistingWorldbook = ref(''); // 选择的世界书
+const loadExistingEntryUid = ref<number | string>(''); // 选择的条目 UID
+const loadExistingEntries = ref<any[]>([]); // 条目列表
+
 // 批量生成相关
 const showBatchDialog = ref(false);
 const batchInput = ref('');
@@ -4334,6 +4422,73 @@ const loadAvailableWorldbooks = () => {
     console.error('❌ 加载世界书列表失败:', error);
     availableWorldbooks.value = [];
   }
+};
+
+// 🆕 加载已有条目列表
+const loadExistingEntriesList = async () => {
+  loadExistingEntryUid.value = '';
+  loadExistingEntries.value = [];
+
+  if (!loadExistingWorldbook.value) return;
+
+  try {
+    const tav = (window as any).TavernHelper;
+    if (!tav) {
+      window.toastr.warning('TavernHelper 不可用');
+      return;
+    }
+
+    // 使用 TavernHelper 获取世界书条目
+    const entries = tav.getWorldbookEntries?.(loadExistingWorldbook.value) || [];
+    loadExistingEntries.value = entries.map((entry: any) => ({
+      uid: entry.uid,
+      comment: entry.comment,
+      key: entry.key,
+      content: entry.content,
+      enabled: entry.enabled,
+      constant: entry.constant,
+      selective: entry.selective,
+      selectiveLogic: entry.selectiveLogic,
+      secondary_keys: entry.secondary_keys,
+      position: entry.position,
+      depth: entry.depth,
+    }));
+    console.log(`✅ 已加载 ${loadExistingEntries.value.length} 个条目`);
+  } catch (error) {
+    console.error('❌ 加载条目失败:', error);
+    window.toastr.error('加载条目失败');
+  }
+};
+
+// 🆕 将选中的已有条目加载到编辑区
+const loadExistingEntryToEdit = () => {
+  if (!loadExistingEntryUid.value) {
+    window.toastr.warning('请先选择条目');
+    return;
+  }
+
+  const entry = loadExistingEntries.value.find(e => e.uid === loadExistingEntryUid.value);
+  if (!entry) {
+    window.toastr.error('未找到该条目');
+    return;
+  }
+
+  // 转换为 worldbookEntryOutput 格式
+  worldbookEntryOutput.value = {
+    name: entry.comment || entry.key?.[0] || '未命名',
+    content: entry.content || '',
+    strategy: {
+      type: entry.constant ? 'constant' : entry.selective ? 'selective' : 'vectorized',
+      keys: entry.key || [],
+      secondary_keys: entry.secondary_keys || [],
+    },
+    // 保存原始 UID，方便后续保存回去
+    uid: entry.uid,
+    _sourceWorldbook: loadExistingWorldbook.value,
+  } as any;
+
+  window.toastr.success(`已加载条目: ${entry.comment || entry.key?.[0] || '未命名'}`);
+  console.log('✅ 已加载条目到编辑区:', worldbookEntryOutput.value);
 };
 
 // 从 localStorage 加载工具数据（插件环境）

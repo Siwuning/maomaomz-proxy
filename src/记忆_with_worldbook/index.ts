@@ -49,7 +49,16 @@ $(() => {
   console.log('💡 调试命令已就绪: maomaomz.status()');
 
   setTimeout(async () => {
+    console.log('====================================');
     console.log('🐱 猫猫的记忆管理工具开始初始化');
+    console.log('====================================');
+    console.log('📍 环境信息:');
+    console.log('  - URL:', window.location.href);
+    console.log('  - 浏览器:', navigator.userAgent.substring(0, 100));
+    console.log('  - jQuery:', typeof $ !== 'undefined' ? '✅' : '❌');
+    console.log('  - TavernHelper:', typeof (window as any).TavernHelper !== 'undefined' ? '✅' : '❌');
+    console.log('  - SillyTavern:', typeof SillyTavern !== 'undefined' ? '✅' : '❌');
+    console.log('====================================');
 
     // 🔥 立即显示加载提示（在授权之前）
     setTimeout(() => {

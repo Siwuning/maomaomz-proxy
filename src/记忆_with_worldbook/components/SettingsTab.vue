@@ -1905,6 +1905,7 @@
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref, watch } from 'vue';
 import {
+  getTavernApiConfig,
   getTavernApiConfigForDisplay,
   getTavernApiPresets,
   getTavernCurrentPreset,
@@ -2106,11 +2107,11 @@ const testApiConnection = async () => {
     let model = '';
 
     if (settings.value.use_tavern_api) {
-      // 使用酒馆 API
-      const config = getTavernApiConfigForDisplay();
-      endpoint = config.url;
-      apiKey = config.key;
-      model = config.model || 'gpt-4o-mini';
+      // 使用酒馆 API - 获取完整配置（不是打码版本）
+      const fullConfig = getTavernApiConfig();
+      endpoint = fullConfig.api_endpoint || '';
+      apiKey = fullConfig.api_key || '';
+      model = fullConfig.model || 'gpt-4o-mini';
     } else {
       // 使用独立配置
       endpoint = settings.value.api_endpoint;

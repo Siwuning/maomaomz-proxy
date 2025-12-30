@@ -989,7 +989,9 @@ function showAuthDialog(allowSkip: boolean = true): Promise<string | null | 'SKI
           to { transform: translateY(0); opacity: 1; }
         }
       </style>
-      ${allowSkip ? `
+      ${
+        allowSkip
+          ? `
       <button
         id="authCloseBtn"
         style="
@@ -1011,7 +1013,9 @@ function showAuthDialog(allowSkip: boolean = true): Promise<string | null | 'SKI
         "
         title="关闭（插件功能将不可用）"
       >✕</button>
-      ` : ''}
+      `
+          : ''
+      }
       <div style="text-align: center; animation: slideUp 0.4s ease;">
         <div style="font-size: 60px; margin-bottom: 20px;">🐱</div>
         <h2 style="
@@ -1089,7 +1093,9 @@ function showAuthDialog(allowSkip: boolean = true): Promise<string | null | 'SKI
           >
             ✅ 验证授权码
           </button>
-          ${allowSkip ? `
+          ${
+            allowSkip
+              ? `
           <button
             id="authSkipBtn"
             style="
@@ -1108,9 +1114,13 @@ function showAuthDialog(allowSkip: boolean = true): Promise<string | null | 'SKI
           >
             暂时跳过
           </button>
-          ` : ''}
+          `
+              : ''
+          }
         </div>
-        ${allowSkip ? `
+        ${
+          allowSkip
+            ? `
         <p style="
           margin-top: 15px;
           font-size: 12px;
@@ -1119,7 +1129,9 @@ function showAuthDialog(allowSkip: boolean = true): Promise<string | null | 'SKI
         ">
           💡 跳过后插件功能不可用，但不影响酒馆正常使用
         </p>
-        ` : ''}
+        `
+            : ''
+        }
         <p style="
           margin-top: 15px;
           font-size: 12px;
@@ -1176,6 +1188,10 @@ function showAuthDialog(allowSkip: boolean = true): Promise<string | null | 'SKI
         skipBtn.style.color = '#888';
       });
       skipBtn.addEventListener('click', handleSkip);
+      skipBtn.addEventListener('touchend', e => {
+        e.preventDefault();
+        handleSkip();
+      });
     }
 
     // 关闭按钮效果
@@ -1189,6 +1205,10 @@ function showAuthDialog(allowSkip: boolean = true): Promise<string | null | 'SKI
         closeBtn.style.color = '#888';
       });
       closeBtn.addEventListener('click', handleSkip);
+      closeBtn.addEventListener('touchend', e => {
+        e.preventDefault();
+        handleSkip();
+      });
     }
 
     // ESC 键关闭（如果允许跳过）
@@ -1205,7 +1225,7 @@ function showAuthDialog(allowSkip: boolean = true): Promise<string | null | 'SKI
 
     // 点击遮罩层关闭（如果允许跳过）
     if (allowSkip) {
-      overlay.addEventListener('click', (e) => {
+      overlay.addEventListener('click', e => {
         if (e.target === overlay) {
           handleSkip();
         }
@@ -1235,6 +1255,11 @@ function showAuthDialog(allowSkip: boolean = true): Promise<string | null | 'SKI
     };
 
     submitBtn.addEventListener('click', handleSubmit);
+    // 🔥 移动端触摸事件支持
+    submitBtn.addEventListener('touchend', e => {
+      e.preventDefault();
+      handleSubmit();
+    });
     input.addEventListener('keypress', e => {
       if (e.key === 'Enter') {
         handleSubmit();
@@ -1283,9 +1308,13 @@ export async function checkAuthorization(): Promise<boolean> {
     // 🔥 网络错误 - 给用户选择：可以跳过或重试
     if (result.networkError) {
       console.warn('⚠️ 网络错误，提示用户');
-      (window as any).toastr?.warning('⚠️ 网络连接失败，无法验证授权码。你可以选择跳过（插件功能不可用）或刷新页面重试', '网络错误', {
-        timeOut: 8000,
-      });
+      (window as any).toastr?.warning(
+        '⚠️ 网络连接失败，无法验证授权码。你可以选择跳过（插件功能不可用）或刷新页面重试',
+        '网络错误',
+        {
+          timeOut: 8000,
+        },
+      );
       // 不阻塞，继续显示授权对话框让用户选择跳过
     }
 
@@ -1342,7 +1371,9 @@ export async function checkAuthorization(): Promise<boolean> {
 
     // 网络错误
     if (result.networkError) {
-      (window as any).toastr?.warning('⚠️ 网络连接失败，请检查网络后重试，或点击"暂时跳过"', '网络错误', { timeOut: 5000 });
+      (window as any).toastr?.warning('⚠️ 网络连接失败，请检查网络后重试，或点击"暂时跳过"', '网络错误', {
+        timeOut: 5000,
+      });
       continue; // 网络错误不计入尝试次数
     }
 
@@ -1352,9 +1383,13 @@ export async function checkAuthorization(): Promise<boolean> {
     (window as any).toastr?.error(result.message, `验证失败 (${attempts}/${MAX_ATTEMPTS})`, { timeOut: 5000 });
 
     if (attempts >= MAX_ATTEMPTS) {
-      (window as any).toastr?.warning('⚠️ 验证失败次数过多。你可以选择"暂时跳过"以继续使用酒馆（插件功能不可用）', '提示', {
-        timeOut: 8000,
-      });
+      (window as any).toastr?.warning(
+        '⚠️ 验证失败次数过多。你可以选择"暂时跳过"以继续使用酒馆（插件功能不可用）',
+        '提示',
+        {
+          timeOut: 8000,
+        },
+      );
       // 不阻塞，继续循环让用户可以选择跳过
     }
   }

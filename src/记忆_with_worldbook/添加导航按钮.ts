@@ -86,6 +86,19 @@ $(() => {
         }
       });
 
+      // 🔥 移动端触摸事件
+      $('#maomaomz-open-panel-btn').on('touchend', function (e) {
+        e.preventDefault();
+        const panel = $('#memoryManagementPanel');
+        if (panel.length > 0) {
+          panel.fadeIn(200);
+          $('#drawer-content').removeClass('openDrawer');
+          (window as any).toastr?.success('🐱 面板已打开！', '', { timeOut: 2000 });
+        } else {
+          (window as any).toastr?.error('面板未加载，请刷新页面重试', '错误');
+        }
+      });
+
       // 按钮悬停效果
       $('#maomaomz-open-panel-btn')
         .on('mouseenter', function () {
@@ -126,6 +139,14 @@ $(() => {
           '#header',
           '.top_header',
           '.navigation',
+          // 🔥 移动端可能的选择器
+          '.drawer-header',
+          '#leftNavDrawerIcon',
+          '.menu_button_icon',
+          '#send_but_sheld',
+          '.range-block',
+          '#rm_button_main',
+          '.rm_button',
         ];
 
         let topBar: JQuery<HTMLElement> = $();
@@ -210,6 +231,25 @@ $(() => {
           console.log('点击mzrodyu猫猫的小破烂导航按钮');
 
           // 打开浮动面板
+          const panel = $('#memoryManagementPanel');
+          if (panel.length > 0) {
+            if (panel.is(':visible')) {
+              panel.fadeOut(200);
+            } else {
+              panel.fadeIn(200);
+            }
+          } else {
+            toastr.error('浮动面板未加载');
+          }
+        });
+
+        // 🔥 移动端触摸事件支持
+        navButton.on('touchend', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          console.log('触摸mzrodyu猫猫的小破烂导航按钮');
+
           const panel = $('#memoryManagementPanel');
           if (panel.length > 0) {
             if (panel.is(':visible')) {

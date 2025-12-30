@@ -643,7 +643,7 @@
 
 <script setup lang="ts">
 import { onMounted, reactive } from 'vue';
-import { setLanguage, useI18n, type SupportedLanguage } from '../i18n';
+import { languageOptions, setLanguage, useI18n, type SupportedLanguage } from '../i18n';
 
 // 国际化
 const { t, currentLanguage, isEnglish } = useI18n();

@@ -191,5 +191,9 @@
   "create_worldbook": "Create Worldbook",
   "export_all": "Export All",
   "clear_all": "Clear All",
-  "debug_tools": "Debug Tools"
+  "debug_tools": "Debug Tools",
+  "floor": "Floor",
+  "bind_to_worldbook": "Bind to Worldbook",
+  "no_summary_records": "No summary records yet",
+  "no_summary_hint": "Use the \"Settings\" tab to create summaries"
 }

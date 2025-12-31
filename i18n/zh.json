@@ -191,5 +191,9 @@
   "create_worldbook": "创建总结世界书",
   "export_all": "导出全部",
   "clear_all": "清空全部",
-  "debug_tools": "调试工具"
+  "debug_tools": "调试工具",
+  "floor": "楼层",
+  "bind_to_worldbook": "绑定到世界书",
+  "no_summary_records": "还没有总结记录",
+  "no_summary_hint": "使用\"设置\"标签页手动创建总结"
 }

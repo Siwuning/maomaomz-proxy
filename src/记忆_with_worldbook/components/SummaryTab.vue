@@ -195,7 +195,7 @@
           <div class="history-info" style="display: flex; align-items: center; gap: 10px; flex: 1">
             <span class="history-number" style="color: #4a9eff; font-weight: bold">#{{ Number(index) + 1 }}</span>
             <span class="history-range" style="color: #888; font-size: 12px"
-              >楼层 {{ item.start_id }} - {{ item.end_id }}</span
+              >{{ t('floor') }} {{ item.start_id }} - {{ item.end_id }}</span
             >
           </div>
           <span class="expand-icon" style="color: #888; font-size: 12px">{{ isExpanded(index) ? '▼' : '▶' }}</span>
@@ -228,7 +228,7 @@
               "
               @click="copySummary(item.content)"
             >
-              <i class="fa-solid fa-copy"></i> 复制
+              <i class="fa-solid fa-copy"></i> {{ t('copy') }}
             </button>
             <button
               class="mini-button worldbook-button"
@@ -249,7 +249,7 @@
               "
               @click="bindToWorldbook(item.content, index)"
             >
-              <i class="fa-solid fa-book"></i> 绑定到世界书
+              <i class="fa-solid fa-book"></i> {{ t('bind_to_worldbook') }}
             </button>
             <button
               class="mini-button delete-button"
@@ -270,7 +270,7 @@
               "
               @click="deleteSummary(index)"
             >
-              <i class="fa-solid fa-trash"></i> 删除
+              <i class="fa-solid fa-trash"></i> {{ t('delete') }}
             </button>
           </div>
           <div
@@ -293,8 +293,8 @@
     </div>
     <div v-else class="empty-state" style="text-align: center; padding: 40px 20px; color: #888">
       <i class="fa-solid fa-inbox" style="font-size: 48px; margin-bottom: 10px; opacity: 0.3"></i>
-      <p style="margin: 10px 0; font-size: 16px">还没有总结记录</p>
-      <small style="font-size: 12px; color: #666">使用"设置"标签页手动创建总结</small>
+      <p style="margin: 10px 0; font-size: 16px">{{ t('no_summary_records') }}</p>
+      <small style="font-size: 12px; color: #666">{{ t('no_summary_hint') }}</small>
     </div>
   </div>
 </template>

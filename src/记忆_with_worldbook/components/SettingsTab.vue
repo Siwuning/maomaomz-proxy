@@ -747,7 +747,7 @@
           "
         >
           <i class="fa-solid fa-bolt" style="color: #fbbf24; font-size: 16px"></i>
-          自动总结
+          {{ t('settings_auto_summary') }}
         </h3>
         <i
           :class="expandedSections['autoSummary'] ? 'fa-chevron-up' : 'fa-chevron-down'"
@@ -778,7 +778,7 @@
               }"
             ></i>
             <span style="color: #fbbf24; font-size: 14px; font-weight: 600">
-              {{ currentSummaryTask.status === 'running' ? '正在总结...' : '总结完成' }}
+              {{ currentSummaryTask.status === 'running' ? t('summarizing') : t('summary_complete') }}
             </span>
           </div>
           <div style="color: #e0e0e0; font-size: 12px; line-height: 1.6">

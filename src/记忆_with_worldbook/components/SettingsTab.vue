@@ -120,7 +120,7 @@
           >
             <div>
               <div style="color: #ffc107; font-size: 14px; font-weight: 600; margin-bottom: 4px">
-                <i class="fa-solid fa-beer-mug-empty" style="margin-right: 6px"></i>使用酒馆 API
+                <i class="fa-solid fa-beer-mug-empty" style="margin-right: 6px"></i>{{ t('settings_use_tavern_api') }}
               </div>
               <div style="color: #999; font-size: 11px; line-height: 1.4">
                 直接使用酒馆主界面配置的 API，完美绕过 CORS 问题<br />
@@ -145,7 +145,7 @@
             "
           >
             <div style="color: #51cf66; font-size: 12px; font-weight: 600; margin-bottom: 10px">
-              ✅ 选择酒馆 API 预设
+              ✅ {{ t('settings_select_preset') }}
             </div>
 
             <!-- 预设选择下拉框 -->

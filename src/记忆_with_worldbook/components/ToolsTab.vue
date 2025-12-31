@@ -49,7 +49,7 @@
           "
         >
           <i class="fa-solid fa-broom" style="color: #ff6b6b; font-size: 18px"></i>
-          反八股工具
+          {{ t('tools_anti_cliche') }}
         </h4>
         <i
           :class="isToolExpanded('antiCliche') ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'"
@@ -469,7 +469,7 @@
           "
         >
           <i class="fa-solid fa-users" style="color: #ffc107; font-size: 18px"></i>
-          NPC 快速生成
+          {{ t('tools_npc_gen') }}
         </h4>
         <i
           :class="isToolExpanded('npcGen') ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'"

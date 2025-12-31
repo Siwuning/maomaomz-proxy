@@ -386,7 +386,7 @@
                 >
                   <i v-if="testingApi" class="fa-solid fa-spinner fa-spin"></i>
                   <i v-else class="fa-solid fa-plug"></i>
-                  {{ testingApi ? '测试中...' : '测试连接' }}
+                  {{ testingApi ? t('testing') : t('test_connection') }}
                 </button>
               </div>
             </div>

@@ -1919,6 +1919,9 @@ import { isApiConfigValid as checkApiConfig, getApiConfigError } from '../utils/
 import { preprocessContent } from '../utils/content-filter';
 import QuickGuide from './QuickGuide.vue';
 
+// 国际化
+const { t } = useI18n();
+
 // 🔥 防御性初始化：确保 store 正确加载
 let settingsStore: ReturnType<typeof useSettingsStore>;
 let settings: ReturnType<typeof storeToRefs<ReturnType<typeof useSettingsStore>>>['settings'];

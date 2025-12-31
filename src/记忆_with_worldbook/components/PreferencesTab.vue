@@ -65,24 +65,26 @@
             v-for="option in languageOptions"
             :key="option.value"
             style="
-              padding: 8px 16px;
-              border-radius: 8px;
-              border: none;
+              padding: 6px 12px;
+              border-radius: 6px;
               cursor: pointer;
-              font-size: 13px;
+              font-size: 12px;
               font-weight: 500;
               transition: all 0.2s ease;
               display: flex;
               align-items: center;
-              gap: 6px;
+              gap: 4px;
             "
             :style="{
               background:
                 preferences.language === option.value
-                  ? 'linear-gradient(135deg, #4a9eff 0%, #8b5cf6 100%)'
+                  ? 'var(--maomaomz-theme-color, #4a9eff)'
                   : 'rgba(30, 41, 59, 0.5)',
               color: preferences.language === option.value ? '#fff' : '#888',
-              border: preferences.language === option.value ? 'none' : '1px solid #3a3a3a',
+              border:
+                preferences.language === option.value
+                  ? '1px solid var(--maomaomz-theme-color, #4a9eff)'
+                  : '1px solid #3a3a3a',
             }"
             @click="handleLanguageChange(option.value as SupportedLanguage)"
           >

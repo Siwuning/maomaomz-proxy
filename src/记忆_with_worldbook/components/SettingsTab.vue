@@ -197,7 +197,7 @@
                   "
                   @click="refreshTavernInfo"
                 >
-                  <i class="fa-solid fa-sync"></i> 刷新
+                  <i class="fa-solid fa-sync"></i> {{ t('refresh') }}
                 </button>
               </div>
             </div>
@@ -206,7 +206,9 @@
 
         <div v-show="!settings.use_tavern_api">
           <div class="form-group" style="margin-bottom: 18px !important">
-            <label style="display: block; margin-bottom: 6px; color: #e8e8e8; font-size: 14px">API 提供商</label>
+            <label style="display: block; margin-bottom: 6px; color: #e8e8e8; font-size: 14px">{{
+              t('settings_api_provider')
+            }}</label>
             <select
               v-model="settings.api_provider"
               style="
@@ -225,13 +227,13 @@
               <option value="openai">OpenAI</option>
               <option value="deepseek">DeepSeek</option>
               <option value="gemini">Gemini AI Studio</option>
-              <option value="local-proxy">本地反代 (无需 API Key)</option>
+              <option value="local-proxy">{{ t('settings_local_proxy') }}</option>
             </select>
           </div>
 
           <div class="form-group" style="margin-bottom: 18px !important">
             <label style="display: block; margin-bottom: 6px; color: #e8e8e8; font-size: 14px">
-              API 端点
+              {{ t('settings_api_endpoint') }}
               <span style="color: #888; font-size: 11px; margin-left: 8px"> (兼容酒馆格式，填写 base URL 即可) </span>
             </label>
             <input

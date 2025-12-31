@@ -601,7 +601,7 @@
                 class="fa-solid"
                 style="color: #888; font-size: 10px; width: 12px"
               ></i>
-              <span style="color: #888; font-size: 12px">高级参数调整</span>
+              <span style="color: #888; font-size: 12px">{{ t('settings_advanced_params') }}</span>
             </div>
             <div v-if="showAdvancedApiParams" style="margin-top: 12px">
               <div class="form-group" style="margin-bottom: 14px !important">

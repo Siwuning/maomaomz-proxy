@@ -4,7 +4,7 @@ import TaskManager from './components/TaskManager.vue';
 import { globalPinia } from './globalPinia';
 import { useSettingsStore, useSummaryHistoryStore } from './settings';
 import { getChatIdSafe, getScriptIdSafe, setGlobalScriptId } from './utils';
-import { manualCheckUpdates } from './versionCheck';
+import { CURRENT_VERSION, manualCheckUpdates } from './versionCheck';
 import { summarizeMessages } from './总结功能';
 // 🔐 UI模块改为动态导入，授权通过后才加载
 // import './浮动面板';
@@ -93,28 +93,57 @@ $(() => {
     (window as any).__MAOMAOMZ_AUTHORIZED__ = true;
     console.log('✅ 授权验证通过，检查版本更新...');
 
-    // 🔄 版本检查（非阻塞，只提示不强制）
-    const { checkForUpdates, CURRENT_VERSION } = await import('./versionCheck');
-    const updateResult = await checkForUpdates(true);
+    // 🛡️ 超时保护函数：防止某个步骤卡住导致整个插件无法加载
+    const withTimeout = <T>(promise: Promise<T>, timeoutMs: number, fallback: T, stepName: string): Promise<T> => {
+      return Promise.race([
+        promise,
+        new Promise<T>(resolve => {
+          setTimeout(() => {
+            console.warn(`⚠️ ${stepName} 超时 (${timeoutMs}ms)，跳过继续加载`);
+            resolve(fallback);
+          }, timeoutMs);
+        }),
+      ]);
+    };
 
-    if (updateResult && updateResult.hasUpdate) {
-      console.log(`📌 发现新版本: ${updateResult.currentVersion} → ${updateResult.latestVersion}`);
-      // 只提示，不阻塞
-      (window as any).toastr?.info(`发现新版本 v${updateResult.latestVersion}，请在扩展管理中更新`, '版本更新', {
-        timeOut: 8000,
-      });
+    // 🔄 版本检查（非阻塞，带超时保护）
+    try {
+      const versionModule = await withTimeout(import('./versionCheck'), 5000, null, '版本检查模块导入');
+
+      const checkForUpdates = versionModule?.checkForUpdates ?? (async () => null);
+
+      const updateResult = await withTimeout(checkForUpdates(true), 8000, null, '版本检查请求');
+
+      if (updateResult && updateResult.hasUpdate) {
+        console.log(`📌 发现新版本: ${updateResult.currentVersion} → ${updateResult.latestVersion}`);
+        // 只提示，不阻塞
+        (window as any).toastr?.info(`发现新版本 v${updateResult.latestVersion}，请在扩展管理中更新`, '版本更新', {
+          timeOut: 8000,
+        });
+      }
+    } catch (e) {
+      console.warn('⚠️ 版本检查失败，跳过继续加载:', e);
     }
 
-    console.log('✅ 版本已是最新，初始化插件功能...');
+    console.log('✅ 版本检查完成，初始化插件功能...');
 
-    // 🌐 加载语言包
-    await loadTranslations();
+    // 🌐 加载语言包（带超时保护）
+    try {
+      await withTimeout(loadTranslations(), 5000, undefined, '语言包加载');
+    } catch (e) {
+      console.warn('⚠️ 语言包加载失败，使用默认语言:', e);
+    }
 
-    // 🔐 授权通过且版本最新后才加载 UI 模块
-    await import('./浮动面板');
-    await import('./添加导航按钮');
-    (window as any).__MAOMAOMZ_UI_LOADED__ = true;
-    console.log('✅ UI 模块已加载');
+    // 🔐 加载 UI 模块（带超时保护和错误处理）
+    try {
+      await withTimeout(import('./浮动面板'), 10000, null, '浮动面板模块');
+      await withTimeout(import('./添加导航按钮'), 10000, null, '导航按钮模块');
+      (window as any).__MAOMAOMZ_UI_LOADED__ = true;
+      console.log('✅ UI 模块已加载');
+    } catch (e) {
+      console.error('❌ UI 模块加载失败:', e);
+      (window as any).toastr?.error('❌ 插件 UI 加载失败，请刷新页面重试', '加载错误', { timeOut: 5000 });
+    }
 
     // 🎉 显示加载成功提示
     setTimeout(() => {
